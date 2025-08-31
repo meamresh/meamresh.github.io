@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amresh Verma - PhD Cosmology Researcher</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header id="header">
+        <nav class="nav-container">
+            <div class="nav-brand">
+                <a href="#hero">Amresh Verma</a>
+            </div>
+            <div class="nav-links">
+                <a href="#about">About</a>
+                <a href="#publications">Publications</a>
+                <a href="#contact">Contact</a>
+            </div>
+            <div class="mobile-menu-btn">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="hero" class="hero">
+        <div class="hero-background"></div>
+        <div class="hero-content">
+            <div class="hero-image">
+                <img src="Adobe Express - file.jpg" alt="Amresh Verma">
+            </div>
+            <h1>Amresh Verma</h1>
+            <p class="hero-subtitle">PhD Researcher in Cosmology</p>
+            <p class="hero-description">
+                Theoretical and observational cosmologist exploring the large-scale structure of the universe, with a focus on dark matter, 
+                gravitational waves, and early universe physics.
+            </p>
+            <div class="hero-buttons">
+                <button class="btn-primary" onclick="scrollToSection('about')">Explore My Research</button>
+                <a href="#contact" class="btn-secondary">Get In Touch</a>
+            </div>
+        </div>
+        <div class="scroll-indicator" onclick="scrollToSection('about')">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6,9 12,15 18,9"></polyline>
+            </svg>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about">
+        <div class="container">
+            <div class="section-header">
+                <h2>About My Research</h2>
+                <p>I'm a PhD researcher at Ariel University, specializing in theoretical and observational cosmology. 
+My research focuses on probing the large-scale structure of the universe and understanding the role of dark matter, 
+gravitational waves, and quantum gravity effects in cosmic evolution.</p>
+            </div>
+
+            <div class="highlight-card">
+    <div class="highlight-icon">🔭</div>
+    <h3>Dark Matter & Quantum Cosmology</h3>
+    <p>Studying the interplay between dark matter and early universe models using observational and theoretical tools.</p>
+</div>
+<div class="highlight-card">
+    <div class="highlight-icon">🌌</div>
+    <h3>Gravitational Wave Background</h3>
+    <p>Exploring signals in stochastic gravitational wave backgrounds from early universe and bouncing cosmologies.</p>
+</div>
+<div class="highlight-card">
+    <div class="highlight-icon">📄</div>
+    <h3>Publications</h3>
+    <p>5 peer-reviewed publications with 90+ citations; H-index of 4.</p>
+</div>
+<div class="highlight-card">
+    <div class="highlight-icon">🤝</div>
+    <h3>Collaborations</h3>
+    <p>Working with researchers on topics in quantum gravity, string cosmology, and observational data interpretation.</p>
+</div>
+
+
+            <div class="about-details">
+                <div class="current-focus">
+                    <h3>Current Focus</h3>
+                    <ul>
+                        <li>Analyzing Planck satellite data to constrain cosmological parameters</li>
+                        <li>Developing machine learning algorithms for weak lensing detection</li>
+                        <li>Collaborating on next-generation survey telescope calibration</li>
+                    </ul>
+                </div>
+                <div class="education">
+                    <h3>Education & Experience</h3>
+                    <div class="timeline">
+                        <div class="timeline-item active">
+                            <h4>PhD in Astrophysics</h4>
+                            <p class="institution">Ariel University</p>
+                            <p class="year">2023 - Present</p>
+                        </div>
+                        <div class="timeline-item">
+                            <h4>MS in Physics</h4>
+                            <p class="institution">JMI, New Delhi</p>
+                            <p class="year">2020 - 2022</p>
+                        </div>
+                        <div class="timeline-item">
+                            <h4>BS in Physics</h4>
+                            <p class="institution">West Bengal State University</p>
+                            <p class="year">2017 - 2020</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Publications Section -->
+    <section id="publications" class="publications">
+        <div class="container">
+            <div class="section-header">
+                <h2>Publications</h2>
+                <p>My research contributions to understanding the cosmos, published in leading 
+                peer-reviewed journals and presented at international conferences.</p>
+            </div>
+
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-filter="all">All Publications</button>
+                <button class="filter-btn" data-filter="research">Research Articles</button>
+                <button class="filter-btn" data-filter="methods">Methods</button>
+                <button class="filter-btn" data-filter="review">Reviews</button>
+            </div>
+
+            <div class="publications-list">
+                <div class="publication-card" data-type="research">
+                    <div class="publication-card" data-type="research">
+    <div class="publication-header">
+        <h3>Probing the early Universe cosmology with NANOGrav: Possibilities and limitations</h3>
+        <a href="https://journals.aps.org/prd/abstract/10.1103/PhysRevD.108.103507" class="external-link" target="_blank">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="m7 17 10-10"></path>
+                <path d="M17 7H7v10"></path>
+            </svg>
+            View Paper
+        </a>
+    </div>
+    <div class="publication-meta">
+        <span class="journal">Physical Review D</span>
+        <span class="year">2023</span>
+        <span class="citations">47 citations</span>
+        <span class="type-badge research">Research</span>
+    </div>
+    <p class="authors">Amresh Verma et al.</p>
+    <p class="abstract">This study explores how NANOGrav data can be used to constrain early universe cosmology, including models with primordial gravitational wave backgrounds.</p>
+</div>
+
+<div class="publication-card" data-type="research">
+    <div class="publication-header">
+        <h3>Gravitational-wave background in bouncing models from semi-classical, quantum and string gravity</h3>
+        <a href="https://iopscience.iop.org/article/10.1088/1475-7516/2024/09/058" class="external-link" target="_blank">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="m7 17 10-10"></path>
+                <path d="M17 7H7v10"></path>
+            </svg>
+            View Paper
+        </a>
+    </div>
+    <div class="publication-meta">
+        <span class="journal">JCAP</span>
+        <span class="year">2024</span>
+        <span class="citations">13 citations</span>
+        <span class="type-badge research">Research</span>
+    </div>
+    <p class="authors">Amresh Verma et al.</p>
+    <p class="abstract">Analyzing stochastic gravitational wave spectra in bouncing cosmological scenarios derived from semi-classical and string theory-based models.</p>
+</div>
+      <!-- New Publication: Impact of low ell's -->
+<div class="publication-card" data-type="research">
+    <div class="publication-header">
+        <h3>Impact of low ell's on large-scale structure anomalies</h3>
+        <a href="https://iopscience.iop.org/article/10.1088/1475-7516/2025/02/069" class="external-link" target="_blank">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="m7 17 10-10"></path>
+                <path d="M17 7H7v10"></path>
+            </svg>
+            View Paper
+        </a>
+    </div>
+    <div class="publication-meta">
+        <span class="journal">JCAP</span>
+        <span class="year">2024</span>
+        <span class="citations">4 citations</span>
+        <span class="type-badge research">Research</span>
+    </div>
+    <p class="authors">A. Verma et al.</p>
+    <p class="abstract">We explore the significance of low multipole moments in explaining large-scale structure anomalies observed in cosmological surveys.</p>
+</div>
+
+<!-- New Publication: Evidence for non-cold dark matter -->
+<div class="publication-card" data-type="research">
+    <div class="publication-header">
+        <h3>Evidence for non-cold dark matter from DESI DR2 measurements</h3>
+        <a href="https://arxiv.org/pdf/2504.14419" class="external-link" target="_blank">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="m7 17 10-10"></path>
+                <path d="M17 7H7v10"></path>
+            </svg>
+            View Paper
+        </a>
+    </div>
+    <div class="publication-meta">
+        <span class="journal">arXiv</span>
+        <span class="year">2025</span>
+        <span class="citations">28 citations</span>
+        <span class="type-badge research">Research</span>
+    </div>
+    <p class="authors">A. Verma et al.</p>
+    <p class="abstract">This work presents new evidence for non-cold dark matter models based on the second data release from the DESI survey.</p>
+</div>
+
+<!-- New Publication: Disentangling NANOGrav Signal Origins -->
+<div class="publication-card" data-type="research">
+    <div class="publication-header">
+        <h3>Disentangling the Origins of the NANOGrav Signal: Early Universe Models and ΔN<sub>eff</sub> Bounds</h3>
+        <a href="https://arxiv.org/pdf/2508.15134" class="external-link" target="_blank">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="m7 17 10-10"></path>
+                <path d="M17 7H7v10"></path>
+            </svg>
+            View Paper
+        </a>
+    </div>
+    <div class="publication-meta">
+        <span class="journal">arXiv</span>
+        <span class="year">2025</span>
+        <span class="citations">1 citation</span>
+        <span class="type-badge research">Research</span>
+    </div>
+    <p class="authors">A. Verma et al.</p>
+    <p class="abstract">We investigate potential early universe scenarios that could produce the NANOGrav signal, including bounds on effective relativistic degrees of freedom.</p>
+</div>
+
+            </div>
+
+            <div class="publication-stats">
+                <p>Total Publications: <strong>5</strong> | Total Citations: <strong>90+</strong> | H-index: <strong>4</strong></p>
+                <a href="CV_Amresh.pdf" class="btn-primary">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="m7 17 10-10"></path>
+                        <path d="M17 7H7v10"></path>
+                    </svg>
+                    View Full CV
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact">
+        <div class="container">
+            <div class="section-header">
+                <h2>Get In Touch</h2>
+                <p>I'm always interested in discussing research collaborations, 
+                speaking opportunities, and innovative projects in cosmology.</p>
+            </div>
+
+            <div class="contact-content">
+                <div class="contact-info">
+                    <h3>Contact Information</h3>
+                    <div class="contact-items">
+                        <a href="mailto:amreshcosmo@gmail.com" class="contact-item">
+                            <div class="contact-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                                    <polyline points="22,6 12,13 2,6"></polyline>
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="contact-label">Email</p>
+                                <p class="contact-value">amreshcosmo@gmail.com</p>
+                            </div>
+                        </a>
+
+                        <a href="tel:+16507234000" class="contact-item">
+                            <div class="contact-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="contact-label">Office Phone</p>
+                                <p class="contact-value">+972 (55) 2631094</p>
+                            </div>
+                        </a>
+
+                        <div class="contact-item">
+                            <div class="contact-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                    <circle cx="12" cy="10" r="3"></circle>
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="contact-label">Office</p>
+                                <p class="contact-value">Physics Building, Room 20, Office No. 2.26, Ariel University</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="social-links">
+                        <h4>Connect Online</h4>
+                        <div class="social-icons">
+                            <a href="https://github.com/meamresh/" class="social-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                                </svg>
+                            </a>
+                            <a href="https://linkedin.com/in/amreshv/" class="social-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                                </svg>
+                            </a>
+                            <a href="https://twitter.com" class="social-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="research-interests">
+                    <h3>Research Opportunities</h3>
+                    <div class="interests-card">
+                        <h4>I'm particularly interested in:</h4>
+                        <ul>
+                            <li>Collaborative research projects on GWs detection using PTAs </li>
+                            <li>Machine learning applications in astrophysics</li>
+                            <li>Conference talks and workshop participation</li>
+                            <li>Mentoring undergraduate and graduate students</li>
+                            <li>Science communication and public outreach</li>
+                        </ul>
+                        <div class="office-hours">
+                            <strong>Office Hours:</strong> Mondays and Thursdays, 2:00 PM - 4:00 PM (by appointment)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-info">
+                    <h3>Amresh Verma</h3>
+                    <p>Exploring the cosmos through rigorous research, innovative methodologies, 
+                    and collaborative science to unlock the mysteries of our universe.</p>
+                </div>
+                <div class="footer-bottom">
+                    <div class="footer-love">
+                        <span>Made with</span>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" class="heart">
+                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                        </svg>
+                        <span>for science</span>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" class="star">
+                            <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"></polygon>
+                        </svg>
+                    </div>
+                    <div class="footer-copyright">
+                        <p>&copy; 2025 Amresh Verma. All rights reserved.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
