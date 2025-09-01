@@ -32,7 +32,7 @@
         <div class="hero-background"></div>
         <div class="hero-content">
             <div class="hero-image">
-                <img src="Adobe Express - file.jpg" alt="Amresh Verma">
+                <img src="Adobe Express - file.jpg" alt="Amresh Verma" id="clickableImage">
             </div>
             <h1>Amresh Verma</h1>
             <p class="hero-subtitle">PhD Researcher in Cosmology</p>
@@ -377,5 +377,32 @@ gravitational waves, and quantum gravity effects in cosmic evolution.</p>
     </footer>
 
     <script src="script.js"></script>
+    <!-- Other sections of your site -->
+
+    <!-- Image Modal (Step 2) -->
+    <div id="imageModal" class="modal">
+        <span class="close">&times;</span>
+        <img class="modal-content" id="modalImg">
+    </div>
+
+    <!-- JavaScript (Step 4) -->
+    <script>
+      const modal = document.getElementById("imageModal");
+      const img = document.getElementById("clickableImage");
+      const modalImg = document.getElementById("modalImg");
+      const closeBtn = document.getElementsByClassName("close")[0];
+
+      img.onclick = () => {
+        modal.style.display = "block";
+        modalImg.src = img.src;
+      }
+
+      closeBtn.onclick = () => modal.style.display = "none";
+
+      modal.onclick = (event) => {
+        if (event.target === modal) modal.style.display = "none";
+      }
+    </script>
 </body>
 </html>
+
