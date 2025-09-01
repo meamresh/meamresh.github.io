@@ -1099,3 +1099,13 @@ html {
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
   border-radius: 8px; /* optional, for smooth look */
 }
+.contact-value a {
+  color: inherit; /* keeps same text color */
+  text-decoration: none; /* remove underline */
+  transition: color 0.2s ease;
+}
+
+.contact-value a:hover {
+  color: #0077ff; /* highlight on hover */
+  text-decoration: underline;
+}
