@@ -120,3 +120,70 @@ document.addEventListener('DOMContentLoaded', () => {
         observer.observe(el);
     });
 });
+
+// Navigation function for highlight cards
+function navigateToSection(sectionId) {
+    // Hide all detail sections
+    const detailSections = document.querySelectorAll('.detail-section');
+    detailSections.forEach(section => {
+        section.classList.remove('active');
+    });
+    
+    // Show target section
+    const targetSection = document.getElementById(sectionId);
+    if (targetSection) {
+        targetSection.classList.add('active');
+        
+        // Smooth scroll to section
+        targetSection.scrollIntoView({ 
+            behavior: 'smooth',
+            block: 'start'
+        });
+        
+        // Update URL hash
+        history.pushState(null, null, `#${sectionId}`);
+    }
+}
+
+// Handle back button and direct URL access
+window.addEventListener('load', () => {
+    const hash = window.location.hash.substring(1);
+    if (hash && document.getElementById(hash)) {
+        setTimeout(() => {
+            navigateToSection(hash);
+        }, 100);
+    }
+});
+
+window.addEventListener('popstate', () => {
+    const hash = window.location.hash.substring(1);
+    if (hash && document.getElementById(hash)) {
+        navigateToSection(hash);
+    } else {
+        // Hide all detail sections if no hash
+        const detailSections = document.querySelectorAll('.detail-section');
+        detailSections.forEach(section => {
+            section.classList.remove('active');
+        });
+    }
+});
+
+// Add close button functionality
+document.addEventListener('DOMContentLoaded', () => {
+    // Add close buttons to detail sections
+    const detailSections = document.querySelectorAll('.detail-section');
+    detailSections.forEach(section => {
+        const closeButton = document.createElement('button');
+        closeButton.innerHTML = '× Close';
+        closeButton.className = 'close-detail-btn';
+        closeButton.onclick = () => {
+            section.classList.remove('active');
+            history.pushState(null, null, window.location.pathname);
+        };
+        
+        const container = section.querySelector('.container');
+        if (container) {
+            container.insertBefore(closeButton, container.firstChild);
+        }
+    });
+});
