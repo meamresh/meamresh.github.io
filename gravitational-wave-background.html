@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gravitational Wave Background Research | Amresh Verma</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- ✅ MathJax for LaTeX rendering -->
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+</head>
+
+<body>
+    <!-- Header -->
+    <header id="header">
+        <nav class="nav-container">
+            <div class="nav-brand">
+                <a href="index.html">Amresh Verma</a>
+            </div>
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="index.html#about">About</a>
+                <a href="index.html#publications">Publications</a>
+                <a href="index.html#contact">Contact</a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Research Page Header -->
+    <section class="research-hero">
+        <div class="container">
+            <div class="research-header">
+                <div class="breadcrumb">
+                    <a href="index.html">Home</a> / <span>Gravitational Wave Background</span>
+                </div>
+                <div class="research-icon" style="text-align: center;">
+                    <img src="https://nanograv.org/sites/default/files/styles/large/public/2023-06/NG15_GWB_plot_v3_noborder.png?itok=T5_eR2kZ" alt="Hellings–Downs correlation plot" style="width: 33%; height: auto;" />
+                </div>
+                <h1>Stochastic Gravitational Wave Background Research</h1>
+                <p class="research-subtitle">Probing early universe physics through pulsar timing arrays and gravitational wave astronomy (Plot Credit: NANOGrav)</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Research Content -->
+<section class="research-content">
+    <div class="container">
+        <div class="content-grid">
+            <div class="research-summary">
+                <h2 class="section-ttl">1. Primordial GW & Reheating Analysis</h2>
+                <p>We analyzed the NANOGrav 15-year dataset to probe early universe physics, focusing on the effects of a nontrivial reheating phase after inflation. Using a power-law parameterization of the gravitational wave (GW) spectrum, we constrained the reheating equation of state and temperature, finding strong implications for the transition into the radiation-dominated era.</p>
+                
+                <div class="research-figure">
+                        <img src="reheating-table.png" alt="Graph of Spectral Index vs Reheating EoS" />
+                        <p class="figure-caption">Figure: The mean $\pm 1 \sigma$ constraints on the primordial and reheating parameters inferred from the NANOGrav 15-yr data for different reheating models.</p>
+                </div>
+                
+                <div class="key-objectives">
+                    <h3>Research Focus Areas</h3>
+                    <ul>
+                        <li><strong>Reheating Equation of State:</strong> Mean value of $ w_{re} = 0.36 \pm 0.2$, indicating a near-instantaneous transition to radiation domination</li>
+                        <li><strong>Spectral Index Sensitivity:</strong> Correlation between $w_{re}$ and inferred tensor spectral index $n_t$</li>
+                        <li><strong>Primordial GW vs. Astrophysical Background:</strong> Evaluated scenarios for reconciling NANOGrav signal with LIGO bounds</li>
+                        <li><strong>Sourced Bounce Models:</strong> Considered blue-tilted GW spectra consistent with bounce cosmologies</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="research-results">
+                <h2>Key Findings</h2>
+
+                <div class="impact-stats">
+                    <div class="stat-card">
+                        <div class="stat-number">$ w_{re} = 0.36 \pm 0.2$</div>
+                        <div class="stat-label">Reheating EoS</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">$n_t = 1.94^{+0.43}_{-0.86}$</div>
+                        <div class="stat-label">Tensor Spectral Index</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">$T_{re} \leq 10^5 \, \text{GeV} $</div>
+                        <div class="stat-label">Reheating Temperature</div>
+                    </div>
+                </div>
+
+                <div class="breakthrough-box">
+                    <h3>🌟 Major Finding</h3>
+                    <p>
+                        Our likelihood analysis of the NANOGrav 15-year data shows strong support for a primordial stochastic GW background with a blue-tilted spectrum, consistent with both canonical inflationary scenarios and exotic models like sourced bounce cosmologies. The best-fit value of the tensor spectral index is \( n_t \sim 2 \), and the inferred reheating parameters suggest a transition close to radiation domination. We propose scenarios involving a mixed GW background or running spectral index to resolve tensions with LIGO bounds. These findings open new avenues for probing reheating physics using GW data from PTAs.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+    <!-- GW Analysis Data -->
+    <section class="data-analysis">
+    <div class="container">
+        <div class="content-grid">
+            <div class="research-summary">
+                <h2 class="section-ttl">2. $\Delta N_{eff}$ from SGWB: PTA and CMB</h2>
+                <p>
+                    We critically assessed the interpretation of the NANOGrav 15-year dataset as evidence for a primordial stochastic gravitational wave background (SGWB). Our analysis highlights that a simple power-law tensor spectrum is inconsistent with current LIGO bounds and must involve spectral breaks or running. Furthermore, any cosmological origin must also comply with CMB constraints, particularly limits on extra radiation energy density quantified via $\Delta N_{\rm eff}$.
+                </p>
+
+                <div class="research-figure">
+                    <img src="1Dneff.png" alt="Delta Neff Constraints from CMB and PTA Models" />
+                    <img src="1Dneffextra.png" alt="Delta Neff Constraints from CMB and PTA Models" />
+                    <p class="figure-caption">
+                        Figure: The marginalized 1D posteriors on $\log_{10} \Delta N_{eff}$ for all models first calculated only for NANOGrav probed frequency range (Top) and then extrapolated till $f_{max} = 1 \, \rm \mu Hz$ (Down). For reference, we also present the `detectability zone' from (present) Planck 2018, SO, and CMB-S4 experiments, corresponding to the dashed vertical lines at $\sigma_{P18}= 0.19$, $ \sigma_{SO}= 0.045$, and $ \sigma_{S4}= 0.027$ respectively.
+                    </p>
+                </div>
+
+                <div class="key-objectives">
+                    <h3>Research Focus Areas</h3>
+                    <ul>
+                        <li><strong>Joint PTA–CMB Constraints:</strong> Combined likelihood analysis constraining early-Universe models using both NANOGrav and Planck $\rm N_{eff}$ bounds.</li>
+                        <li><strong>Spectrum Deviations:</strong> Showed that a pure power-law GW spectrum is inconsistent with full observational data (CMB, NANOGrav, LIGO).</li>
+                        <li><strong>Model-by-Model Evaluation:</strong> Inflation with strong running, scalar-induced GWs (SIGW), and cosmic strings assessed against CMB radiation content.</li>
+                        <li><strong>Future Prospects:</strong> Demonstrated that PTA frequency extensions to $\mu$Hz will allow definitive constraints on cosmological models, particularly through $\Delta N_{\rm eff}$ sensitivity.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="research-results">
+                <h2>Key Findings</h2>
+
+                <div class="impact-stats">
+                    <div class="stat-card">
+                        <div class="stat-number">Excluded @ $\mathcal{O}(10^3)\sigma$</div>
+                        <div class="stat-label">SIGW Radiation Excess</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">$\Delta N_{\rm eff}^{\text{Run,Inf}} \gg 0.17$</div>
+                        <div class="stat-label">Inflation w/ Strong Running</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">Up to $\mu$Hz Sensitivity</div>
+                        <div class="stat-label">Required for Full $\Delta N_{\rm eff}$ Detection</div>
+                    </div>
+                </div>
+
+                <div class="breakthrough-box">
+                    <h3>🌟 Major Finding</h3>
+                    <p>
+                        Our Bayesian analysis of Early-Universe gravitational wave models, constrained by both NANOGrav and Planck data, shows that several cosmological scenarios—especially those predicting large $\Delta N_{\rm eff}$—are strongly disfavored. Scalar-induced GWs and inflationary models with strong spectral running exceed current radiation bounds and are excluded at high confidence. We emphasize the unique role of $\Delta N_{\rm eff}$ as an independent cosmological probe of primordial SGWB, with future CMB experiments (e.g., CMB-S4, Simons Observatory) expected to decisively test remaining viable models.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+ <!-- Publications Related to This Research -->
+    <section class="related-publications">
+        <div class="container">
+            <h2>Related Publications</h2>
+            <div class="publications-grid">
+                <div class="publication-card featured">
+                    <div class="publication-header">
+                        <h3>Probing the early Universe cosmology with NANOGrav: Possibilities and limitations</h3>
+                        <span class="pub-year">2023</span>
+                    </div>
+                    <div class="publication-meta">
+                        <span class="journal">Physical Review D</span>
+                        <span class="citations">47 citations</span>
+                        <span class="impact-factor">IF: 5.3</span>
+                    </div>
+                    <p class="abstract">We use the latest measurements from NANOGrav to constrain the Universe's reheating equation of state $w_{re}$, the reheating temperature $T_{re}$, the tensor to scalar ratio $r$, and the tensor tilt $n_t$. Assuming the constant equation of state $w_{re}$ responsible for reheating phase, we find preference for instant reheating</p>
+                    <div class="publication-links">
+                        <a href="https://arxiv.org/abs/2307.15123" class="pub-link">arXiv:2307.15123</a>
+                        <a href="https://journals.aps.org/prd/abstract/10.1103/PhysRevD.108.103507" class="pub-link">DOI</a>
+                        <a href="https://ui.adsabs.harvard.edu/abs/2023PhRvD.108j3507B/abstract" class="pub-link">NASA ADS</a>
+                    </div>
+                </div>
+
+                <div class="publication-card">
+                    <div class="publication-header">
+                        <h3>Disentangling the Origins of the NANOGrav Signal: Early Universe Models and $\Delta N_{eff}$ Bounds</h3>
+                        <span class="pub-year">2025</span>
+                    </div>
+                    <div class="publication-meta">
+                        <!-- <span class="journal">Physical Review D</span> -->
+                        <!-- <span class="citations">22 citations</span> -->
+                        <!-- <span class="impact-factor">IF: 5.4</span> -->
+                    </div>
+                    <p class="abstract">We compute the contribution of effective number of relativistic species, $\Delta N_{eff}$, for a number of Early-Universe models proposed to explain the pulsar timing array (PTA) spectrum. We demonstrate that models predicting $\Delta N_{eff}$ above the CMB limit would be firmly excluded, implying that the NANOGrav signal in tension with these bounds must instead arise from astrophysical sources.</p>
+                    <div class="publication-links">
+                        <a href="https://arxiv.org/abs/2508.15134" class="pub-link">arXiv:2508.15134</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+<!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-info">
+                    <h3>Amresh Verma</h3>
+                    <p>PhD Researcher in Cosmology at Ariel University, exploring the fundamental nature of the universe through theoretical and observational approaches.</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <div class="footer-love">
+                    <span>Made with</span>
+                    <span class="heart">❤️</span>
+                    <span>for advancing cosmological research</span>
+                </div>
+                <div class="footer-copyright">
+                    <span>&copy; 2025 Amresh Verma. No rights reserved. Copy whatever you need.</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
