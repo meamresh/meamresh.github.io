@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-PBH Cosmology Simulator</title>
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js"></script>
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #00d4ff, #7b2cbf);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            color: #a0a0a0;
+            font-size: 1.1em;
+        }
+
+        .controls {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #00d4ff;
+        }
+
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            color: #e0e0e0;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+
+        input[type="text"]:focus, input[type="number"]:focus {
+            outline: none;
+            border-color: #00d4ff;
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .help-text {
+            font-size: 0.9em;
+            color: #a0a0a0;
+            margin-top: 5px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        button {
+            flex: 1;
+            padding: 14px 28px;
+            font-size: 1em;
+            font-weight: 600;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #00d4ff, #0096c7);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 212, 255, 0.4);
+        }
+
+        .btn-primary:disabled {
+            background: #555;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #e0e0e0;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        #status {
+            padding: 12px;
+            margin: 15px 0;
+            border-radius: 6px;
+            display: none;
+            font-weight: 500;
+        }
+
+        #status.loading {
+            display: block;
+            background: rgba(0, 212, 255, 0.2);
+            border-left: 4px solid #00d4ff;
+            color: #00d4ff;
+        }
+
+        #status.error {
+            display: block;
+            background: rgba(255, 71, 87, 0.2);
+            border-left: 4px solid #ff4757;
+            color: #ff4757;
+        }
+
+        #status.success {
+            display: block;
+            background: rgba(46, 213, 115, 0.2);
+            border-left: 4px solid #2ed573;
+            color: #2ed573;
+        }
+
+        .plots {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .plot-container {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+
+        .plot-title {
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            color: #00d4ff;
+        }
+
+        .presets {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .preset-btn {
+            padding: 8px 16px;
+            background: rgba(123, 44, 191, 0.3);
+            border: 1px solid #7b2cbf;
+            color: #e0e0e0;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.2s;
+        }
+
+        .preset-btn:hover {
+            background: rgba(123, 44, 191, 0.5);
+            transform: translateY(-1px);
+        }
+
+        .advanced-toggle {
+            margin-top: 15px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .advanced-toggle:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .advanced-params {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+        }
+
+        .advanced-params.show {
+            display: block;
+        }
+
+        .param-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8em;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Multi-PBH Cosmology Simulator</h1>
+            <p class="subtitle">Simulate primordial black hole evaporation and cosmological evolution</p>
+        </header>
+
+        <div class="controls">
+            <div class="input-group">
+                <label for="masses">PBH Masses (kg)</label>
+                <input type="text" id="masses" placeholder="e.g., 1e10, 1e12, 1e14" value="1e10, 1e12, 1e14">
+                <p class="help-text">Enter comma-separated masses in kilograms (scientific notation supported)</p>
+                <div class="presets">
+                    <button class="preset-btn" onclick="setPreset('light')">Light PBHs</button>
+                    <button class="preset-btn" onclick="setPreset('heavy')">Heavy PBHs</button>
+                    <button class="preset-btn" onclick="setPreset('mixed')">Mixed Population</button>
+                    <button class="preset-btn" onclick="setPreset('extreme')">Extreme Range</button>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="ratios">Number Density Ratios (optional)</label>
+                <input type="text" id="ratios" placeholder="e.g., 1, 10, 100 (leave empty for equal)">
+                <p class="help-text">Relative abundances of each species (same order as masses)</p>
+            </div>
+
+            <div class="advanced-toggle" onclick="toggleAdvanced()">
+                <span id="toggle-icon">▶</span> Advanced Parameters
+            </div>
+
+            <div class="advanced-params" id="advancedParams">
+                <div class="param-grid">
+                    <div class="input-group">
+                        <label for="tfinal">Time Factor</label>
+                        <input type="number" id="tfinal" value="10" step="1" min="1">
+                        <p class="help-text">Multiple of longest lifetime</p>
+                    </div>
+                    <div class="input-group">
+                        <label for="nsteps">Number of Steps</label>
+                        <input type="number" id="nsteps" value="3000" step="100" min="100">
+                        <p class="help-text">Integration points</p>
+                    </div>
+                    <div class="input-group">
+                        <label for="mmin">M_min (kg)</label>
+                        <input type="number" id="mmin" value="1e-15" step="any">
+                        <p class="help-text">Cutoff mass</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="status"></div>
+
+            <div class="button-group">
+                <button class="btn-primary" id="runBtn" onclick="runSimulation()">Run Simulation</button>
+                <button class="btn-secondary" onclick="clearPlots()">Clear Plots</button>
+            </div>
+        </div>
+
+        <div class="plots" id="plots">
+            <div class="plot-container">
+                <h3 class="plot-title">Energy Densities vs Time</h3>
+                <div id="densityPlot"></div>
+            </div>
+            <div class="plot-container">
+                <h3 class="plot-title">Fractional Energy Densities</h3>
+                <div id="fractionPlot"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let pyodide = null;
+        let isInitialized = false;
+
+        // Initialize Pyodide
+        async function initPyodide() {
+            if (isInitialized) return;
+            
+            setStatus('Initializing Python environment...', 'loading');
+            try {
+                pyodide = await loadPyodide();
+                await pyodide.loadPackage(['numpy', 'scipy', 'matplotlib']);
+                
+                // Load the MultiPBHCosmology class
+                const pythonCode = `
+import numpy as np
+from math import pi
+from scipy.integrate import solve_ivp
+
+class MultiPBHCosmology:
+    """Multi-species PBH cosmology integrator."""
+
+    def __init__(self, masses_kg, N_ratios=None, base_number_density=None,
+                 M_min=1e-15, tiny_rho_frac=1e-30):
+        self.G = 6.67430e-11
+        self.hbar = 1.054571817e-34
+        self.c = 299792458.0
+        self.pi = pi
+        self.alpha = self.hbar * self.c**4 / (15360.0 * self.pi * self.G**2)
+
+        self.masses0 = np.array(masses_kg, dtype=float)
+        self.K = len(self.masses0)
+
+        if N_ratios is None:
+            self.N_ratios = np.ones(self.K, dtype=float)
+        else:
+            self.N_ratios = np.array(N_ratios, dtype=float)
+
+        self.M_max = np.max(self.masses0)
+        self.t0 = self.G * self.M_max / self.c**3
+        self.a0 = 1.0
+
+        if base_number_density is None:
+            Vh = 4.0/3.0 * self.pi * (self.c * self.t0)**3
+            self.N_base = 1.0 / Vh
+        else:
+            self.N_base = float(base_number_density)
+
+        idx_max = int(np.argmax(self.masses0))
+        scale = self.N_ratios[idx_max]
+        self.N = self.N_base * (self.N_ratios / scale)
+
+        self.M_min = float(M_min)
+
+        rho_pbh_total = np.sum(self.N * self.masses0 * self.c**2) / (self.a0**3)
+        self.rhoR0 = tiny_rho_frac * rho_pbh_total
+
+        self.taus = self.masses0**3 / (3.0 * self.alpha)
+        self.sol = None
+
+    def _mass_loss_rate_scalar(self, M):
+        if M > self.M_min:
+            if M > 10.0 * self.M_min:
+                return -self.alpha / (M**2)
+            else:
+                factor = (M - self.M_min) / (9.0 * self.M_min)
+                return -self.alpha / (M**2) * factor
+        return 0.0
+
+    def mass_loss_rate_vec(self, M_array):
+        v = np.empty_like(M_array)
+        for i, M in enumerate(M_array):
+            v[i] = self._mass_loss_rate_scalar(M)
+        return v
+
+    def deriv(self, t, y):
+        K = self.K
+        M = y[:K]
+        rhoR = y[K]
+        a = y[K + 1]
+
+        dMdt = self.mass_loss_rate_vec(M)
+        n = self.N / (a**3)
+        rho_i = n * np.maximum(M, 0.0) * self.c**2
+
+        rho_tot = np.sum(rho_i) + rhoR
+        H = np.sqrt(8.0 * self.pi * self.G * rho_tot / 3.0) if rho_tot > 0.0 else 0.0
+
+        Q = -np.sum(n * (self.c**2) * dMdt)
+
+        drhoR_dt = -4.0 * H * rhoR + Q
+        da_dt = a * H
+
+        dy = np.empty(K + 2)
+        dy[:K] = dMdt
+        dy[K] = drhoR_dt
+        dy[K + 1] = da_dt
+        return dy
+
+    def run(self, t_final_factor=10.0, nsteps=3000, method="LSODA", rtol=1e-8, atol=1e-30):
+        y0 = np.empty(self.K + 2)
+        y0[: self.K] = self.masses0
+        y0[self.K] = self.rhoR0
+        y0[self.K + 1] = self.a0
+
+        t_final = float(t_final_factor * np.max(self.taus))
+
+        if not np.isfinite(t_final) or t_final <= 0.0:
+            raise ValueError("Computed t_final is not positive/finite.")
+        if t_final <= self.t0:
+            t_final = self.t0 * 10.0 + 1e-40
+
+        start = np.log10(max(self.t0, 1e-300))
+        end = np.log10(t_final)
+        t_eval = np.logspace(start, end, nsteps)
+
+        t_eval = np.clip(t_eval, self.t0, t_final)
+        t_eval[0] = self.t0
+        t_eval[-1] = t_final
+
+        t_eval = np.unique(t_eval)
+        if t_eval.size < 2:
+            t_eval = np.array([self.t0, t_final], dtype=float)
+
+        self.sol = solve_ivp(self.deriv, (self.t0, t_final), y0,
+                            method=method, t_eval=t_eval, rtol=rtol, atol=atol)
+
+        self.postprocess()
+        return self.sol
+
+    def postprocess(self):
+        K = self.K
+        sol = self.sol
+        self.t = sol.t
+        self.M = np.maximum(sol.y[:K, :], 0.0)
+        self.rhoR = sol.y[K, :]
+        self.a = sol.y[K + 1, :]
+
+        self.n = (self.N[:, None]) / (self.a[None, :]**3)
+        self.rho_i = self.n * self.M * self.c**2
+        self.rho_tot = np.sum(self.rho_i, axis=0) + self.rhoR
+
+        self.f_i = self.rho_i / self.rho_tot[None, :]
+        self.fR = self.rhoR / self.rho_tot
+`;
+                await pyodide.runPythonAsync(pythonCode);
+                isInitialized = true;
+                setStatus('Python environment ready!', 'success');
+                setTimeout(() => hideStatus(), 2000);
+            } catch (error) {
+                setStatus('Failed to initialize: ' + error.message, 'error');
+                console.error(error);
+            }
+        }
+
+        // Run simulation
+        async function runSimulation() {
+            if (!isInitialized) {
+                await initPyodide();
+            }
+
+            const massesInput = document.getElementById('masses').value;
+            const ratiosInput = document.getElementById('ratios').value;
+            const tfinal = parseFloat(document.getElementById('tfinal').value);
+            const nsteps = parseInt(document.getElementById('nsteps').value);
+            const mmin = parseFloat(document.getElementById('mmin').value);
+
+            if (!massesInput.trim()) {
+                setStatus('Please enter at least one mass', 'error');
+                return;
+            }
+
+            setStatus('Running simulation...', 'loading');
+            document.getElementById('runBtn').disabled = true;
+
+            try {
+                // Parse masses
+                const masses = massesInput.split(',').map(s => {
+                    const val = s.trim();
+                    return parseFloat(val);
+                }).filter(x => !isNaN(x) && x > 0);
+
+                if (masses.length === 0) {
+                    throw new Error('No valid masses entered');
+                }
+
+                // Parse ratios
+                let ratios = null;
+                if (ratiosInput.trim()) {
+                    ratios = ratiosInput.split(',').map(s => parseFloat(s.trim())).filter(x => !isNaN(x) && x > 0);
+                    if (ratios.length !== masses.length) {
+                        throw new Error('Number of ratios must match number of masses');
+                    }
+                }
+
+                // Set Python variables
+                pyodide.globals.set('masses_input', masses);
+                if (ratios) {
+                    pyodide.globals.set('ratios_input', ratios);
+                }
+                pyodide.globals.set('tfinal', tfinal);
+                pyodide.globals.set('nsteps', nsteps);
+                pyodide.globals.set('mmin', mmin);
+
+                // Run simulation
+                const runCode = `
+import json
+
+pbh = MultiPBHCosmology(
+    masses_kg=masses_input,
+    N_ratios=${ratios ? 'ratios_input' : 'None'},
+    M_min=mmin
+)
+
+pbh.run(t_final_factor=tfinal, nsteps=nsteps)
+
+# Prepare data for plotting
+result = {
+    't': pbh.t.tolist(),
+    'rho_i': [pbh.rho_i[i, :].tolist() for i in range(pbh.K)],
+    'rhoR': pbh.rhoR.tolist(),
+    'f_i': [pbh.f_i[i, :].tolist() for i in range(pbh.K)],
+    'fR': pbh.fR.tolist(),
+    'masses': pbh.masses0.tolist(),
+    'taus': pbh.taus.tolist(),
+    't0': pbh.t0,
+    'K': pbh.K
+}
+
+json.dumps(result)
+`;
+
+                const resultJson = await pyodide.runPythonAsync(runCode);
+                const data = JSON.parse(resultJson);
+
+                // Plot results
+                plotDensities(data);
+                plotFractions(data);
+
+                setStatus('Simulation complete!', 'success');
+                setTimeout(() => hideStatus(), 3000);
+            } catch (error) {
+                setStatus('Error: ' + error.message, 'error');
+                console.error(error);
+            } finally {
+                document.getElementById('runBtn').disabled = false;
+            }
+        }
+
+        // Plot density evolution
+        function plotDensities(data) {
+            const traces = [];
+
+            // Plot each PBH species
+            const colors = ['#00d4ff', '#7b2cbf', '#ff006e', '#fb5607', '#ffbe0b', '#8ac926'];
+            for (let i = 0; i < data.K; i++) {
+                traces.push({
+                    x: data.t,
+                    y: data.rho_i[i],
+                    type: 'scatter',
+                    mode: 'lines',
+                    name: `ρ<sub>${i}</sub> (M<sub>0</sub>=${formatMass(data.masses[i])})`,
+                    line: { width: 2, color: colors[i % colors.length] }
+                });
+
+                // Add evaporation time marker
+                const t_evap = data.t0 + data.taus[i];
+                traces.push({
+                    x: [t_evap, t_evap],
+                    y: [Math.min(...data.rho_i[i]), Math.max(...data.rho_i[i])],
+                    type: 'scatter',
+                    mode: 'lines',
+                    name: `t<sub>evap,${i}</sub>`,
+                    line: { width: 1, dash: 'dash', color: colors[i % colors.length] },
+                    opacity: 0.5,
+                    showlegend: true
+                });
+            }
+
+            // Plot radiation
+            traces.push({
+                x: data.t,
+                y: data.rhoR,
+                type: 'scatter',
+                mode: 'lines',
+                name: 'ρ<sub>R</sub> (radiation)',
+                line: { width: 2, dash: 'dot', color: '#ffffff' }
+            });
+
+            const layout = {
+                xaxis: {
+                    type: 'log',
+                    title: 'Time (s)',
+                    gridcolor: 'rgba(255,255,255,0.1)',
+                    color: '#e0e0e0'
+                },
+                yaxis: {
+                    type: 'log',
+                    title: 'Energy Density (J/m³)',
+                    gridcolor: 'rgba(255,255,255,0.1)',
+                    color: '#e0e0e0'
+                },
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(0,0,0,0.3)',
+                font: { color: '#e0e0e0' },
+                legend: {
+                    bgcolor: 'rgba(0,0,0,0.5)',
+                    bordercolor: 'rgba(255,255,255,0.2)',
+                    borderwidth: 1
+                },
+                margin: { t: 20, r: 20, b: 60, l: 80 }
+            };
+
+            Plotly.newPlot('densityPlot', traces, layout, {responsive: true});
+        }
+
+        // Plot fractional densities
+        function plotFractions(data) {
+            const traces = [];
+
+            const colors = ['#00d4ff', '#7b2cbf', '#ff006e', '#fb5607', '#ffbe0b', '#8ac926'];
+            for (let i = 0; i < data.K; i++) {
+                traces.push({
+                    x: data.t,
+                    y: data.f_i[i],
+                    type: 'scatter',
+                    mode: 'lines',
+                    name: `f<sub>${i}</sub> (M<sub>0</sub>=${formatMass(data.masses[i])})`,
+                    line: { width: 2, color: colors[i % colors.length] },
+                    fill: 'tonexty',
+                    fillcolor: colors[i % colors.length] + '20'
+                });
+            }
+
+            traces.push({
+                x: data.t,
+                y: data.fR,
+                type: 'scatter',
+                mode: 'lines',
+                name: 'f<sub>R</sub> (radiation)',
+                line: { width: 2, dash: 'dot', color: '#ffffff' }
+            });
+
+            const layout = {
+                xaxis: {
+                    type: 'log',
+                    title: 'Time (s)',
+                    gridcolor: 'rgba(255,255,255,0.1)',
+                    color: '#e0e0e0'
+                },
+                yaxis: {
+                    title: 'Fractional Energy Density',
+                    gridcolor: 'rgba(255,255,255,0.1)',
+                    color: '#e0e0e0',
+                    range: [0, 1]
+                },
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(0,0,0,0.3)',
+                font: { color: '#e0e0e0' },
+                legend: {
+                    bgcolor: 'rgba(0,0,0,0.5)',
+                    bordercolor: 'rgba(255,255,255,0.2)',
+                    borderwidth: 1
+                },
+                margin: { t: 20, r: 20, b: 60, l: 80 }
+            };
+
+            Plotly.newPlot('fractionPlot', traces, layout, {responsive: true});
+        }
+
+        // Utility functions
+        function formatMass(mass) {
+            return mass.toExponential(1) + ' kg';
+        }
+
+        function setStatus(message, type) {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = type;
+        }
+
+        function hideStatus() {
+            document.getElementById('status').style.display = 'none';
+        }
+
+        function clearPlots() {
+            Plotly.purge('densityPlot');
+            Plotly.purge('fractionPlot');
+            setStatus('Plots cleared', 'success');
+            setTimeout(() => hideStatus(), 2000);
+        }
+
+        function toggleAdvanced() {
+            const params = document.getElementById('advancedParams');
+            const icon = document.getElementById('toggle-icon');
+            params.classList.toggle('show');
+            icon.textContent = params.classList.contains('show') ? '▼' : '▶';
+        }
+
+        function setPreset(type) {
+            const massInput = document.getElementById('masses');
+            const ratioInput = document.getElementById('ratios');
+            
+            switch(type) {
+                case 'light':
+                    massInput.value = '1e8, 1e9, 1e10';
+                    ratioInput.value = '';
+                    break;
+                case 'heavy':
+                    massInput.value = '1e13, 1e14, 1e15';
+                    ratioInput.value = '';
+                    break;
+                case 'mixed':
+                    massInput.value = '1e10, 1e12, 1e14';
+                    ratioInput.value = '1, 10, 100';
+                    break;
+                case 'extreme':
+                    massInput.value = '1e8, 1e11, 1e14, 1e17';
+                    ratioInput.value = '1000, 100, 10, 1';
+                    break;
+            }
+        }
+
+        // Initialize on page load
+        window.addEventListener('load', () => {
+            initPyodide();
+        });
+    </script>
+</body>
+</html>
