@@ -260,7 +260,7 @@
         <div class="controls">
             <div class="input-group">
                 <label for="masses">PBH Masses (kg)</label>
-                <input type="text" id="masses" placeholder="e.g., 1e10, 1e12, 1e14">
+                <input type="text" id="masses" placeholder="e.g., 1e10, 1e12, 1e14" value="1e10, 1e12, 1e14">
                 <p class="help-text">Enter comma-separated masses in kilograms (scientific notation supported)</p>
                 <div class="presets">
                     <button class="preset-btn" onclick="setPreset('light')">Two PBHs</button>
@@ -316,6 +316,14 @@
             <div class="plot-container">
                 <h3 class="plot-title">Fractional Energy Densities</h3>
                 <div id="fractionPlot"></div>
+            </div>
+            <div class="plot-container">
+                <h3 class="plot-title">Scale Factor vs Time</h3>
+                <div id="scaleFactorPlot"></div>
+            </div>
+            <div class="plot-container">
+                <h3 class="plot-title">Hubble Parameter vs Scale Factor</h3>
+                <div id="hubblePlot"></div>
             </div>
         </div>
     </div>
@@ -464,6 +472,9 @@ class MultiPBHCosmology:
 
         self.f_i = self.rho_i / self.rho_tot[None, :]
         self.fR = self.rhoR / self.rho_tot
+        
+        # Calculate Hubble parameter at each time
+        self.H = np.sqrt(8.0 * self.pi * self.G * self.rho_tot / 3.0)
 `;
                 await pyodide.runPythonAsync(pythonCode);
                 isInitialized = true;
@@ -546,7 +557,9 @@ result = {
     'masses': pbh.masses0.tolist(),
     'taus': pbh.taus.tolist(),
     't0': pbh.t0,
-    'K': pbh.K
+    'K': pbh.K,
+    'a': pbh.a.tolist(),
+    'H': pbh.H.tolist()
 }
 
 json.dumps(result)
@@ -558,6 +571,8 @@ json.dumps(result)
                 // Plot results
                 plotDensities(data);
                 plotFractions(data);
+                plotScaleFactor(data);
+                plotHubble(data);
 
                 setStatus('Simulation complete!', 'success');
                 setTimeout(() => hideStatus(), 3000);
@@ -690,6 +705,82 @@ json.dumps(result)
             Plotly.newPlot('fractionPlot', traces, layout, {responsive: true});
         }
 
+        // Plot scale factor evolution
+        function plotScaleFactor(data) {
+            const trace = {
+                x: data.t,
+                y: data.a,
+                type: 'scatter',
+                mode: 'lines',
+                name: 'Scale Factor a(t)',
+                line: { width: 3, color: '#00d4ff' }
+            };
+
+            const layout = {
+                xaxis: {
+                    type: 'log',
+                    title: 'Time (s)',
+                    gridcolor: 'rgba(255,255,255,0.1)',
+                    color: '#e0e0e0'
+                },
+                yaxis: {
+                    type: 'log',
+                    title: 'Scale Factor a',
+                    gridcolor: 'rgba(255,255,255,0.1)',
+                    color: '#e0e0e0'
+                },
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(0,0,0,0.3)',
+                font: { color: '#e0e0e0' },
+                legend: {
+                    bgcolor: 'rgba(0,0,0,0.5)',
+                    bordercolor: 'rgba(255,255,255,0.2)',
+                    borderwidth: 1
+                },
+                margin: { t: 20, r: 20, b: 60, l: 80 }
+            };
+
+            Plotly.newPlot('scaleFactorPlot', [trace], layout, {responsive: true});
+        }
+
+        // Plot Hubble parameter vs scale factor
+        function plotHubble(data) {
+            const trace = {
+                x: data.a,
+                y: data.H,
+                type: 'scatter',
+                mode: 'lines',
+                name: 'H(a)',
+                line: { width: 3, color: '#7b2cbf' }
+            };
+
+            const layout = {
+                xaxis: {
+                    type: 'log',
+                    title: 'Scale Factor a',
+                    gridcolor: 'rgba(255,255,255,0.1)',
+                    color: '#e0e0e0'
+                },
+                yaxis: {
+                    type: 'log',
+                    title: 'Hubble Parameter H (s⁻¹)',
+                    gridcolor: 'rgba(255,255,255,0.1)',
+                    color: '#e0e0e0'
+                },
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(0,0,0,0.3)',
+                font: { color: '#e0e0e0' },
+                legend: {
+                    bgcolor: 'rgba(0,0,0,0.5)',
+                    bordercolor: 'rgba(255,255,255,0.2)',
+                    borderwidth: 1
+                },
+                margin: { t: 20, r: 20, b: 60, l: 80 }
+            };
+
+            Plotly.newPlot('hubblePlot', [trace], layout, {responsive: true});
+        }
+
         // Utility functions
         function formatMass(mass) {
             return mass.toExponential(1) + ' kg';
@@ -708,6 +799,8 @@ json.dumps(result)
         function clearPlots() {
             Plotly.purge('densityPlot');
             Plotly.purge('fractionPlot');
+            Plotly.purge('scaleFactorPlot');
+            Plotly.purge('hubblePlot');
             setStatus('Plots cleared', 'success');
             setTimeout(() => hideStatus(), 2000);
         }
