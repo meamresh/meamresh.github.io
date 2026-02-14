@@ -239,6 +239,44 @@
             gap: 15px;
         }
 
+        .plot-selection {
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+        }
+
+        .plot-selection h4 {
+            color: #00d4ff;
+            margin-bottom: 10px;
+        }
+
+        .checkbox-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #00d4ff;
+        }
+
+        .checkbox-item label {
+            margin: 0;
+            font-weight: normal;
+            cursor: pointer;
+            color: #e0e0e0;
+        }
+
         @media (max-width: 768px) {
             h1 {
                 font-size: 1.8em;
@@ -254,13 +292,13 @@
     <div class="container">
         <header>
             <h1>Multi-PBH Cosmology Simulator</h1>
-            <p class="subtitle">Simulate primordial black hole evaporation and cosmological evolution</p>
+            <p class="subtitle">Simulate primordial black hole evaporation with temperature evolution</p>
         </header>
 
         <div class="controls">
             <div class="input-group">
                 <label for="masses">PBH Masses (kg)</label>
-                <input type="text" id="masses" placeholder="e.g., 1e10, 1e12, 1e14" value="1e10, 1e12, 1e14">
+                <input type="text" id="masses" placeholder="e.g., 1e10, 1e12, 1e14" value="1e1, 1e4">
                 <p class="help-text">Enter comma-separated masses in kilograms (scientific notation supported)</p>
                 <div class="presets">
                     <button class="preset-btn" onclick="setPreset('light')">Two PBHs</button>
@@ -272,7 +310,7 @@
 
             <div class="input-group">
                 <label for="ratios">Number Density Ratios (optional)</label>
-                <input type="text" id="ratios" placeholder="e.g., 1, 10, 100 (leave empty for equal)">
+                <input type="text" id="ratios" placeholder="e.g., 1, 10, 100 (leave empty for equal)" value="1e5, 1">
                 <p class="help-text">Relative abundances of each species (same order as masses)</p>
             </div>
 
@@ -297,6 +335,45 @@
                         <input type="number" id="mmin" value="1e-15" step="any">
                         <p class="help-text">Cutoff mass</p>
                     </div>
+                    <div class="input-group">
+                        <label for="tinyrho">Tiny Rho Fraction</label>
+                        <input type="number" id="tinyrho" value="1e3" step="any">
+                        <p class="help-text">Initial radiation fraction</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="plot-selection">
+                <h4>Select Plots to Display</h4>
+                <div class="checkbox-grid">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="plot_densities" checked>
+                        <label for="plot_densities">Energy Densities</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="plot_fractions" checked>
+                        <label for="plot_fractions">Fractional Densities</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="plot_scalefactor" checked>
+                        <label for="plot_scalefactor">Scale Factor</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="plot_hubble" checked>
+                        <label for="plot_hubble">Hubble Parameter</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="plot_temperature" checked>
+                        <label for="plot_temperature">Temperature Evolution</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="plot_entropy" checked>
+                        <label for="plot_entropy">Comoving Entropy</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="plot_thermalization" checked>
+                        <label for="plot_thermalization">Thermalization Rate</label>
+                    </div>
                 </div>
             </div>
 
@@ -308,24 +385,7 @@
             </div>
         </div>
 
-        <div class="plots" id="plots">
-            <div class="plot-container">
-                <h3 class="plot-title">Energy Densities vs Time</h3>
-                <div id="densityPlot"></div>
-            </div>
-            <div class="plot-container">
-                <h3 class="plot-title">Fractional Energy Densities</h3>
-                <div id="fractionPlot"></div>
-            </div>
-            <div class="plot-container">
-                <h3 class="plot-title">Scale Factor vs Time</h3>
-                <div id="scaleFactorPlot"></div>
-            </div>
-            <div class="plot-container">
-                <h3 class="plot-title">Hubble Parameter vs Scale Factor</h3>
-                <div id="hubblePlot"></div>
-            </div>
-        </div>
+        <div class="plots" id="plots"></div>
     </div>
 
     <script>
@@ -339,22 +399,24 @@
             setStatus('Initializing Python environment...', 'loading');
             try {
                 pyodide = await loadPyodide();
-                await pyodide.loadPackage(['numpy', 'scipy', 'matplotlib']);
+                await pyodide.loadPackage(['numpy', 'scipy']);
                 
-                // Load the MultiPBHCosmology class
+                // Load the MultiPBHCosmology class with temperature physics
                 const pythonCode = `
 import numpy as np
 from math import pi
 from scipy.integrate import solve_ivp
 
 class MultiPBHCosmology:
-    """Multi-species PBH cosmology integrator."""
+    """Multi-species PBH cosmology with temperature, entropy, and thermalization."""
 
     def __init__(self, masses_kg, N_ratios=None, base_number_density=None,
-                 M_min=1e-15, tiny_rho_frac=1e-30):
+                 M_min=1e-15, tiny_rho_frac=1e-10):
+        # Physical constants (SI)
         self.G = 6.67430e-11
         self.hbar = 1.054571817e-34
         self.c = 299792458.0
+        self.kB = 1.380649e-23
         self.pi = pi
         self.alpha = self.hbar * self.c**4 / (15360.0 * self.pi * self.G**2)
 
@@ -383,10 +445,15 @@ class MultiPBHCosmology:
         self.M_min = float(M_min)
 
         rho_pbh_total = np.sum(self.N * self.masses0 * self.c**2) / (self.a0**3)
+        self.tiny_rho_frac = tiny_rho_frac
         self.rhoR0 = tiny_rho_frac * rho_pbh_total
 
         self.taus = self.masses0**3 / (3.0 * self.alpha)
         self.sol = None
+
+        self.gstar = 106.75
+        self.gstar_s = 106.75
+        self.alpha_eff = 0.1
 
     def _mass_loss_rate_scalar(self, M):
         if M > self.M_min:
@@ -403,6 +470,41 @@ class MultiPBHCosmology:
             v[i] = self._mass_loss_rate_scalar(M)
         return v
 
+    def _eval_gstar(self, T, which='energy'):
+        if which == 'energy':
+            gobj = getattr(self, 'gstar', None)
+        else:
+            gobj = getattr(self, 'gstar_s', None)
+        if gobj is None:
+            return 106.75
+        if callable(gobj):
+            return float(gobj(T))
+        else:
+            return float(gobj)
+
+    def solve_T_from_rho(self, rho, T_guess=None, tol=1e-6, maxit=100):
+        coeff = (self.hbar*self.c)**3 / (self.kB**4)
+        rho_arr = np.array(rho, copy=False)
+        T_out = np.zeros_like(rho_arr, dtype=float)
+        for idx, rv in np.ndenumerate(rho_arr):
+            if rv <= 0.0:
+                T_out[idx] = 0.0
+                continue
+            if T_guess is None:
+                T = (coeff * rv / 100.0)**0.25
+            else:
+                T = float(T_guess)
+            for it in range(maxit):
+                g = self._eval_gstar(T, which='energy')
+                if g <= 0:
+                    g = 100.0
+                T_new = (coeff * rv / g)**0.25
+                T = 0.5 * (T + T_new)
+                if abs(T_new - T) / (T + 1e-30) < tol:
+                    break
+            T_out[idx] = float(T)
+        return T_out
+
     def deriv(self, t, y):
         K = self.K
         M = y[:K]
@@ -412,7 +514,6 @@ class MultiPBHCosmology:
         dMdt = self.mass_loss_rate_vec(M)
         n = self.N / (a**3)
         rho_i = n * np.maximum(M, 0.0) * self.c**2
-
         rho_tot = np.sum(rho_i) + rhoR
         H = np.sqrt(8.0 * self.pi * self.G * rho_tot / 3.0) if rho_tot > 0.0 else 0.0
 
@@ -427,7 +528,7 @@ class MultiPBHCosmology:
         dy[K + 1] = da_dt
         return dy
 
-    def run(self, t_final_factor=10.0, nsteps=3000, method="LSODA", rtol=1e-8, atol=1e-30):
+    def run(self, t_final_factor=10000000.0, nsteps=3000, method="LSODA", rtol=1e-8, atol=1e-30):
         y0 = np.empty(self.K + 2)
         y0[: self.K] = self.masses0
         y0[self.K] = self.rhoR0
@@ -473,8 +574,44 @@ class MultiPBHCosmology:
         self.f_i = self.rho_i / self.rho_tot[None, :]
         self.fR = self.rhoR / self.rho_tot
         
-        # Calculate Hubble parameter at each time
         self.H = np.sqrt(8.0 * self.pi * self.G * self.rho_tot / 3.0)
+
+        self.compute_temperature_and_entropy()
+        self.compute_bh_temperatures()
+        self.compute_thermalization_rate()
+
+    def compute_temperature_and_entropy(self, T_guess=None):
+        self.T = self.solve_T_from_rho(self.rhoR, T_guess=T_guess)
+
+        coeff_s = (4/3)*(self.kB**4) / (self.hbar*self.c)**3
+        Nt = self.T.shape[-1]
+        self.s = np.zeros_like(self.T)
+        for i in range(Nt):
+            Ti = self.T[i]
+            if Ti <= 0:
+                self.s[i] = 0.0
+            else:
+                g_s = self._eval_gstar(Ti, which='entropy')
+                self.s[i] = coeff_s * g_s * Ti**3
+
+        self.S_com = self.s * (self.a**3)
+
+    def compute_bh_temperatures(self):
+        K = self.K
+        Nt = self.t.size
+        self.T_BH = np.zeros((K, Nt))
+        for i in range(K):
+            Mi = self.M[i, :]
+            mask = Mi > 0.0
+            Tb = np.zeros_like(Mi)
+            Tb[mask] = (self.hbar * self.c**3) / (8.0 * self.pi * self.G * Mi[mask] * self.kB)
+            self.T_BH[i, :] = Tb
+
+    def compute_thermalization_rate(self):
+        g_vals = np.array([self._eval_gstar(T, which='energy') for T in self.T])
+        self.Gamma = g_vals * (self.alpha_eff**2) * (self.kB * self.T) / self.hbar
+        Hsafe = np.maximum(self.H, 1e-300)
+        self.Gamma_over_H = self.Gamma / Hsafe
 `;
                 await pyodide.runPythonAsync(pythonCode);
                 isInitialized = true;
@@ -497,6 +634,7 @@ class MultiPBHCosmology:
             const tfinal = parseFloat(document.getElementById('tfinal').value);
             const nsteps = parseInt(document.getElementById('nsteps').value);
             const mmin = parseFloat(document.getElementById('mmin').value);
+            const tinyrho = parseFloat(document.getElementById('tinyrho').value);
 
             if (!massesInput.trim()) {
                 setStatus('Please enter at least one mass', 'error');
@@ -534,6 +672,7 @@ class MultiPBHCosmology:
                 pyodide.globals.set('tfinal', tfinal);
                 pyodide.globals.set('nsteps', nsteps);
                 pyodide.globals.set('mmin', mmin);
+                pyodide.globals.set('tinyrho', tinyrho);
 
                 // Run simulation
                 const runCode = `
@@ -542,7 +681,8 @@ import json
 pbh = MultiPBHCosmology(
     masses_kg=masses_input,
     N_ratios=${ratios ? 'ratios_input' : 'None'},
-    M_min=mmin
+    M_min=mmin,
+    tiny_rho_frac=tinyrho
 )
 
 pbh.run(t_final_factor=tfinal, nsteps=nsteps)
@@ -559,7 +699,12 @@ result = {
     't0': pbh.t0,
     'K': pbh.K,
     'a': pbh.a.tolist(),
-    'H': pbh.H.tolist()
+    'H': pbh.H.tolist(),
+    'T': pbh.T.tolist(),
+    'T_BH': [pbh.T_BH[i, :].tolist() for i in range(pbh.K)],
+    'S_com': pbh.S_com.tolist(),
+    'Gamma': pbh.Gamma.tolist(),
+    'Gamma_over_H': pbh.Gamma_over_H.tolist()
 }
 
 json.dumps(result)
@@ -568,11 +713,38 @@ json.dumps(result)
                 const resultJson = await pyodide.runPythonAsync(runCode);
                 const data = JSON.parse(resultJson);
 
-                // Plot results
-                plotDensities(data);
-                plotFractions(data);
-                plotScaleFactor(data);
-                plotHubble(data);
+                // Clear existing plots
+                document.getElementById('plots').innerHTML = '';
+
+                // Plot based on selection
+                if (document.getElementById('plot_densities').checked) {
+                    addPlotContainer('densityPlot', 'Energy Densities vs Time');
+                    plotDensities(data);
+                }
+                if (document.getElementById('plot_fractions').checked) {
+                    addPlotContainer('fractionPlot', 'Fractional Energy Densities');
+                    plotFractions(data);
+                }
+                if (document.getElementById('plot_scalefactor').checked) {
+                    addPlotContainer('scaleFactorPlot', 'Scale Factor vs Time');
+                    plotScaleFactor(data);
+                }
+                if (document.getElementById('plot_hubble').checked) {
+                    addPlotContainer('hubblePlot', 'Hubble Parameter vs Scale Factor');
+                    plotHubble(data);
+                }
+                if (document.getElementById('plot_temperature').checked) {
+                    addPlotContainer('temperaturePlot', 'Temperature Evolution');
+                    plotTemperature(data);
+                }
+                if (document.getElementById('plot_entropy').checked) {
+                    addPlotContainer('entropyPlot', 'Comoving Entropy');
+                    plotEntropy(data);
+                }
+                if (document.getElementById('plot_thermalization').checked) {
+                    addPlotContainer('thermalizationPlot', 'Thermalization Rate (Γ/H)');
+                    plotThermalization(data);
+                }
 
                 setStatus('Simulation complete!', 'success');
                 setTimeout(() => hideStatus(), 3000);
@@ -584,11 +756,22 @@ json.dumps(result)
             }
         }
 
+        // Add plot container dynamically
+        function addPlotContainer(id, title) {
+            const plotsDiv = document.getElementById('plots');
+            const container = document.createElement('div');
+            container.className = 'plot-container';
+            container.innerHTML = `
+                <h3 class="plot-title">${title}</h3>
+                <div id="${id}"></div>
+            `;
+            plotsDiv.appendChild(container);
+        }
+
         // Plot density evolution
         function plotDensities(data) {
             const traces = [];
 
-            // Plot each PBH species
             const colors = ['#00d4ff', '#7b2cbf', '#ff006e', '#fb5607', '#ffbe0b', '#8ac926'];
             for (let i = 0; i < data.K; i++) {
                 traces.push({
@@ -600,7 +783,6 @@ json.dumps(result)
                     line: { width: 2, color: colors[i % colors.length] }
                 });
 
-                // Add evaporation time marker
                 const t_evap = data.t0 + data.taus[i];
                 traces.push({
                     x: [t_evap, t_evap],
@@ -614,7 +796,6 @@ json.dumps(result)
                 });
             }
 
-            // Plot radiation
             traces.push({
                 x: data.t,
                 y: data.rhoR,
@@ -781,6 +962,159 @@ json.dumps(result)
             Plotly.newPlot('hubblePlot', [trace], layout, {responsive: true});
         }
 
+        // Plot temperature evolution
+        function plotTemperature(data) {
+            const traces = [];
+            const colors = ['#00d4ff', '#7b2cbf', '#ff006e', '#fb5607', '#ffbe0b', '#8ac926'];
+
+            // Radiation temperature
+            traces.push({
+                x: data.t,
+                y: data.T.map(t => Math.max(t, 1e-300)),
+                type: 'scatter',
+                mode: 'lines',
+                name: 'T<sub>bath</sub>',
+                line: { width: 3, color: '#ffffff' }
+            });
+
+            // BH temperatures
+            for (let i = 0; i < data.K; i++) {
+                traces.push({
+                    x: data.t,
+                    y: data.T_BH[i].map(t => Math.max(t, 1e-300)),
+                    type: 'scatter',
+                    mode: 'lines',
+                    name: `T<sub>BH,${i}</sub>`,
+                    line: { width: 2, dash: 'dash', color: colors[i % colors.length] }
+                });
+            }
+
+            const layout = {
+                xaxis: {
+                    type: 'log',
+                    title: 'Time (s)',
+                    gridcolor: 'rgba(255,255,255,0.1)',
+                    color: '#e0e0e0'
+                },
+                yaxis: {
+                    type: 'log',
+                    title: 'Temperature (K)',
+                    gridcolor: 'rgba(255,255,255,0.1)',
+                    color: '#e0e0e0'
+                },
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(0,0,0,0.3)',
+                font: { color: '#e0e0e0' },
+                legend: {
+                    bgcolor: 'rgba(0,0,0,0.5)',
+                    bordercolor: 'rgba(255,255,255,0.2)',
+                    borderwidth: 1
+                },
+                margin: { t: 20, r: 20, b: 60, l: 80 }
+            };
+
+            Plotly.newPlot('temperaturePlot', traces, layout, {responsive: true});
+        }
+
+        // Plot comoving entropy
+        function plotEntropy(data) {
+            const trace = {
+                x: data.t,
+                y: data.S_com.map(s => Math.max(s, 1e-300)),
+                type: 'scatter',
+                mode: 'lines',
+                name: 'S<sub>comoving</sub>',
+                line: { width: 3, color: '#fb5607' }
+            };
+
+            const layout = {
+                xaxis: {
+                    type: 'log',
+                    title: 'Time (s)',
+                    gridcolor: 'rgba(255,255,255,0.1)',
+                    color: '#e0e0e0'
+                },
+                yaxis: {
+                    type: 'log',
+                    title: 'Comoving Entropy',
+                    gridcolor: 'rgba(255,255,255,0.1)',
+                    color: '#e0e0e0'
+                },
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(0,0,0,0.3)',
+                font: { color: '#e0e0e0' },
+                legend: {
+                    bgcolor: 'rgba(0,0,0,0.5)',
+                    bordercolor: 'rgba(255,255,255,0.2)',
+                    borderwidth: 1
+                },
+                margin: { t: 20, r: 20, b: 60, l: 80 }
+            };
+
+            Plotly.newPlot('entropyPlot', [trace], layout, {responsive: true});
+        }
+
+        // Plot thermalization rate
+        function plotThermalization(data) {
+            const trace = {
+                x: data.t,
+                y: data.Gamma_over_H,
+                type: 'scatter',
+                mode: 'lines',
+                name: 'Γ/H',
+                line: { width: 3, color: '#8ac926' }
+            };
+
+            const layout = {
+                xaxis: {
+                    type: 'log',
+                    title: 'Time (s)',
+                    gridcolor: 'rgba(255,255,255,0.1)',
+                    color: '#e0e0e0'
+                },
+                yaxis: {
+                    type: 'log',
+                    title: 'Γ/H',
+                    gridcolor: 'rgba(255,255,255,0.1)',
+                    color: '#e0e0e0'
+                },
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(0,0,0,0.3)',
+                font: { color: '#e0e0e0' },
+                shapes: [{
+                    type: 'line',
+                    x0: Math.min(...data.t),
+                    x1: Math.max(...data.t),
+                    y0: 1,
+                    y1: 1,
+                    line: {
+                        color: 'white',
+                        width: 2,
+                        dash: 'dash'
+                    }
+                }],
+                annotations: [{
+                    x: Math.log10(Math.max(...data.t)),
+                    y: Math.log10(1),
+                    xref: 'x',
+                    yref: 'y',
+                    text: 'Γ/H = 1',
+                    showarrow: false,
+                    font: { color: 'white' },
+                    xanchor: 'right',
+                    yanchor: 'bottom'
+                }],
+                legend: {
+                    bgcolor: 'rgba(0,0,0,0.5)',
+                    bordercolor: 'rgba(255,255,255,0.2)',
+                    borderwidth: 1
+                },
+                margin: { t: 20, r: 20, b: 60, l: 80 }
+            };
+
+            Plotly.newPlot('thermalizationPlot', [trace], layout, {responsive: true});
+        }
+
         // Utility functions
         function formatMass(mass) {
             return mass.toExponential(1) + ' kg';
@@ -797,10 +1131,7 @@ json.dumps(result)
         }
 
         function clearPlots() {
-            Plotly.purge('densityPlot');
-            Plotly.purge('fractionPlot');
-            Plotly.purge('scaleFactorPlot');
-            Plotly.purge('hubblePlot');
+            document.getElementById('plots').innerHTML = '';
             setStatus('Plots cleared', 'success');
             setTimeout(() => hideStatus(), 2000);
         }
