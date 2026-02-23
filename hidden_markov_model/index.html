@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="A full-spectrum benchmark of Kalman, particle, and particle-flow filters under nonlinearity and high dimensionality."
+    />
+    <meta property="og:title" content="From Kalman to Particle Flow | Portfolio" />
+    <meta
+      property="og:description"
+      content="Research-grade benchmark of KF, EKF/UKF, PF, and particle-flow methods with NEES diagnostics."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="assets/img/particle_cloud.gif" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <title>Kalman to Particle Flow | Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&amp;family=Space+Grotesk:wght@400;500;700&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="assets/css/site.css" />
+  </head>
+  <body>
+    <div class="bg-layer"></div>
+    <header class="site-header">
+      <a class="brand" href="../index.html">Amresh Verma</a>
+      <nav>
+        <a href="#story">Narrative</a>
+        <a href="#benchmark">Benchmark</a>
+        <a href="#insights">Insights</a>
+        <a href="#about">About</a>
+      </nav>
+    </header>
+
+    <main id="top">
+      <section class="hero reveal">
+        <p class="eyebrow">State Estimation Research Portfolio</p>
+        <h1>
+          From Kalman to Particle Flow: A Full-Spectrum Benchmark of State
+          Estimation Under Nonlinearity and High Dimensionality
+        </h1>
+        <p class="lead">
+          This repository benchmarks KF, EKF/UKF, Bootstrap PF, PF-PF,
+          EDH/LEDH, and kernelized particle flow using linear, nonlinear, and
+          high-dimensional experiments with consistency diagnostics and runtime
+          profiling.
+        </p>
+        <div class="hero-actions">
+          <a class="button primary" href="#benchmark">View Results</a>
+          <a class="button ghost" href="https://github.com/meamresh/MLCOE_Q2_PF/blob/main/README.md">Read Mini-Paper</a>
+          <a
+            class="button ghost"
+            href="https://github.com/meamresh/MLCOE_Q2_PF"
+            >GitHub Repo</a
+          >
+          <a
+            class="button ghost"
+            href="https://github.com/meamresh/MLCOE_Q2_PF/blob/main/reports/Report_I_AmreshVerma.pdf"
+            >Project Report</a
+          >
+          <a class="button ghost" href="../index.html">Back to Main Site</a>
+        </div>
+        <figure class="hero-figure">
+          <img
+            src="assets/img/particle_cloud.gif"
+            alt="Animated particle cloud collapsing around true trajectory in range-bearing localization"
+          />
+          <figcaption>
+            Particle cloud evolution in range-bearing localization.
+          </figcaption>
+        </figure>
+      </section>
+
+      <section id="story" class="section reveal">
+        <h2>Three-Act Narrative Arc</h2>
+        <div class="act-grid">
+          <article class="act-card">
+            <p class="act-kicker">Act 1</p>
+            <h3>Linear-Gaussian Baseline</h3>
+            <p>
+              Kalman filter baselines with Riccati and Joseph covariance
+              updates establish the numerical gold standard.
+            </p>
+            <img
+              src="assets/img/act1_kf_baseline.png"
+              alt="KF stability metrics figure"
+            />
+          </article>
+
+          <article class="act-card">
+            <p class="act-kicker">Act 2</p>
+            <h3>Nonlinear Stress Tests</h3>
+            <p>
+              Range-bearing localization pushes EKF/UKF assumptions; NEES
+              diagnostics reveal consistency failures hidden by point-error
+              metrics.
+            </p>
+            <img
+              src="assets/img/act2_nees.png"
+              alt="NEES consistency comparison for EKF and UKF"
+            />
+          </article>
+
+          <article class="act-card">
+            <p class="act-kicker">Act 3</p>
+            <h3>Transport-Based Methods</h3>
+            <p>
+              PF-PF and EDH/LEDH flows are compared against classical filters on
+              challenging nonlinear tracking tasks.
+            </p>
+            <img
+              src="assets/img/act3_transport.png"
+              alt="RMSE trajectories for transport-based filtering methods"
+            />
+          </article>
+        </div>
+      </section>
+
+      <section id="benchmark" class="section reveal">
+        <div class="section-head">
+          <h2>Benchmark Table</h2>
+          <p>
+            Metrics are pulled from repository outputs in `reports/`.
+            NEES and memory were not logged for all transport-based runs.
+          </p>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Method</th>
+                <th>RMSE (lower is better)</th>
+                <th>NEES (target ~ 1, lower is better)</th>
+                <th>Runtime (s, lower is better)</th>
+                <th>Memory (MB, lower is better)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>EKF</td>
+                <td>1.660</td>
+                <td>40.034</td>
+                <td>0.990</td>
+                <td>450.5</td>
+              </tr>
+              <tr>
+                <td>UKF</td>
+                <td>1.316</td>
+                <td>6.398</td>
+                <td>1.032</td>
+                <td>452.8</td>
+              </tr>
+              <tr>
+                <td>Bootstrap PF</td>
+                <td>0.906</td>
+                <td>1.253</td>
+                <td>1.912</td>
+                <td>494.0</td>
+              </tr>
+              <tr>
+                <td>PF-PF (LEDH proposal)</td>
+                <td>2.492</td>
+                <td>n/a</td>
+                <td>10.857</td>
+                <td>n/a</td>
+              </tr>
+              <tr>
+                <td>LEDH</td>
+                <td>3.543</td>
+                <td>n/a</td>
+                <td>5.197</td>
+                <td>n/a</td>
+              </tr>
+              <tr>
+                <td>Kernel-PFF (matrix)</td>
+                <td>3.322</td>
+                <td>n/a</td>
+                <td>14.642</td>
+                <td>n/a</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="small-ref">
+          Sources: `reports/2_Nonlinear_NonGaussianSSM/EKF_UKF_PF_Comparison/evaluation_results.csv`,
+          `reports/3_Deterministic_Kernel_Flow/Li(17)/summary.txt`, and
+          `reports/3_Deterministic_Kernel_Flow/Filters_Comparison_Diagnostics/experiment_summary.txt`.
+          Comparative framing follows Li (2017) and Hu et al. (2021).
+        </p>
+      </section>
+
+      <section class="section reveal">
+        <div class="callout">
+          <h3>Why NEES Matters</h3>
+          <p>
+            RMSE can look strong while uncertainty is miscalibrated. NEES
+            (Normalized Estimation Error Squared) tests whether the predicted
+            covariance is statistically consistent with observed estimation
+            error.
+          </p>
+          <p class="formula">
+            NEES = <span>(x - x&#770;)</span><sup>T</sup> <span>P</span><sup>-1</sup>
+            <span>(x - x&#770;)</span>
+          </p>
+          <p>
+            This is often the metric that differentiates robust Bayesian
+            filtering from overconfident approximations in interviews.
+          </p>
+        </div>
+      </section>
+
+      <section class="section reveal">
+        <h2>Scaling Study</h2>
+        <p>
+          Dimensionality growth exposes the practical trade-off between accuracy
+          and computational cost for particle-family methods.
+        </p>
+        <img
+          class="wide-plot"
+          src="assets/img/scaling_tradeoff.png"
+          alt="Scaling analysis of filter performance with increasing dimension"
+        />
+      </section>
+
+      <section id="insights" class="section reveal">
+        <h2>Key Insights</h2>
+        <div class="insight-grid">
+          <article>
+            <h3>Joseph stabilization is a safeguard</h3>
+            <p>
+              It improves covariance numerics and positive-definiteness checks,
+              but it is not an automatic RMSE gain.
+            </p>
+          </article>
+          <article>
+            <h3>NEES exposes hidden failures</h3>
+            <p>
+              EKF/UKF can appear acceptable on point-error metrics while failing
+              consistency in nonlinear regimes.
+            </p>
+          </article>
+          <article>
+            <h3>Flow design changes trade-offs</h3>
+            <p>
+              Transport proposals can reduce degeneracy but may impose runtime
+              overhead that must be justified by reliability gains.
+            </p>
+          </article>
+          <article>
+            <h3>Scaling dictates deployment</h3>
+            <p>
+              High-dimensional behavior often decides what can be used in
+              autonomy, quant inference, and data assimilation pipelines.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section id="about" class="section reveal">
+        <h2>Audience-Specific Framing</h2>
+        <div class="role-grid">
+          <article>
+            <h3>Quant Research</h3>
+            <p>
+              Kalman filtering, state-space Bayesian inference, covariance
+              conditioning, and calibration diagnostics.
+            </p>
+          </article>
+          <article>
+            <h3>ML Research / PhD</h3>
+            <p>
+              Particle flow, RKHS kernels, transport proposals, and
+              high-dimensional posterior approximation.
+            </p>
+          </article>
+          <article>
+            <h3>Robotics / Autonomy</h3>
+            <p>
+              Range-bearing localization, NEES consistency, and real-time filter
+              benchmarking under nonlinearity.
+            </p>
+          </article>
+          <article>
+            <h3>Data Assimilation</h3>
+            <p>
+              EDH/LEDH transport, dimensional scaling, and non-Gaussian state
+              estimation in scientific systems.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section reveal">
+        <h2>Reproducibility</h2>
+        <pre><code>python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+python -m src.experiments.exp_part1_lgssm_kf_compare</code></pre>
+      </section>
+    </main>
+
+    <footer>
+      <p>
+        Built for GitHub Pages. Set repository Pages source to
+        <strong>GitHub Actions</strong> to deploy this site from `main`.
+      </p>
+    </footer>
+
+    <script src="assets/js/site.js"></script>
+  </body>
+</html>
