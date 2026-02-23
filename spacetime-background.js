@@ -23,9 +23,9 @@
 
     const MAX_STARS = 8;
     const EPSILON = 22;
-    const RECOVERY_RATE = 0.11;
-    const CURSOR_MASS_TARGET = 24;
-    const LENSING_STRENGTH = viewportWidth < 900 ? 18 : 26;
+    const RECOVERY_RATE = 0.12;
+    const CURSOR_MASS_TARGET = 30;
+    const LENSING_STRENGTH = viewportWidth < 900 ? 24 : 34;
 
     const scene = new THREE.Scene();
     scene.fog = new THREE.FogExp2(0x050913, 0.0125);
@@ -68,7 +68,7 @@
         new THREE.MeshBasicMaterial({
             color: 0x0d1d33,
             transparent: true,
-            opacity: 0.25,
+            opacity: 0.36,
             side: THREE.DoubleSide,
             depthWrite: false
         })
@@ -80,7 +80,7 @@
             color: 0x86aefb,
             wireframe: true,
             transparent: true,
-            opacity: 0.36,
+            opacity: 0.5,
             depthWrite: false
         })
     );
@@ -191,7 +191,7 @@
     }
 
     function addPersistentMass(x, y) {
-        const strength = THREE.MathUtils.randFloat(14, 24);
+        const strength = THREE.MathUtils.randFloat(18, 30);
         const mass = {
             position: new THREE.Vector2(x, y),
             strength,
