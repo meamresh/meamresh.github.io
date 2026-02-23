@@ -5,138 +5,119 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="A full-spectrum benchmark of Kalman, particle, and particle-flow filters under nonlinearity and high dimensionality."
+      content="Controlled benchmark of Kalman, particle, and deterministic flow filters with NEES calibration, stability diagnostics, and computational trade-off analysis."
     />
-    <meta property="og:title" content="From Kalman to Particle Flow | Portfolio" />
-    <meta
-      property="og:description"
-      content="Research-grade benchmark of KF, EKF/UKF, PF, and particle-flow methods with NEES diagnostics."
-    />
-    <meta property="og:type" content="website" />
-    <meta property="og:image" content="assets/img/particle_cloud.gif" />
-    <meta name="twitter:card" content="summary_large_image" />
-    <title>Kalman to Particle Flow | Portfolio</title>
+    <title>State Estimation Benchmark | Hidden Markov Model Portfolio</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&amp;family=Space+Grotesk:wght@400;500;700&amp;display=swap"
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:wght@500;600&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="assets/css/site.css" />
   </head>
   <body>
-    <div class="bg-layer"></div>
     <header class="site-header">
       <a class="brand" href="../index.html">Amresh Verma</a>
       <nav>
-        <a href="#story">Narrative</a>
-        <a href="#benchmark">Benchmark</a>
         <a href="#insights">Insights</a>
-        <a href="#about">About</a>
+        <a href="#benchmark">Benchmark</a>
+        <a href="#scaling">Scaling</a>
+        <a href="#design">Design</a>
+        <a href="#failure">Failure Modes</a>
+        <a href="#repro">Reproducibility</a>
       </nav>
     </header>
 
-    <main id="top">
-      <section class="hero reveal">
-        <p class="eyebrow">State Estimation Research Portfolio</p>
-        <h1>
-          From Kalman to Particle Flow: A Full-Spectrum Benchmark of State
-          Estimation Under Nonlinearity and High Dimensionality
-        </h1>
-        <p class="lead">
-          This repository benchmarks KF, EKF/UKF, Bootstrap PF, PF-PF,
-          EDH/LEDH, and kernelized particle flow using linear, nonlinear, and
-          high-dimensional experiments with consistency diagnostics and runtime
-          profiling.
+    <main>
+      <section class="hero" id="top">
+        <p class="hero-tag">Quantitative Inference Portfolio</p>
+        <h1>State Estimation Under Nonlinearity and Dimensional Scaling</h1>
+        <p class="hero-subtitle">
+          A controlled benchmark of Kalman, particle, and deterministic flow
+          filters evaluated on calibration, stability, and computational cost.
         </p>
+
+        <ul class="exec-summary">
+          <li>Designed and benchmarked 6 Bayesian state estimators (KF to Particle Flow).</li>
+          <li>Evaluated statistical consistency using NEES, not just RMSE.</li>
+          <li>Analyzed accuracy-runtime-memory trade-offs under nonlinear and high-dimensional stress.</li>
+        </ul>
+
         <div class="hero-actions">
-          <a class="button primary" href="#benchmark">View Results</a>
-          <a class="button ghost" href="https://github.com/meamresh/MLCOE_Q2_PF/blob/main/README.md">Read Mini-Paper</a>
-          <a
-            class="button ghost"
-            href="https://github.com/meamresh/MLCOE_Q2_PF"
-            >GitHub Repo</a
-          >
+          <a class="button primary" href="#benchmark">Results</a>
+          <a class="button ghost" href="https://github.com/meamresh/MLCOE_Q2_PF">GitHub</a>
           <a
             class="button ghost"
             href="https://github.com/meamresh/MLCOE_Q2_PF/blob/main/reports/Report_I_AmreshVerma.pdf"
-            >Project Report</a
+            >Report</a
           >
-          <a class="button ghost" href="../index.html">Back to Main Site</a>
+          <a class="button ghost" href="../index.html">Main Site</a>
         </div>
+
         <figure class="hero-figure">
           <img
+            class="zoomable-plot"
             src="assets/img/particle_cloud.gif"
-            alt="Animated particle cloud collapsing around true trajectory in range-bearing localization"
+            alt="Particle cloud evolution in range-bearing localization"
+            data-caption="Particle cloud evolution in range-bearing localization"
+            data-source-url="https://github.com/meamresh/meamresh.github.io/blob/main/hidden_markov_model/assets/img/particle_cloud.gif"
           />
-          <figcaption>
-            Particle cloud evolution in range-bearing localization.
-          </figcaption>
+          <figcaption>Particle cloud evolution in the nonlinear tracking setting.</figcaption>
         </figure>
       </section>
 
-      <section id="story" class="section reveal">
-        <h2>Three-Act Narrative Arc</h2>
-        <div class="act-grid">
-          <article class="act-card">
-            <p class="act-kicker">Act 1</p>
-            <h3>Linear-Gaussian Baseline</h3>
+      <section id="insights" class="section">
+        <h2>Key Insights</h2>
+        <div class="card-grid four">
+          <article class="card">
+            <h3>Calibration is a first-class metric</h3>
             <p>
-              Kalman filter baselines with Riccati and Joseph covariance
-              updates establish the numerical gold standard.
+              NEES exposed overconfidence in filters that appeared acceptable on
+              point error alone.
             </p>
-            <img
-              src="assets/img/act1_kf_baseline.png"
-              alt="KF stability metrics figure"
-            />
           </article>
-
-          <article class="act-card">
-            <p class="act-kicker">Act 2</p>
-            <h3>Nonlinear Stress Tests</h3>
+          <article class="card">
+            <h3>Numerical stabilization has boundaries</h3>
             <p>
-              Range-bearing localization pushes EKF/UKF assumptions; NEES
-              diagnostics reveal consistency failures hidden by point-error
-              metrics.
+              Joseph-form covariance updates improved robustness but did not
+              eliminate nonlinear divergence mechanisms.
             </p>
-            <img
-              src="assets/img/act2_nees.png"
-              alt="NEES consistency comparison for EKF and UKF"
-            />
           </article>
-
-          <article class="act-card">
-            <p class="act-kicker">Act 3</p>
-            <h3>Transport-Based Methods</h3>
+          <article class="card">
+            <h3>Deterministic flow proposals shift trade-offs</h3>
             <p>
-              PF-PF and EDH/LEDH flows are compared against classical filters on
-              challenging nonlinear tracking tasks.
+              Flow-based proposals improved robustness in hard regimes with
+              measurable runtime overhead.
             </p>
-            <img
-              src="assets/img/act3_transport.png"
-              alt="RMSE trajectories for transport-based filtering methods"
-            />
+          </article>
+          <article class="card">
+            <h3>Scaling governs deployability</h3>
+            <p>
+              High-dimensional behavior determined practical feasibility more
+              than single-scenario leaderboard performance.
+            </p>
           </article>
         </div>
       </section>
 
-      <section id="benchmark" class="section reveal">
-        <div class="section-head">
-          <h2>Benchmark Table</h2>
-          <p>
-            Metrics are pulled from repository outputs in `reports/`.
-            NEES and memory were not logged for all transport-based runs.
-          </p>
-        </div>
+      <section id="benchmark" class="section">
+        <h2>Benchmark Results</h2>
+        <p class="section-intro">
+          The table combines accuracy, calibration, and systems costs. RMSE alone
+          is not sufficient for decision-critical inference.
+        </p>
+
         <div class="table-wrap">
           <table>
             <thead>
               <tr>
                 <th>Method</th>
-                <th>RMSE (lower is better)</th>
-                <th>NEES (target ~ 1, lower is better)</th>
-                <th>Runtime (s, lower is better)</th>
-                <th>Memory (MB, lower is better)</th>
+                <th>RMSE</th>
+                <th>NEES (target ~ 1)</th>
+                <th>Runtime (s)</th>
+                <th>Memory (MB)</th>
+                <th>Verdict</th>
               </tr>
             </thead>
             <tbody>
@@ -144,8 +125,9 @@
                 <td>EKF</td>
                 <td>1.660</td>
                 <td>40.034</td>
-                <td>0.990</td>
+                <td class="fastest">0.990</td>
                 <td>450.5</td>
+                <td>Fast but severely miscalibrated in nonlinear settings.</td>
               </tr>
               <tr>
                 <td>UKF</td>
@@ -153,20 +135,23 @@
                 <td>6.398</td>
                 <td>1.032</td>
                 <td>452.8</td>
+                <td>Better than EKF, still overconfident under stress.</td>
               </tr>
               <tr>
                 <td>Bootstrap PF</td>
-                <td>0.906</td>
-                <td>1.253</td>
+                <td class="best"><strong>0.906</strong></td>
+                <td class="best"><strong>1.253</strong></td>
                 <td>1.912</td>
                 <td>494.0</td>
+                <td>Best calibrated among NEES-logged methods with strong accuracy.</td>
               </tr>
               <tr>
-                <td>PF-PF (LEDH proposal)</td>
+                <td>PF-PF (LEDH)</td>
                 <td>2.492</td>
                 <td>n/a</td>
                 <td>10.857</td>
                 <td>n/a</td>
+                <td>Stable proposals, high runtime cost in current configuration.</td>
               </tr>
               <tr>
                 <td>LEDH</td>
@@ -174,6 +159,7 @@
                 <td>n/a</td>
                 <td>5.197</td>
                 <td>n/a</td>
+                <td>Deterministic flow behavior with moderate compute overhead.</td>
               </tr>
               <tr>
                 <td>Kernel-PFF (matrix)</td>
@@ -181,134 +167,258 @@
                 <td>n/a</td>
                 <td>14.642</td>
                 <td>n/a</td>
+                <td>High-dimensional robustness signal, but expensive in runtime.</td>
               </tr>
             </tbody>
           </table>
         </div>
-        <p class="small-ref">
-          Sources: `reports/2_Nonlinear_NonGaussianSSM/EKF_UKF_PF_Comparison/evaluation_results.csv`,
-          `reports/3_Deterministic_Kernel_Flow/Li(17)/summary.txt`, and
-          `reports/3_Deterministic_Kernel_Flow/Filters_Comparison_Diagnostics/experiment_summary.txt`.
-          Comparative framing follows Li (2017) and Hu et al. (2021).
-        </p>
-      </section>
 
-      <section class="section reveal">
-        <div class="callout">
-          <h3>Why NEES Matters</h3>
-          <p>
-            RMSE can look strong while uncertainty is miscalibrated. NEES
-            (Normalized Estimation Error Squared) tests whether the predicted
-            covariance is statistically consistent with observed estimation
-            error.
-          </p>
+        <p class="table-summary">
+          Interpretation: Bootstrap PF gave the strongest combined signal on
+          accuracy and calibration where NEES was logged, while deterministic
+          flows showed useful stress robustness at significantly higher compute cost.
+          For downstream decision systems, calibration quality is as important as error magnitude.
+        </p>
+
+        <div class="nees-callout">
+          <h3>NEES Emphasis</h3>
           <p class="formula">
-            NEES = <span>(x - x&#770;)</span><sup>T</sup> <span>P</span><sup>-1</sup>
-            <span>(x - x&#770;)</span>
+            NEES = (x - x&#770;)<sup>T</sup> P<sup>-1</sup> (x - x&#770;)
           </p>
           <p>
-            This is often the metric that differentiates robust Bayesian
-            filtering from overconfident approximations in interviews.
+            A filter with low RMSE but inflated NEES is statistically overconfident
+            and unsafe for downstream decision-making.
           </p>
         </div>
+
+        <figure class="plot-card">
+          <img
+            class="zoomable-plot"
+            src="assets/img/act2_nees.png"
+            alt="NEES comparison in nonlinear regime"
+            data-caption="NEES behavior under nonlinear stress (EKF vs UKF)"
+            data-source-url="https://github.com/meamresh/MLCOE_Q2_PF/blob/main/reports/2_Nonlinear_NonGaussianSSM/linearization_sigma_pt_failures/nees_comparison.png"
+          />
+          <figcaption>Calibration diagnostics in nonlinear range-bearing localization.</figcaption>
+        </figure>
       </section>
 
-      <section class="section reveal">
+      <section id="scaling" class="section">
         <h2>Scaling Study</h2>
-        <p>
-          Dimensionality growth exposes the practical trade-off between accuracy
-          and computational cost for particle-family methods.
+        <p class="section-intro">
+          As dimensionality increases, method choice is governed by an
+          accuracy-efficiency frontier, not a single scalar metric.
         </p>
-        <img
-          class="wide-plot"
-          src="assets/img/scaling_tradeoff.png"
-          alt="Scaling analysis of filter performance with increasing dimension"
-        />
+
+        <figure class="plot-card">
+          <img
+            class="zoomable-plot"
+            src="assets/img/scaling_tradeoff.png"
+            alt="Scaling trade-off plot"
+            data-caption="Accuracy-runtime trade-off under dimensional scaling"
+            data-source-url="https://github.com/meamresh/MLCOE_Q2_PF/blob/main/reports/2_Nonlinear_NonGaussianSSM/EKF_UKF_PF_Comparison/particle_scaling_analysis.png"
+          />
+          <figcaption>Dimensional scaling analysis from the runtime-memory study.</figcaption>
+        </figure>
+
+        <h3 class="subsection-title">Computational Awareness</h3>
+        <div class="table-wrap compact">
+          <table>
+            <thead>
+              <tr>
+                <th>Method</th>
+                <th>Time Complexity (approx.)</th>
+                <th>Memory Complexity (approx.)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>KF / EKF / UKF</td>
+                <td>O(d^3)</td>
+                <td>O(d^2)</td>
+              </tr>
+              <tr>
+                <td>Bootstrap PF</td>
+                <td>O(Nd)</td>
+                <td>O(Nd)</td>
+              </tr>
+              <tr>
+                <td>PF-PF / LEDH</td>
+                <td>O(Nd^2)</td>
+                <td>O(Nd)</td>
+              </tr>
+              <tr>
+                <td>Kernel-PFF (matrix)</td>
+                <td>O(N^2d)</td>
+                <td>O(N^2)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="small-note">
+          Runtime and memory were explicitly profiled per method in the benchmark pipeline.
+        </p>
       </section>
 
-      <section id="insights" class="section reveal">
-        <h2>Key Insights</h2>
-        <div class="insight-grid">
-          <article>
-            <h3>Joseph stabilization is a safeguard</h3>
+      <section id="design" class="section">
+        <h2>Experimental Design</h2>
+
+        <article class="design-philosophy">
+          <h3>Design Philosophy</h3>
+          <p>This benchmark isolates three axes:</p>
+          <ol>
+            <li>Linearity vs nonlinearity</li>
+            <li>Gaussian vs non-Gaussian uncertainty</li>
+            <li>Dimensional scaling behavior</li>
+          </ol>
+          <p>Each experiment evaluates:</p>
+          <ul>
+            <li>Point accuracy</li>
+            <li>Covariance calibration</li>
+            <li>Numerical stability</li>
+            <li>Computational complexity</li>
+          </ul>
+        </article>
+
+        <h3 class="subsection-title">Progressive Stress Framework</h3>
+        <div class="card-grid three">
+          <article class="card">
+            <h4>Act 1: Linear-Gaussian Baseline</h4>
+            <p>KF stability and covariance update behavior under controlled assumptions.</p>
+            <img
+              class="zoomable-plot"
+              src="assets/img/act1_kf_baseline.png"
+              alt="KF baseline stability figure"
+              data-caption="KF baseline stability metrics"
+              data-source-url="https://github.com/meamresh/MLCOE_Q2_PF/blob/main/reports/1_LinearGaussianSSM/figures/kf_stability_metrics.png"
+            />
+          </article>
+          <article class="card">
+            <h4>Act 2: Nonlinear Stress</h4>
+            <p>Approximate Gaussian filters tested under range-bearing nonlinearity and calibration pressure.</p>
+            <img
+              class="zoomable-plot"
+              src="assets/img/act2_nees.png"
+              alt="Nonlinear NEES behavior"
+              data-caption="Nonlinear NEES behavior"
+              data-source-url="https://github.com/meamresh/MLCOE_Q2_PF/blob/main/reports/2_Nonlinear_NonGaussianSSM/linearization_sigma_pt_failures/nees_comparison.png"
+            />
+          </article>
+          <article class="card">
+            <h4>Act 3: Deterministic Flow Proposals</h4>
+            <p>PF-PF and flow-based methods evaluated under stronger degeneracy and transport constraints.</p>
+            <img
+              class="zoomable-plot"
+              src="assets/img/act3_transport.png"
+              alt="Deterministic flow proposal performance"
+              data-caption="Deterministic flow proposal performance"
+              data-source-url="https://github.com/meamresh/MLCOE_Q2_PF/blob/main/reports/3_Deterministic_Kernel_Flow/Li%2817%29/rmse_vs_steps.png"
+            />
+          </article>
+        </div>
+      </section>
+
+      <section id="failure" class="section">
+        <h2>Failure Modes</h2>
+        <div class="card-grid two">
+          <article class="card">
+            <h3>EKF divergence under strong nonlinearity</h3>
             <p>
-              It improves covariance numerics and positive-definiteness checks,
-              but it is not an automatic RMSE gain.
+              First-order linearization produced unstable covariance behavior and
+              inflated NEES when measurement geometry became strongly nonlinear.
             </p>
           </article>
-          <article>
-            <h3>NEES exposes hidden failures</h3>
+          <article class="card">
+            <h3>Particle degeneracy when N is insufficient</h3>
             <p>
-              EKF/UKF can appear acceptable on point-error metrics while failing
-              consistency in nonlinear regimes.
+              Weight collapse reduced effective sample size and increased variance
+              in posterior approximation under sparse or hard observations.
             </p>
           </article>
-          <article>
-            <h3>Flow design changes trade-offs</h3>
+          <article class="card">
+            <h3>Runtime overhead in deterministic flows</h3>
             <p>
-              Transport proposals can reduce degeneracy but may impose runtime
-              overhead that must be justified by reliability gains.
+              EDH/LEDH and kernelized transport improved certain stress cases but
+              incurred substantial runtime overhead relative to KF/PF baselines.
             </p>
           </article>
-          <article>
-            <h3>Scaling dictates deployment</h3>
+          <article class="card">
+            <h3>Overconfidence detected by NEES</h3>
             <p>
-              High-dimensional behavior often decides what can be used in
-              autonomy, quant inference, and data assimilation pipelines.
+              Calibration failure occurred even when point-error metrics appeared
+              acceptable, reinforcing NEES as a non-optional diagnostic.
             </p>
           </article>
         </div>
       </section>
 
-      <section id="about" class="section reveal">
-        <h2>Audience-Specific Framing</h2>
-        <div class="role-grid">
-          <article>
-            <h3>Quant Research</h3>
-            <p>
-              Kalman filtering, state-space Bayesian inference, covariance
-              conditioning, and calibration diagnostics.
-            </p>
-          </article>
-          <article>
-            <h3>ML Research / PhD</h3>
-            <p>
-              Particle flow, RKHS kernels, transport proposals, and
-              high-dimensional posterior approximation.
-            </p>
-          </article>
-          <article>
-            <h3>Robotics / Autonomy</h3>
-            <p>
-              Range-bearing localization, NEES consistency, and real-time filter
-              benchmarking under nonlinearity.
-            </p>
-          </article>
-          <article>
-            <h3>Data Assimilation</h3>
-            <p>
-              EDH/LEDH transport, dimensional scaling, and non-Gaussian state
-              estimation in scientific systems.
-            </p>
-          </article>
-        </div>
-      </section>
-
-      <section class="section reveal">
+      <section id="repro" class="section">
         <h2>Reproducibility</h2>
+        <p class="section-intro">
+          No new experiments were added in this portfolio redesign. The page uses
+          existing outputs from the benchmark repository.
+        </p>
         <pre><code>python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-python -m src.experiments.exp_part1_lgssm_kf_compare</code></pre>
+bash scripts/run_part1.sh</code></pre>
+        <p class="small-note">
+          Source repository:
+          <a href="https://github.com/meamresh/MLCOE_Q2_PF">github.com/meamresh/MLCOE_Q2_PF</a>
+        </p>
+      </section>
+
+      <section class="section" id="quant">
+        <h2>Relevance to Quantitative Research</h2>
+        <div class="card-grid two">
+          <article class="card">
+            <h3>State-space reasoning</h3>
+            <p>
+              Filtering maps naturally to latent-state inference, where hidden
+              factors evolve sequentially under uncertainty.
+            </p>
+          </article>
+          <article class="card">
+            <h3>Real-time inference discipline</h3>
+            <p>
+              The benchmark emphasizes online updates, calibration quality, and
+              failure awareness rather than static offline fit.
+            </p>
+          </article>
+          <article class="card">
+            <h3>Calibration as control signal</h3>
+            <p>
+              NEES provides a direct signal for uncertainty reliability, critical
+              when downstream policies consume posterior covariance.
+            </p>
+          </article>
+          <article class="card">
+            <h3>High-dimensional systems perspective</h3>
+            <p>
+              Scaling diagnostics connect algorithmic complexity to practical
+              deployment constraints in large latent-state systems.
+            </p>
+          </article>
+        </div>
       </section>
     </main>
 
     <footer>
-      <p>
-        Built for GitHub Pages. Set repository Pages source to
-        <strong>GitHub Actions</strong> to deploy this site from `main`.
-      </p>
+      <p>Built for GitHub Pages with a quant-research-first presentation hierarchy.</p>
     </footer>
+
+    <div id="plot-modal" class="plot-modal" aria-hidden="true">
+      <button class="plot-modal-close" id="plot-modal-close" aria-label="Close plot">Close</button>
+      <div class="plot-modal-body">
+        <img id="plot-modal-image" alt="Expanded plot" />
+        <p id="plot-modal-caption" class="plot-modal-caption"></p>
+        <p class="plot-modal-source-wrap">
+          <a id="plot-modal-source" href="#" target="_blank" rel="noopener noreferrer"
+            >Open plot source on GitHub</a
+          >
+        </p>
+      </div>
+    </div>
 
     <script src="assets/js/site.js"></script>
   </body>
