@@ -4,6 +4,36 @@
         return;
     }
 
+    const helperLabel = document.getElementById('mass-helper');
+    let firstMassPlaced = false;
+
+    function showMassHelper(clientX, clientY) {
+        if (!helperLabel || firstMassPlaced) {
+            return;
+        }
+
+        helperLabel.style.left = `${clientX + 18}px`;
+        helperLabel.style.top = `${clientY - 14}px`;
+        helperLabel.classList.add('visible');
+        helperLabel.setAttribute('aria-hidden', 'false');
+    }
+
+    function hideMassHelper() {
+        if (!helperLabel) {
+            return;
+        }
+
+        helperLabel.classList.remove('visible');
+        helperLabel.setAttribute('aria-hidden', 'true');
+    }
+
+    function markMassAdded() {
+        if (!firstMassPlaced) {
+            firstMassPlaced = true;
+            hideMassHelper();
+        }
+    }
+
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     let viewportWidth = window.innerWidth;
@@ -11,10 +41,12 @@
 
     const MAX_STARS = 8;
     const EPSILON = 22;
-    const CURSOR_MASS_TARGET = 30;
+    const CURSOR_MASS_TARGET = 36;
 
     function attachPointerState(state) {
         const pointerBuffer = { x: 0, y: 0 };
+        state.pointerActive = false;
+        state.hoverBoost = 1;
 
         function mapScreenToFabric(clientX, clientY, out) {
             const x = (clientX / viewportWidth - 0.5) * state.fabricWidth;
@@ -31,6 +63,8 @@
                 state.cursorMass.target.x = pointerBuffer.x;
                 state.cursorMass.target.y = pointerBuffer.y;
                 state.cursorMass.targetStrength = CURSOR_MASS_TARGET;
+                state.pointerActive = true;
+                showMassHelper(event.clientX, event.clientY);
             }
         }, { passive: true });
 
@@ -38,6 +72,8 @@
             if (event.button !== 0) {
                 return;
             }
+
+            markMassAdded();
 
             if (!mapScreenToFabric(event.clientX, event.clientY, pointerBuffer)) {
                 return;
@@ -59,6 +95,8 @@
 
         const releaseCursorMass = () => {
             state.cursorMass.targetStrength = 0;
+            state.pointerActive = false;
+            hideMassHelper();
         };
 
         window.addEventListener('blur', releaseCursorMass);
@@ -173,6 +211,8 @@
             state.cursorMass.position.x += (state.cursorMass.target.x - state.cursorMass.position.x) * 0.16;
             state.cursorMass.position.y += (state.cursorMass.target.y - state.cursorMass.position.y) * 0.16;
             state.cursorMass.strength += (state.cursorMass.targetStrength - state.cursorMass.strength) * 0.085;
+            state.hoverBoost += ((state.pointerActive ? 1.8 : 1) - state.hoverBoost) * 0.09;
+            const effectiveCursorStrength = state.cursorMass.strength * state.hoverBoost;
 
             for (let i = 0; i < state.persistentMasses.length; i += 1) {
                 const mass = state.persistentMasses[i];
@@ -188,7 +228,7 @@
                     zTarget += applyMass(v.x, v.y, mass.position.x, mass.position.y, mass.currentStrength);
                 }
 
-                zTarget += applyMass(v.x, v.y, state.cursorMass.position.x, state.cursorMass.position.y, state.cursorMass.strength);
+                zTarget += applyMass(v.x, v.y, state.cursorMass.position.x, state.cursorMass.position.y, effectiveCursorStrength);
                 v.z += (zTarget - v.z) * 0.12;
             }
 
@@ -229,7 +269,7 @@
                 let sy = star.y;
 
                 const allMasses = state.persistentMasses.slice();
-                allMasses.push({ position: state.cursorMass.position, currentStrength: state.cursorMass.strength });
+                allMasses.push({ position: state.cursorMass.position, currentStrength: effectiveCursorStrength });
 
                 for (let m = 0; m < allMasses.length; m += 1) {
                     const mass = allMasses[m];
@@ -259,7 +299,7 @@
             }
 
             const cursorPoint = mapToScreen(state.cursorMass.position.x, state.cursorMass.position.y, -2);
-            drawRing(cursorPoint.sx, cursorPoint.sy, state.cursorMass.strength, time, true);
+            drawRing(cursorPoint.sx, cursorPoint.sy, effectiveCursorStrength, time, true);
         }
 
         function handleResizeFallback() {
@@ -439,6 +479,8 @@
 
         cursorMass.ring.material.opacity = 0.14;
         cursorMass.core.material.opacity = 0.0;
+        let pointerActive = false;
+        let cursorHoverBoost = 1;
 
         function disposeMassVisuals(mass) {
             scene.remove(mass.ring, mass.core);
@@ -469,6 +511,8 @@
 
         function releaseCursorMass() {
             cursorMass.targetStrength = 0;
+            pointerActive = false;
+            hideMassHelper();
         }
 
         const pointerBuffer = new THREE.Vector2();
@@ -477,6 +521,8 @@
             if (mapScreenToFabric(event.clientX, event.clientY, pointerBuffer)) {
                 cursorMass.target.copy(pointerBuffer);
                 cursorMass.targetStrength = CURSOR_MASS_TARGET;
+                pointerActive = true;
+                showMassHelper(event.clientX, event.clientY);
             }
         }, { passive: true });
 
@@ -484,6 +530,8 @@
             if (event.button !== 0) {
                 return;
             }
+
+            markMassAdded();
 
             if (!mapScreenToFabric(event.clientX, event.clientY, pointerBuffer)) {
                 return;
@@ -587,6 +635,8 @@
 
             cursorMass.position.lerp(cursorMass.target, 0.16);
             cursorMass.strength += (cursorMass.targetStrength - cursorMass.strength) * 0.085;
+            cursorHoverBoost += ((pointerActive ? 1.78 : 1) - cursorHoverBoost) * 0.09;
+            const effectiveCursorStrength = cursorMass.strength * cursorHoverBoost;
 
             for (let i = 0; i < persistentMasses.length; i += 1) {
                 const mass = persistentMasses[i];
@@ -594,7 +644,7 @@
                 updateMassVisual(mass, mass.currentStrength, time, false);
             }
 
-            updateMassVisual(cursorMass, cursorMass.strength, time, true);
+            updateMassVisual(cursorMass, effectiveCursorStrength, time, true);
 
             for (let i = 0; i < vertexCount; i += 1) {
                 const i3 = i * 3;
@@ -610,8 +660,8 @@
                     }
                 }
 
-                if (cursorMass.strength > 0.02) {
-                    zTarget += applyMassContribution(px, py, cursorMass.position.x, cursorMass.position.y, cursorMass.strength);
+                if (effectiveCursorStrength > 0.02) {
+                    zTarget += applyMassContribution(px, py, cursorMass.position.x, cursorMass.position.y, effectiveCursorStrength);
                 }
 
                 displacementCurrent[i] += (zTarget - displacementCurrent[i]) * RECOVERY_RATE;
@@ -635,8 +685,8 @@
                     }
                 }
 
-                if (cursorMass.strength > 0.03) {
-                    applyLensing(baseX, baseY, cursorMass.position.x, cursorMass.position.y, cursorMass.strength, lensingVector);
+                if (effectiveCursorStrength > 0.03) {
+                    applyLensing(baseX, baseY, cursorMass.position.x, cursorMass.position.y, effectiveCursorStrength, lensingVector);
                 }
 
                 starPositions[i3] += (baseX + lensingVector.x - starPositions[i3]) * 0.16;

@@ -54,11 +54,35 @@ body {
     z-index: 4;
     pointer-events: none;
     user-select: none;
-    color: rgba(181, 210, 255, 0.33);
+    color: rgba(204, 224, 255, 0.56);
     font-family: "Times New Roman", Georgia, serif;
-    font-size: clamp(0.72rem, 1.35vw, 0.92rem);
+    font-size: clamp(0.76rem, 1.38vw, 0.98rem);
     letter-spacing: 0.04em;
-    text-shadow: 0 0 16px rgba(120, 170, 255, 0.24);
+    text-shadow: 0 0 20px rgba(129, 179, 255, 0.34);
+}
+
+.mass-helper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 7;
+    pointer-events: none;
+    user-select: none;
+    padding: 6px 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(186, 212, 255, 0.36);
+    background: rgba(8, 14, 28, 0.72);
+    color: rgba(210, 228, 255, 0.88);
+    font-size: 0.77rem;
+    letter-spacing: 0.02em;
+    opacity: 0;
+    transform: translate(-50%, -130%);
+    transition: opacity 220ms ease;
+    backdrop-filter: blur(4px);
+}
+
+.mass-helper.visible {
+    opacity: 1;
 }
 
 .field-equation sub {
@@ -218,7 +242,7 @@ body > .modal {
 .hero-buttons {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 12px;
     align-items: center;
 }
 
@@ -761,6 +785,13 @@ body > .modal {
 
     .hero-buttons {
         flex-direction: column;
+        width: 100%;
+    }
+
+    .hero-buttons .btn-primary,
+    .hero-buttons .btn-secondary {
+        justify-content: center;
+        width: min(320px, 100%);
     }
 
     .highlights-grid {
@@ -797,6 +828,7 @@ body > .modal {
     .hero-buttons {
         flex-direction: row;
         justify-content: center;
+        flex-wrap: wrap;
     }
 }
 
