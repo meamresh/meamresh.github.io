@@ -3,67 +3,154 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Finance Project | Placeholder</title>
-  <link rel="stylesheet" href="portfolio.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <title>Finance Portfolio | Amresh Verma</title>
+  <link rel="stylesheet" href="finance.css" />
 </head>
 <body>
   <header class="site-header">
     <a class="brand" href="portfolio.html">Quant/ML Portfolio</a>
-    <nav>
+    <nav aria-label="Primary">
       <a href="portfolio.html">All Projects</a>
+      <a href="hidden_markov_model/">Hidden Markov Model</a>
       <a href="index.html">Homepage</a>
     </nav>
   </header>
 
   <main>
-    <section class="hero">
-      <h1>Finance Project (Placeholder)</h1>
-      <p>
-        This page is reserved for an upcoming quantitative finance project.
-        The structure is ready for a full technical case study.
+    <section class="hero" aria-labelledby="finance-hero-title">
+      <p class="kicker">Finance Research Portfolio</p>
+      <h1 id="finance-hero-title">Quant workflows focused on risk, factor structure, and text signals.</h1>
+      <p class="hero-subtitle">
+        This page is wired for recruiter review with direct links to committed artifacts and clearly marked placeholders where notebooks/results are not yet checked in.
       </p>
       <div class="hero-actions">
-        <a class="btn" href="portfolio.html">Back to Portfolio</a>
-        <a class="btn" href="index.html">Back to Homepage</a>
+        <a class="btn btn-primary" href="finance/placeholders/github-code-link.md">View code on GitHub</a>
+        <a class="btn btn-secondary" href="finance/placeholders/run-notebooks-demo.md">Run notebooks / See demo</a>
       </div>
     </section>
 
-    <section class="section">
-      <h2>Planned Scope</h2>
-      <div class="project-grid">
-        <article class="project-card">
-          <div class="project-head">
-            <h3>Problem Definition</h3>
-            <span class="badge soon">Planned</span>
-          </div>
-          <p>Define forecasting, signal extraction, and evaluation constraints.</p>
+    <section class="section" aria-labelledby="kpi-title">
+      <div class="section-head">
+        <h2 id="kpi-title">KPI Snapshot</h2>
+        <p>Repository scan date: 2026-02-25</p>
+      </div>
+      <div class="kpi-grid">
+        <article class="kpi-card">
+          <h3>FinBERT Corpus Size</h3>
+          <p class="kpi-value">0 documents detected</p>
+          <p class="kpi-note">No committed dataset count or sentiment notebook found in this repository clone.</p>
         </article>
-
-        <article class="project-card">
-          <div class="project-head">
-            <h3>Model Stack</h3>
-            <span class="badge soon">Planned</span>
-          </div>
-          <p>Prototype baseline and probabilistic models with calibration diagnostics.</p>
+        <article class="kpi-card">
+          <h3>Yield Curve PCA</h3>
+          <p class="kpi-value">N/A (no PCA output found)</p>
+          <p class="kpi-note">No committed fixed-income PCA notebook/results were detected.</p>
         </article>
-
-        <article class="project-card">
-          <div class="project-head">
-            <h3>Risk and Robustness</h3>
-            <span class="badge soon">Planned</span>
-          </div>
-          <p>Evaluate regime sensitivity, drawdown behavior, and uncertainty quality.</p>
-        </article>
-
-        <article class="project-card">
-          <div class="project-head">
-            <h3>Reproducibility</h3>
-            <span class="badge soon">Planned</span>
-          </div>
-          <p>Document data workflow, experiments, and deployment assumptions.</p>
+        <article class="kpi-card">
+          <h3>Risk Notebook Metrics</h3>
+          <p class="kpi-value">VaR result not found</p>
+          <p class="kpi-note">1-day 95% VaR card is intentionally omitted until a notebook output is committed.</p>
         </article>
       </div>
+    </section>
+
+    <section class="section" aria-labelledby="projects-title">
+      <div class="section-head">
+        <h2 id="projects-title">Featured Projects</h2>
+        <p>Each card links to existing files only. Missing artifacts are explicitly marked as placeholders.</p>
+      </div>
+
+      <div class="project-grid">
+        <article class="project-card" aria-labelledby="fixed-income-title">
+          <img src="assets/thumbs/fixed-income.svg" alt="Placeholder thumbnail for Fixed Income project" loading="lazy" />
+          <div class="project-content">
+            <h3 id="fixed-income-title">Fixed Income</h3>
+            <p class="objective">Objective: model yield-curve structure and rate sensitivity with reproducible notebooks.</p>
+            <ul>
+              <li>No dedicated fixed-income notebook is committed in this clone.</li>
+              <li>No project-specific plot is committed; placeholder thumbnail is used.</li>
+              <li>A placeholder demo script path is provided for implementation handoff.</li>
+            </ul>
+            <p class="result"><strong>Result:</strong> placeholder - run notebook</p>
+            <div class="card-links">
+              <!-- TODO: Replace notebook placeholder with finance/notebooks/fixed_income.ipynb once committed -->
+              <a href="finance/placeholders/fixed-income-notebook-placeholder.md">Notebook</a>
+              <a href="assets/thumbs/fixed-income.svg">Plot</a>
+              <a href="finance/demos/fixed_income_demo_placeholder.py">Demo script</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="project-card" aria-labelledby="market-risk-title">
+          <img src="assets/thumbs/market-risk.svg" alt="Placeholder thumbnail for Market Risk project" loading="lazy" />
+          <div class="project-content">
+            <h3 id="market-risk-title">Market Risk</h3>
+            <p class="objective">Objective: estimate distributional loss metrics and stress-test scenarios under controlled assumptions.</p>
+            <ul>
+              <li>No committed VaR/ES notebook or CSV result file found by repository scan.</li>
+              <li>No market-risk chart image is committed; placeholder thumbnail is used.</li>
+              <li>A placeholder demo script file is included for workflow scaffolding.</li>
+            </ul>
+            <p class="result"><strong>Result:</strong> placeholder - run notebook</p>
+            <div class="card-links">
+              <!-- TODO: Replace notebook placeholder with finance/notebooks/market_risk.ipynb once committed -->
+              <a href="finance/placeholders/market-risk-notebook-placeholder.md">Notebook</a>
+              <a href="assets/thumbs/market-risk.svg">Plot</a>
+              <a href="finance/demos/market_risk_demo_placeholder.py">Demo script</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="project-card" aria-labelledby="sentiment-title">
+          <img src="assets/thumbs/sentiment.svg" alt="Placeholder thumbnail for Sentiment project" loading="lazy" />
+          <div class="project-content">
+            <h3 id="sentiment-title">Sentiment</h3>
+            <p class="objective">Objective: score financial text and map sentiment signals to tradable market context.</p>
+            <ul>
+              <li>No committed sentiment notebook or FinBERT dataset files were detected.</li>
+              <li>No sentiment-specific figure is committed; placeholder thumbnail is used.</li>
+              <li>A placeholder demo script path is provided for future integration.</li>
+            </ul>
+            <p class="result"><strong>Result:</strong> placeholder - run notebook</p>
+            <div class="card-links">
+              <!-- TODO: Replace notebook placeholder with finance/notebooks/sentiment.ipynb once committed -->
+              <a href="finance/placeholders/sentiment-notebook-placeholder.md">Notebook</a>
+              <a href="assets/thumbs/sentiment.svg">Plot</a>
+              <a href="finance/demos/sentiment_demo_placeholder.py">Demo script</a>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="skills-title">
+      <div class="section-head">
+        <h2 id="skills-title">Technical Skills Snapshot</h2>
+      </div>
+      <div class="skill-grid">
+        <article class="skill-card">
+          <h3>Research Framing</h3>
+          <p>Risk-first project framing with explicit placeholders for missing evidence and reproducibility handoff.</p>
+        </article>
+        <article class="skill-card">
+          <h3>Web Delivery</h3>
+          <p>Static deployment-ready HTML/CSS with accessible semantics and direct artifact linking.</p>
+        </article>
+        <article class="skill-card">
+          <h3>Engineering Hygiene</h3>
+          <p>Relative-link integrity, clear TODO markers, and repository-driven evidence boundaries.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="tl-dr-title">
+      <div class="section-head">
+        <h2 id="tl-dr-title">Hiring Manager TL;DR</h2>
+      </div>
+      <ul class="tldr-list">
+        <li>This page is recruiter-ready in structure but intentionally honest about missing finance artifacts.</li>
+        <li>Every project card links only to committed files or explicitly labeled placeholders.</li>
+        <li>Once notebooks are committed, KPI cards and result rows can be swapped from placeholders to measured outputs without layout changes.</li>
+      </ul>
     </section>
   </main>
 </body>
