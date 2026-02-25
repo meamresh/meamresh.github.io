@@ -1,158 +1,150 @@
+<!-- finance.html -->
 <!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Finance & Quantitative Analysis — Amresh Verma</title>
-  <meta name="description" content="Quant portfolio: fixed-income modeling, VaR & market-risk diagnostics, and financial-news sentiment pipelines. Notebooks, reproducible artifacts, and TL;DR for hiring managers." />
+  <meta name="description" content="Notebook-driven finance portfolio: fixed-income modeling, VaR methodologies, and FinBERT sentiment pipelines. Reproducible notebooks and TL;DR for hiring managers." />
   <link rel="stylesheet" href="finance.css" />
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
 
   <header class="site-header" role="banner">
-    <div class="container header-inner">
-      <a class="brand" href="portfolio.html">Amresh Verma — Quant / ML</a>
-      <nav class="main-nav" role="navigation" aria-label="Primary">
-        <a href="index.html">Home</a>
-        <a href="portfolio.html">All Projects</a>
-        <a href="hidden_markov_model/">HMM Project</a>
-        <a href="https://github.com/meamresh" target="_blank" rel="noopener">GitHub</a>
-      </nav>
-    </div>
+    <a class="brand" href="portfolio.html">Amresh Verma — Quant / ML</a>
+    <nav aria-label="Primary">
+      <a href="index.html">Home</a>
+      <a href="portfolio.html">All Projects</a>
+      <a href="hidden_markov_model/">HMM Project</a>
+      <a href="https://github.com/meamresh" target="_blank" rel="noopener">GitHub</a>
+    </nav>
   </header>
 
-  <main id="main" class="container" role="main">
-    <!-- HERO -->
+  <main id="main">
     <section class="hero" aria-labelledby="hero-title">
-      <p class="eyebrow">Finance & Quantitative Analysis</p>
+      <p class="hero-tag">Finance Portfolio</p>
       <h1 id="hero-title">State-space modelling for rates, calibration-aware risk, and alternative-data signals</h1>
-      <p class="lead">
-        Three notebook-driven projects demonstrating yield-curve & fixed-income analysis, comparative VaR methods, and a FinBERT sentiment pipeline. Notebooks are runnable — links below.
+
+      <p class="hero-subtitle">
+        Notebook-driven portfolio demonstrating yield-curve & fixed-income analysis, comparative VaR methods, and a FinBERT sentiment pipeline. Notebooks are linked below — quick runnable instructions included.
       </p>
 
-      <div class="cta-row">
-        <a class="btn primary" href="https://github.com/meamresh" target="_blank" rel="noopener">View code on GitHub</a>
-        <a class="btn" href="finance/notebooks/index.md">Open notebooks</a>
-        <a class="btn" href="finance/placeholders/readme-notes.md">Run instructions (Colab tips)</a>
+      <ul class="exec-summary">
+        <li><strong>Elevator:</strong> reproducible notebooks for risk & signal research — suitable for quant research or quant engineering teams.</li>
+        <li><strong>Why this matters:</strong> clear metrics, backtests, and diagnostic tooling to evaluate model reliability and production readiness.</li>
+      </ul>
+
+      <div class="hero-actions">
+        <a class="button primary" href="https://github.com/meamresh" target="_blank" rel="noopener">View code on GitHub</a>
+        <a class="button" href="https://github.com/meamresh/Finance">Open notebooks</a>
       </div>
 
-      <p class="note">Note: metrics shown were extracted from notebooks in <code>finance/notebooks/</code>. If a number is unverified at runtime it is labelled <em>unverified</em> and the notebook to run is linked.</p>
+      <figure class="hero-figure" aria-hidden="true">
+        <!-- small hero placeholder (optional) -->
+        <img src="assets/thumbs/finance-hero.svg" alt="Finance project overview thumbnail" />
+        <figcaption>Notebook-first workflow: reproducible analysis, diagnostics, and artifacts.</figcaption>
+      </figure>
     </section>
 
-    <!-- KPI CARDS -->
-    <section class="kpis" aria-labelledby="kpi-title">
-      <h2 id="kpi-title">Key results (at a glance)</h2>
-      <ul class="kpi-grid" role="list">
-        <li class="kpi-card" aria-hidden="false">
-          <div class="kpi-number">$291,342</div>
-          <div class="kpi-label">1-day 95% VaR (Treasury portfolio)</div>
-          <div class="kpi-meta">See: <a href="finance/notebooks/1_FixedIncome/fixed_income_state_estimation.ipynb">fixed_income_state_estimation.ipynb</a></div>
-        </li>
+    <!-- KPI section -->
+    <section class="section" aria-labelledby="kpi-title">
+      <h2 id="kpi-title">Key results (quick)</h2>
+      <div class="card-grid three">
+        <article class="card">
+          <h3>1-day 95% VaR</h3>
+          <p class="section-intro">Calculated for a Treasury portfolio</p>
+          <p class="plot-card formula"><strong>$291,342</strong></p>
+          <p class="small-note">Source: <a href="https://github.com/meamresh/Finance/blob/main/1_FixedIncome/ValueAtRisk.ipynb">ValueAtRisk.ipynb</a> — README-stated value shown; verify by running the notebook if needed.</p>
+        </article>
 
-        <li class="kpi-card">
-          <div class="kpi-number">6,250+</div>
-          <div class="kpi-label">News articles processed (FinBERT)</div>
-          <div class="kpi-meta">See: <a href="finance/notebooks/3_SentimentAnalysis/SentimentAnalysis.ipynb">SentimentAnalysis.ipynb</a></div>
-        </li>
+        <article class="card">
+          <h3>News articles processed</h3>
+          <p class="section-intro">FinBERT sentiment pipeline (sample)</p>
+          <p class="plot-card formula"><strong>6,250+</strong></p>
+          <p class="small-note">Source: <a href="https://github.com/meamresh/Finance/blob/main/3_SentimentAnalysis/SentimentAnalysis.ipynb">SentimentAnalysis.ipynb</a></p>
+        </article>
 
-        <li class="kpi-card">
-          <div class="kpi-number">2 factors / 97%</div>
-          <div class="kpi-label">PCA for yield-curve (variance explained)</div>
-          <div class="kpi-meta">See: <a href="finance/notebooks/1_FixedIncome/">1_FixedIncome/</a></div>
-        </li>
-      </ul>
+        <article class="card">
+          <h3>PCA for yield curve</h3>
+          <p class="section-intro">Dimensionality reduction result</p>
+          <p class="plot-card formula"><strong>2 factors — 97% variance</strong></p>
+          <p class="small-note">See: <a href="https://github.com/meamresh/Finance/blob/main/1_FixedIncome/Nelson_Siegel_Model.ipynb">Nelson_Siegel_Model.ipynb/</a></p>
+        </article>
+      </div>
     </section>
 
-    <!-- PROJECT CARDS -->
-    <section class="projects" aria-labelledby="projects-title">
+    <!-- Projects -->
+    <section class="section" aria-labelledby="projects-title">
       <h2 id="projects-title">Featured projects</h2>
+      <p class="section-intro">Three focused notebooks: fixed income, market risk, and alternative-data sentiment. Each card links directly to the notebook for quick review.</p>
 
-      <article class="project" aria-labelledby="p1-title">
-        <div class="project-thumb">
-          <img src="assets/thumbs/fixed-income.svg" alt="Yield curve thumbnail" loading="lazy" />
-        </div>
-        <div class="project-body">
-          <h3 id="p1-title">Fixed Income — Nelson-Siegel & VaR</h3>
-          <p class="objective">Objective: model U.S. Treasury curves and compute portfolio-level VaR using factor decomposition and PCA.</p>
-          <ul class="project-bullets">
-            <li>Data: FRED yield series (notebooks include FRED fetch; API key required to run).</li>
-            <li>Methods: Nelson-Siegel curve fits, PCA factor decomposition, VaR via PCA-driven exposures.</li>
-            <li>Result: 1-day 95% VaR = <strong>$291,342</strong> (see notebook for backtest details).</li>
+      <div class="card-grid three">
+        <!-- Fixed Income -->
+        <article class="card">
+          <h3>Fixed Income — Nelson-Siegel & VaR</h3>
+          <p class="section-intro">Objective: model US Treasury curves and compute portfolio VaR using factor decomposition and PCA.</p>
+          <ul>
+            <li>FRED data fetch (notebook contains fetch + modeling cells; FRED API key required to run fresh).</li>
+            <li>Nelson-Siegel parameter estimation and factor decomposition (level, slope, curvature).</li>
+            <li>VaR computed for a multi-bond portfolio; backtest cells included.</li>
           </ul>
-          <p class="project-links">
-            <a href="finance/notebooks/1_FixedIncome/fixed_income_state_estimation.ipynb">Open notebook</a> ·
-            <a href="finance/notebooks/1_FixedIncome/README.md">Quick readme</a>
+          <p class="plot-card"><em>Result (notebook):</em> 1-day 95% VaR = <strong>$291,342</strong> (see notebook for backtest details).</p>
+          <p class="small-note">
+            <a href="https://github.com/meamresh/Finance/blob/main/1_FixedIncome/ValueAtRisk.ipynb">Open notebook</a> ·
+            <a href="https://github.com/meamresh/Finance/tree/main/1_FixedIncome#readme">Notebook notes</a>
           </p>
-        </div>
-      </article>
+        </article>
 
-      <article class="project" aria-labelledby="p2-title">
-        <div class="project-thumb">
-          <img src="assets/thumbs/market-risk.svg" alt="NEES diagnostics thumbnail" loading="lazy" />
-        </div>
-        <div class="project-body">
-          <h3 id="p2-title">Market Risk — VaR methodologies & robustness</h3>
-          <p class="objective">Objective: implement and compare Historical, Parametric (Normal & t), and Monte Carlo VaR for risky assets (example: BTC-USD).</p>
-          <ul class="project-bullets">
-            <li>Comparative study of tail fit and simulation methods; distribution diagnostics included.</li>
-            <li>Monte Carlo & parametric implementations with backtesting cells (see MarketRisk.ipynb).</li>
-            <li>Results summary (notebook): Historical 95% VaR ≈ −6.0% · Monte Carlo 95% VaR ≈ −3.23% (sample wallet).</li>
+        <!-- Market Risk -->
+        <article class="card">
+          <h3>Market Risk — VaR methodologies</h3>
+          <p class="section-intro">Objective: implement and compare Historical, Parametric (normal & t), and Monte Carlo VaR methods (example asset: BTC-USD).</p>
+          <ul>
+            <li>Distributional fits (normal & Student’s t) and tail diagnostics.</li>
+            <li>Monte Carlo simulation with configurable iteration count (notebook includes examples).</li>
+            <li>Backtesting comparisons across confidence levels (90%, 95%, 99%).</li>
           </ul>
-          <p class="project-links">
-            <a href="finance/notebooks/2_Crypto_Equities/MarketRisk.ipynb">Open notebook</a>
+          <p class="plot-card"><em>Notebook summary:</em> Historical 95% VaR ≈ −6.0% · Monte Carlo 95% VaR ≈ −3.23% (sample wallet)</p>
+          <p class="small-note">
+            <a href="https://github.com/meamresh/Finance/blob/main/2_Crypto_Equities/MarketRisk.ipynb">Open notebook</a>
           </p>
-        </div>
-      </article>
+        </article>
 
-      <article class="project" aria-labelledby="p3-title">
-        <div class="project-thumb">
-          <img src="assets/thumbs/sentiment.svg" alt="Sentiment vs price thumbnail" loading="lazy" />
-        </div>
-        <div class="project-body">
-          <h3 id="p3-title">Alternative Data — Financial news sentiment</h3>
-          <p class="objective">Objective: ingest news (GDELT), apply FinBERT, and correlate weekly sentiment with asset returns.</p>
-          <ul class="project-bullets">
-            <li>Pipeline: GDELT → article extraction → FinBERT → weekly aggregation; includes bootstrap CIs and structural-break diagnostics.</li>
-            <li>Performance: 6,250+ articles processed (notebook cells show sampling & aggregation).</li>
-            <li>Notes: FinBERT inference requires model weights and may be GPU-accelerated in Colab.</li>
+        <!-- Sentiment -->
+        <article class="card">
+          <h3>Alternative Data — Financial news sentiment</h3>
+          <p class="section-intro">Objective: ingest GDELT news, extract article text, run FinBERT, and correlate weekly sentiment with returns.</p>
+          <ul>
+            <li>Article extraction (newspaper3k) → FinBERT inference (Hugging Face); batch processing included.</li>
+            <li>Weekly aggregation, bootstrap CIs, structural break detection, and robustness checks.</li>
+            <li>Resume-capable pipeline with Parquet persistence for large runs.</li>
           </ul>
-          <p class="project-links">
-            <a href="finance/notebooks/3_SentimentAnalysis/SentimentAnalysis.ipynb">Open notebook</a>
+          <p class="plot-card"><em>Notebook notes:</em> 6,250+ articles processed in sample runs — see notebook for sampling & inference cells.</p>
+          <p class="small-note">
+            <a href="https://github.com/meamresh/Finance/blob/main/3_SentimentAnalysis/SentimentAnalysis.ipynb">Open notebook</a>
           </p>
-        </div>
-      </article>
+        </article>
+      </div>
     </section>
 
-    <!-- SKILLS & TLDR -->
-    <section class="skills" aria-labelledby="skills-title">
+    <!-- Skills & TLDR -->
+    <section class="section" aria-labelledby="skills-title">
       <h2 id="skills-title">Technical skills (quick)</h2>
-      <p class="skill-list">
-        <strong>Quant:</strong> yield-curve modelling, VaR, risk attribution ·
-        <strong>Stats:</strong> PCA, bootstrap CIs, structural-break detection ·
-        <strong>ML & NLP:</strong> FinBERT, PyTorch inference ·
-        <strong>Engineering:</strong> Python, pandas, matplotlib, reproducible notebooks
-      </p>
+      <p class="section-intro">Quant: yield-curve modelling, VaR, risk attribution · Stats: PCA, bootstrap CIs, structural-break detection · ML/NLP: FinBERT, PyTorch inference · Engineering: Python, pandas, matplotlib, reproducible notebooks</p>
     </section>
 
-    <section class="tldr" aria-labelledby="tldr-title">
+    <section class="section" aria-labelledby="tldr-title">
       <h2 id="tldr-title">Hiring manager TL;DR</h2>
-      <p>30 days: deliver reproducible backtests and clear metric dashboards for ongoing models. 90 days: productionise the best-performing risk pipeline with CI, monitoring, and retraining schedule.</p>
+      <p class="section-intro"><strong>30 days:</strong> deliver reproducible backtests and dashboardable metrics for candidate models. <strong>90 days:</strong> productionise the best risk pipeline with CI, monitoring and scheduled retraining.</p>
     </section>
   </main>
 
-  <footer class="site-footer">
-    <div class="container">
-      <p>
-        <a href="index.html">Back to homepage</a> ·
-        <a href="https://github.com/meamresh" target="_blank" rel="noopener">GitHub</a>
-      </p>
-      <p class="muted">Last updated: 2026-02-25</p>
+  <footer>
+    <div class="table-summary">
+      <a href="index.html">Back to homepage</a> · <a href="https://github.com/meamresh" target="_blank" rel="noopener">GitHub</a>
+      <div class="small-note">Last updated: 2026-02-25</div>
     </div>
   </footer>
-
-  <script>
-    // progressive enhancement: nothing sensitive; placeholder for tiny interactions if needed
-  </script>
 </body>
 </html>
