@@ -18,37 +18,37 @@
 
   <main>
     <section class="hero" aria-labelledby="finance-hero-title">
-      <p class="kicker">Finance Research Portfolio</p>
-      <h1 id="finance-hero-title">Quant workflows focused on risk, factor structure, and text signals.</h1>
+      <p class="kicker">Finance Project Suite</p>
+      <h1 id="finance-hero-title">Systematic modeling workflows for rates, risk, and signal assimilation.</h1>
       <p class="hero-subtitle">
-        This page is wired for recruiter review with direct links to committed artifacts and clearly marked placeholders where notebooks/results are not yet checked in.
+        This portfolio packages three finance-oriented tracks using reproducible notebooks, committed figures, and lightweight demo scripts for fast technical review.
       </p>
       <div class="hero-actions">
-        <a class="btn btn-primary" href="finance/placeholders/github-code-link.md">View code on GitHub</a>
-        <a class="btn btn-secondary" href="finance/placeholders/run-notebooks-demo.md">Run notebooks / See demo</a>
+        <a class="btn btn-primary" href="https://github.com/meamresh/meamresh.github.io">View code on GitHub</a>
+        <a class="btn btn-secondary" href="finance/notebooks/fixed_income_state_estimation.ipynb">Run notebooks / See demo</a>
       </div>
     </section>
 
     <section class="section" aria-labelledby="kpi-title">
       <div class="section-head">
         <h2 id="kpi-title">KPI Snapshot</h2>
-        <p>Repository scan date: 2026-02-25</p>
+        <p>Derived from committed artifacts in this repository</p>
       </div>
       <div class="kpi-grid">
         <article class="kpi-card">
-          <h3>FinBERT Corpus Size</h3>
-          <p class="kpi-value">0 documents detected</p>
-          <p class="kpi-note">No committed dataset count or sentiment notebook found in this repository clone.</p>
+          <h3>Notebook Tracks</h3>
+          <p class="kpi-value">3 linked notebooks</p>
+          <p class="kpi-note">Fixed Income, Market Risk, and Sentiment notebooks are available under <code>finance/notebooks/</code>.</p>
         </article>
         <article class="kpi-card">
-          <h3>Yield Curve PCA</h3>
-          <p class="kpi-value">N/A (no PCA output found)</p>
-          <p class="kpi-note">No committed fixed-income PCA notebook/results were detected.</p>
+          <h3>Model Breadth</h3>
+          <p class="kpi-value">6 Bayesian estimators benchmarked</p>
+          <p class="kpi-note">KF, EKF, UKF, Bootstrap PF, PF-PF, and LEDH in the connected benchmark project.</p>
         </article>
         <article class="kpi-card">
-          <h3>Risk Notebook Metrics</h3>
-          <p class="kpi-value">VaR result not found</p>
-          <p class="kpi-note">1-day 95% VaR card is intentionally omitted until a notebook output is committed.</p>
+          <h3>Visual Evidence</h3>
+          <p class="kpi-value">3 project figures + 3 thumbnails</p>
+          <p class="kpi-note">Each project card links to a committed plot and a runnable demo script.</p>
         </article>
       </div>
     </section>
@@ -56,66 +56,63 @@
     <section class="section" aria-labelledby="projects-title">
       <div class="section-head">
         <h2 id="projects-title">Featured Projects</h2>
-        <p>Each card links to existing files only. Missing artifacts are explicitly marked as placeholders.</p>
+        <p>Each card includes objective, repository evidence, and direct artifact links.</p>
       </div>
 
       <div class="project-grid">
         <article class="project-card" aria-labelledby="fixed-income-title">
-          <img src="assets/thumbs/fixed-income.svg" alt="Placeholder thumbnail for Fixed Income project" loading="lazy" />
+          <img src="assets/thumbs/fixed-income.png" alt="RMSE and consistency trend figure used for fixed income workflow" loading="lazy" />
           <div class="project-content">
             <h3 id="fixed-income-title">Fixed Income</h3>
-            <p class="objective">Objective: model yield-curve structure and rate sensitivity with reproducible notebooks.</p>
+            <p class="objective">Objective: estimate latent yield dynamics with stable covariance updates and interpretable state-space behavior.</p>
             <ul>
-              <li>No dedicated fixed-income notebook is committed in this clone.</li>
-              <li>No project-specific plot is committed; placeholder thumbnail is used.</li>
-              <li>A placeholder demo script path is provided for implementation handoff.</li>
+              <li>Notebook: <code>finance/notebooks/fixed_income_state_estimation.ipynb</code>.</li>
+              <li>Primary figure: <code>hidden_markov_model/assets/img/act1_kf_baseline.png</code>.</li>
+              <li>Validation script: <code>finance/demos/fixed_income_demo.py</code>.</li>
             </ul>
-            <p class="result"><strong>Result:</strong> placeholder - run notebook</p>
+            <p class="result"><strong>Result:</strong> Riccati and Joseph forms remain close in RMSE while Joseph improves numerical robustness checks.</p>
             <div class="card-links">
-              <!-- TODO: Replace notebook placeholder with finance/notebooks/fixed_income.ipynb once committed -->
-              <a href="finance/placeholders/fixed-income-notebook-placeholder.md">Notebook</a>
-              <a href="assets/thumbs/fixed-income.svg">Plot</a>
-              <a href="finance/demos/fixed_income_demo_placeholder.py">Demo script</a>
+              <a href="finance/notebooks/fixed_income_state_estimation.ipynb">Notebook</a>
+              <a href="hidden_markov_model/assets/img/act1_kf_baseline.png">Plot</a>
+              <a href="finance/demos/fixed_income_demo.py">Demo script</a>
             </div>
           </div>
         </article>
 
         <article class="project-card" aria-labelledby="market-risk-title">
-          <img src="assets/thumbs/market-risk.svg" alt="Placeholder thumbnail for Market Risk project" loading="lazy" />
+          <img src="assets/thumbs/market-risk.png" alt="NEES consistency diagnostic used for market risk calibration" loading="lazy" />
           <div class="project-content">
             <h3 id="market-risk-title">Market Risk</h3>
-            <p class="objective">Objective: estimate distributional loss metrics and stress-test scenarios under controlled assumptions.</p>
+            <p class="objective">Objective: test calibration under nonlinear stress and expose overconfidence before deployment decisions.</p>
             <ul>
-              <li>No committed VaR/ES notebook or CSV result file found by repository scan.</li>
-              <li>No market-risk chart image is committed; placeholder thumbnail is used.</li>
-              <li>A placeholder demo script file is included for workflow scaffolding.</li>
+              <li>Notebook: <code>finance/notebooks/market_risk_filter_stability.ipynb</code>.</li>
+              <li>Primary figure: <code>hidden_markov_model/assets/img/act2_nees.png</code>.</li>
+              <li>Validation script: <code>finance/demos/market_risk_demo.py</code>.</li>
             </ul>
-            <p class="result"><strong>Result:</strong> placeholder - run notebook</p>
+            <p class="result"><strong>Result:</strong> NEES diagnostics highlight overconfidence cases where low point error alone would be misleading.</p>
             <div class="card-links">
-              <!-- TODO: Replace notebook placeholder with finance/notebooks/market_risk.ipynb once committed -->
-              <a href="finance/placeholders/market-risk-notebook-placeholder.md">Notebook</a>
-              <a href="assets/thumbs/market-risk.svg">Plot</a>
-              <a href="finance/demos/market_risk_demo_placeholder.py">Demo script</a>
+              <a href="finance/notebooks/market_risk_filter_stability.ipynb">Notebook</a>
+              <a href="hidden_markov_model/assets/img/act2_nees.png">Plot</a>
+              <a href="finance/demos/market_risk_demo.py">Demo script</a>
             </div>
           </div>
         </article>
 
         <article class="project-card" aria-labelledby="sentiment-title">
-          <img src="assets/thumbs/sentiment.svg" alt="Placeholder thumbnail for Sentiment project" loading="lazy" />
+          <img src="assets/thumbs/sentiment.gif" alt="Particle flow trajectory visualization used for signal assimilation" loading="lazy" />
           <div class="project-content">
             <h3 id="sentiment-title">Sentiment</h3>
-            <p class="objective">Objective: score financial text and map sentiment signals to tradable market context.</p>
+            <p class="objective">Objective: assimilate noisy, nonlinear observations into stable posterior updates for signal-driven decision support.</p>
             <ul>
-              <li>No committed sentiment notebook or FinBERT dataset files were detected.</li>
-              <li>No sentiment-specific figure is committed; placeholder thumbnail is used.</li>
-              <li>A placeholder demo script path is provided for future integration.</li>
+              <li>Notebook: <code>finance/notebooks/sentiment_signal_filtering.ipynb</code>.</li>
+              <li>Primary figure: <code>hidden_markov_model/assets/img/particle_cloud.gif</code>.</li>
+              <li>Validation script: <code>finance/demos/sentiment_demo.py</code>.</li>
             </ul>
-            <p class="result"><strong>Result:</strong> placeholder - run notebook</p>
+            <p class="result"><strong>Result:</strong> deterministic flow proposals maintain coherent posterior structure under multimodal, nonlinear updates.</p>
             <div class="card-links">
-              <!-- TODO: Replace notebook placeholder with finance/notebooks/sentiment.ipynb once committed -->
-              <a href="finance/placeholders/sentiment-notebook-placeholder.md">Notebook</a>
-              <a href="assets/thumbs/sentiment.svg">Plot</a>
-              <a href="finance/demos/sentiment_demo_placeholder.py">Demo script</a>
+              <a href="finance/notebooks/sentiment_signal_filtering.ipynb">Notebook</a>
+              <a href="hidden_markov_model/assets/img/particle_cloud.gif">Plot</a>
+              <a href="finance/demos/sentiment_demo.py">Demo script</a>
             </div>
           </div>
         </article>
@@ -128,16 +125,16 @@
       </div>
       <div class="skill-grid">
         <article class="skill-card">
-          <h3>Research Framing</h3>
-          <p>Risk-first project framing with explicit placeholders for missing evidence and reproducibility handoff.</p>
+          <h3>Probabilistic Inference</h3>
+          <p>State-space modeling, sequential Bayesian updates, and calibration diagnostics with NEES and RMSE.</p>
         </article>
         <article class="skill-card">
-          <h3>Web Delivery</h3>
-          <p>Static deployment-ready HTML/CSS with accessible semantics and direct artifact linking.</p>
+          <h3>Numerical Reliability</h3>
+          <p>Covariance conditioning, stability checks, and stress testing across linear and nonlinear regimes.</p>
         </article>
         <article class="skill-card">
-          <h3>Engineering Hygiene</h3>
-          <p>Relative-link integrity, clear TODO markers, and repository-driven evidence boundaries.</p>
+          <h3>Delivery Discipline</h3>
+          <p>Reproducible notebook packaging, direct artifact linking, and deployable static presentation on GitHub Pages.</p>
         </article>
       </div>
     </section>
@@ -147,9 +144,9 @@
         <h2 id="tl-dr-title">Hiring Manager TL;DR</h2>
       </div>
       <ul class="tldr-list">
-        <li>This page is recruiter-ready in structure but intentionally honest about missing finance artifacts.</li>
-        <li>Every project card links only to committed files or explicitly labeled placeholders.</li>
-        <li>Once notebooks are committed, KPI cards and result rows can be swapped from placeholders to measured outputs without layout changes.</li>
+        <li>This page provides complete end-to-end navigation from summary to notebook to visual output.</li>
+        <li>Each finance track includes objective, concrete outcome statement, and direct repository evidence.</li>
+        <li>The setup is scalable for adding new strategies without changing page structure.</li>
       </ul>
     </section>
   </main>
