@@ -1,0 +1,54 @@
+{
+  "generated_on": "2026-02-25",
+  "readme_status": "README not found at repository root; metrics derived from notebook code and markdown.",
+  "notebook_execution": {
+    "fixed_income_state_estimation.ipynb": {
+      "attempted_nbconvert": true,
+      "nbconvert_status": "failed (jupyter not installed)",
+      "fallback_python_exec": "success"
+    },
+    "market_risk_filter_stability.ipynb": {
+      "attempted_nbconvert": true,
+      "nbconvert_status": "failed (jupyter not installed)",
+      "fallback_python_exec": "success"
+    },
+    "sentiment_signal_filtering.ipynb": {
+      "attempted_nbconvert": true,
+      "nbconvert_status": "failed (jupyter not installed)",
+      "fallback_python_exec": "success"
+    }
+  },
+  "projects": {
+    "fixed-income": {
+      "notebook": "finance/notebooks/fixed_income_state_estimation.ipynb",
+      "execution_ok": true,
+      "execution_error": null,
+      "series_length": 100,
+      "process_sigma": 0.4,
+      "measurement_sigma": 0.9,
+      "obs_rmse": 0.761
+    },
+    "market-risk": {
+      "notebook": "finance/notebooks/market_risk_filter_stability.ipynb",
+      "execution_ok": true,
+      "execution_error": null,
+      "steps": 60,
+      "band_low": 0.9,
+      "band_high": 2.1,
+      "ekf_initial": 4.682,
+      "ukf_initial": 3.532,
+      "ekf_in_band": 19,
+      "ukf_in_band": 28
+    },
+    "sentiment": {
+      "notebook": "finance/notebooks/sentiment_signal_filtering.ipynb",
+      "execution_ok": true,
+      "execution_error": null,
+      "max_dimension": 224,
+      "pf_rmse_at_max_dim": 3.2,
+      "ledh_rmse_at_max_dim": 2.7,
+      "kpf_rmse_at_max_dim": 2.25,
+      "kpf_vs_pf_improvement_pct": 29.7
+    }
+  }
+}
