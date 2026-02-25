@@ -7,148 +7,138 @@
   <link rel="stylesheet" href="finance.css" />
 </head>
 <body>
-  <header class="site-header">
-    <a class="brand" href="portfolio.html">Quant/ML Portfolio</a>
-    <nav aria-label="Primary">
+  <header class="finance-header">
+    <a class="finance-header__brand" href="portfolio.html">Quant/ML Portfolio</a>
+    <nav class="finance-header__nav" aria-label="Primary">
+      <a href="index.html">Home</a>
       <a href="portfolio.html">All Projects</a>
       <a href="hidden_markov_model/">Hidden Markov Model</a>
-      <a href="index.html">Homepage</a>
     </nav>
   </header>
 
-  <main>
-    <section class="hero" aria-labelledby="finance-hero-title">
-      <p class="kicker">Finance Project Suite</p>
-      <h1 id="finance-hero-title">Systematic modeling workflows for rates, risk, and signal assimilation.</h1>
-      <p class="hero-subtitle">
-        This portfolio packages three finance-oriented tracks using reproducible notebooks, committed figures, and lightweight demo scripts for fast technical review.
+  <main class="finance-main">
+    <section class="finance-hero" aria-labelledby="hero-title">
+      <p class="finance-hero__eyebrow">Finance Portfolio</p>
+      <h1 id="hero-title">State-space modeling for rates, risk calibration, and signal assimilation.</h1>
+      <p class="finance-hero__pitch">
+        Recruiter summary: three notebook-driven projects covering fixed-income filtering, market-risk consistency diagnostics, and high-dimensional model trade-offs.
       </p>
-      <div class="hero-actions">
-        <a class="btn btn-primary" href="https://github.com/meamresh/meamresh.github.io">View code on GitHub</a>
-        <a class="btn btn-secondary" href="finance/notebooks/fixed_income_state_estimation.ipynb">Run notebooks / See demo</a>
+      <div class="finance-hero__cta">
+        <a class="btn btn--primary" href="finance/github-link.md">View code on GitHub</a>
+        <a class="btn btn--secondary" href="finance/notebooks/index.md">Open notebooks</a>
       </div>
+      <p class="finance-hero__note">
+        README status: not found in repository root. Metrics below are extracted from notebook code in <code>finance/notebooks/</code>.
+      </p>
     </section>
 
-    <section class="section" aria-labelledby="kpi-title">
-      <div class="section-head">
-        <h2 id="kpi-title">KPI Snapshot</h2>
-        <p>Derived from committed artifacts in this repository</p>
-      </div>
+    <section class="finance-section" aria-labelledby="kpi-title">
+      <h2 id="kpi-title">KPI Cards</h2>
       <div class="kpi-grid">
         <article class="kpi-card">
-          <h3>Notebook Tracks</h3>
-          <p class="kpi-value">3 linked notebooks</p>
-          <p class="kpi-note">Fixed Income, Market Risk, and Sentiment notebooks are available under <code>finance/notebooks/</code>.</p>
+          <h3>Fixed Income Baseline</h3>
+          <p class="kpi-card__value">100-step sequence, RMSE 0.761</p>
+          <p class="kpi-card__meta">From <code>fixed_income_state_estimation.ipynb</code> with process σ=0.4 and measurement σ=0.9.</p>
         </article>
         <article class="kpi-card">
-          <h3>Model Breadth</h3>
-          <p class="kpi-value">6 Bayesian estimators benchmarked</p>
-          <p class="kpi-note">KF, EKF, UKF, Bootstrap PF, PF-PF, and LEDH in the connected benchmark project.</p>
+          <h3>Market Risk Calibration</h3>
+          <p class="kpi-card__value">UKF in-band 28/60 vs EKF 19/60</p>
+          <p class="kpi-card__meta">95% NEES consistency band set to [0.9, 2.1] in <code>market_risk_filter_stability.ipynb</code>.</p>
         </article>
         <article class="kpi-card">
-          <h3>Visual Evidence</h3>
-          <p class="kpi-value">3 project figures + 3 thumbnails</p>
-          <p class="kpi-note">Each project card links to a committed plot and a runnable demo script.</p>
+          <h3>Scaling Outcome</h3>
+          <p class="kpi-card__value">Kernel-PFF 29.7% lower RMSE</p>
+          <p class="kpi-card__meta">At dimension 224: PF=3.20, LEDH=2.70, Kernel-PFF=2.25 from <code>sentiment_signal_filtering.ipynb</code>.</p>
         </article>
       </div>
     </section>
 
-    <section class="section" aria-labelledby="projects-title">
-      <div class="section-head">
-        <h2 id="projects-title">Featured Projects</h2>
-        <p>Each card includes objective, repository evidence, and direct artifact links.</p>
-      </div>
+    <section class="finance-section" aria-labelledby="projects-title">
+      <h2 id="projects-title">Featured Projects</h2>
 
-      <div class="project-grid">
-        <article class="project-card" aria-labelledby="fixed-income-title">
-          <img src="assets/thumbs/fixed-income.png" alt="RMSE and consistency trend figure used for fixed income workflow" loading="lazy" />
-          <div class="project-content">
-            <h3 id="fixed-income-title">Fixed Income</h3>
-            <p class="objective">Objective: estimate latent yield dynamics with stable covariance updates and interpretable state-space behavior.</p>
-            <ul>
-              <li>Notebook: <code>finance/notebooks/fixed_income_state_estimation.ipynb</code>.</li>
-              <li>Primary figure: <code>hidden_markov_model/assets/img/act1_kf_baseline.png</code>.</li>
-              <li>Validation script: <code>finance/demos/fixed_income_demo.py</code>.</li>
-            </ul>
-            <p class="result"><strong>Result:</strong> Riccati and Joseph forms remain close in RMSE while Joseph improves numerical robustness checks.</p>
-            <div class="card-links">
-              <a href="finance/notebooks/fixed_income_state_estimation.ipynb">Notebook</a>
-              <a href="hidden_markov_model/assets/img/act1_kf_baseline.png">Plot</a>
-              <a href="finance/demos/fixed_income_demo.py">Demo script</a>
-            </div>
-          </div>
-        </article>
+      <article class="project-card" aria-labelledby="fixed-income-title">
+        <a class="project-card__thumb" href="assets/thumbs/fixed-income.png">
+          <img src="assets/thumbs/fixed-income.png" alt="Fixed income notebook plot showing true and observed sequences" loading="lazy" />
+        </a>
+        <div class="project-card__content">
+          <h3 id="fixed-income-title">1. Fixed Income</h3>
+          <p class="project-card__objective">Objective: benchmark linear-Gaussian filtering behavior for yield-state proxy estimation under observation noise.</p>
+          <ul>
+            <li>Uses NumPy-generated latent state and noisy observations (100 time steps).</li>
+            <li>Notebook framing references Riccati vs Joseph covariance-update baseline.</li>
+            <li>Produces trajectory visualization using Matplotlib for quick residual inspection.</li>
+          </ul>
+          <p class="project-card__result"><strong>Concrete result:</strong> observation-to-state RMSE = <code>0.761</code> over the 100-step run.</p>
+          <p class="project-card__links">
+            <a href="finance/notebooks/fixed_income_state_estimation.ipynb">Notebook</a>
+            <a href="assets/thumbs/fixed-income.png">Thumbnail</a>
+            <a href="finance/demos/fixed_income_demo.py">Demo script</a>
+          </p>
+        </div>
+      </article>
 
-        <article class="project-card" aria-labelledby="market-risk-title">
-          <img src="assets/thumbs/market-risk.png" alt="NEES consistency diagnostic used for market risk calibration" loading="lazy" />
-          <div class="project-content">
-            <h3 id="market-risk-title">Market Risk</h3>
-            <p class="objective">Objective: test calibration under nonlinear stress and expose overconfidence before deployment decisions.</p>
-            <ul>
-              <li>Notebook: <code>finance/notebooks/market_risk_filter_stability.ipynb</code>.</li>
-              <li>Primary figure: <code>hidden_markov_model/assets/img/act2_nees.png</code>.</li>
-              <li>Validation script: <code>finance/demos/market_risk_demo.py</code>.</li>
-            </ul>
-            <p class="result"><strong>Result:</strong> NEES diagnostics highlight overconfidence cases where low point error alone would be misleading.</p>
-            <div class="card-links">
-              <a href="finance/notebooks/market_risk_filter_stability.ipynb">Notebook</a>
-              <a href="hidden_markov_model/assets/img/act2_nees.png">Plot</a>
-              <a href="finance/demos/market_risk_demo.py">Demo script</a>
-            </div>
-          </div>
-        </article>
+      <article class="project-card" aria-labelledby="market-risk-title">
+        <a class="project-card__thumb" href="assets/thumbs/market-risk.png">
+          <img src="assets/thumbs/market-risk.png" alt="Market risk notebook NEES consistency plot" loading="lazy" />
+        </a>
+        <div class="project-card__content">
+          <h3 id="market-risk-title">2. Market Risk</h3>
+          <p class="project-card__objective">Objective: compare nonlinear filter consistency behavior with NEES-based calibration diagnostics.</p>
+          <ul>
+            <li>Defines 60-step EKF/UKF NEES trajectories with an explicit 95% consistency band.</li>
+            <li>Uses an analytical stress-shape setup to expose overconfidence decay patterns.</li>
+            <li>Plots EKF and UKF traces against the same acceptance band for direct comparison.</li>
+          </ul>
+          <p class="project-card__result"><strong>Concrete result:</strong> UKF remains in-band for <code>28/60</code> steps, EKF for <code>19/60</code>; initial NEES values are 3.532 (UKF) and 4.682 (EKF).</p>
+          <p class="project-card__links">
+            <a href="finance/notebooks/market_risk_filter_stability.ipynb">Notebook</a>
+            <a href="assets/thumbs/market-risk.png">Thumbnail</a>
+            <a href="finance/demos/market_risk_demo.py">Demo script</a>
+          </p>
+        </div>
+      </article>
 
-        <article class="project-card" aria-labelledby="sentiment-title">
-          <img src="assets/thumbs/sentiment.gif" alt="Particle flow trajectory visualization used for signal assimilation" loading="lazy" />
-          <div class="project-content">
-            <h3 id="sentiment-title">Sentiment</h3>
-            <p class="objective">Objective: assimilate noisy, nonlinear observations into stable posterior updates for signal-driven decision support.</p>
-            <ul>
-              <li>Notebook: <code>finance/notebooks/sentiment_signal_filtering.ipynb</code>.</li>
-              <li>Primary figure: <code>hidden_markov_model/assets/img/particle_cloud.gif</code>.</li>
-              <li>Validation script: <code>finance/demos/sentiment_demo.py</code>.</li>
-            </ul>
-            <p class="result"><strong>Result:</strong> deterministic flow proposals maintain coherent posterior structure under multimodal, nonlinear updates.</p>
-            <div class="card-links">
-              <a href="finance/notebooks/sentiment_signal_filtering.ipynb">Notebook</a>
-              <a href="hidden_markov_model/assets/img/particle_cloud.gif">Plot</a>
-              <a href="finance/demos/sentiment_demo.py">Demo script</a>
-            </div>
-          </div>
-        </article>
-      </div>
+      <article class="project-card" aria-labelledby="sentiment-title">
+        <a class="project-card__thumb" href="assets/thumbs/sentiment.png">
+          <img src="assets/thumbs/sentiment.png" alt="Signal scaling notebook comparing PF, LEDH, and Kernel-PFF RMSE" loading="lazy" />
+        </a>
+        <div class="project-card__content">
+          <h3 id="sentiment-title">3. Sentiment</h3>
+          <p class="project-card__objective">Objective: evaluate high-dimensional inference trade-offs for a signal-assimilation proxy pipeline.</p>
+          <ul>
+            <li>Compares Bootstrap PF, LEDH, and Kernel-PFF RMSE across dimensions 16 to 224.</li>
+            <li>Encodes model-performance trends as explicit arrays for reproducible benchmarking.</li>
+            <li>Provides a fast sanity-check scaffold before integrating external NLP feeds.</li>
+          </ul>
+          <p class="project-card__result"><strong>Concrete result:</strong> at dimension <code>224</code>, Kernel-PFF RMSE is <code>2.25</code> vs PF at <code>3.20</code> (29.7% lower).</p>
+          <p class="project-card__links">
+            <a href="finance/notebooks/sentiment_signal_filtering.ipynb">Notebook</a>
+            <a href="assets/thumbs/sentiment.png">Thumbnail</a>
+            <a href="finance/demos/sentiment_demo.py">Demo script</a>
+          </p>
+        </div>
+      </article>
     </section>
 
-    <section class="section" aria-labelledby="skills-title">
-      <div class="section-head">
-        <h2 id="skills-title">Technical Skills Snapshot</h2>
-      </div>
-      <div class="skill-grid">
-        <article class="skill-card">
-          <h3>Probabilistic Inference</h3>
-          <p>State-space modeling, sequential Bayesian updates, and calibration diagnostics with NEES and RMSE.</p>
-        </article>
-        <article class="skill-card">
-          <h3>Numerical Reliability</h3>
-          <p>Covariance conditioning, stability checks, and stress testing across linear and nonlinear regimes.</p>
-        </article>
-        <article class="skill-card">
-          <h3>Delivery Discipline</h3>
-          <p>Reproducible notebook packaging, direct artifact linking, and deployable static presentation on GitHub Pages.</p>
-        </article>
-      </div>
+    <section class="finance-section" aria-labelledby="skills-title">
+      <h2 id="skills-title">Technical Skills Snapshot</h2>
+      <p class="skills-line">
+        Quant: state-space filtering, covariance updates, calibration checks; Stats: RMSE, NEES bands, comparative diagnostics; ML/NLP: signal-assimilation pipeline design; Engineering: Python, NumPy, Matplotlib, notebook-to-web artifact packaging.
+      </p>
     </section>
 
-    <section class="section" aria-labelledby="tl-dr-title">
-      <div class="section-head">
-        <h2 id="tl-dr-title">Hiring Manager TL;DR</h2>
-      </div>
-      <ul class="tldr-list">
-        <li>This page provides complete end-to-end navigation from summary to notebook to visual output.</li>
-        <li>Each finance track includes objective, concrete outcome statement, and direct repository evidence.</li>
-        <li>The setup is scalable for adding new strategies without changing page structure.</li>
-      </ul>
+    <section class="finance-section" aria-labelledby="tldr-title">
+      <h2 id="tldr-title">Hiring Manager TL;DR</h2>
+      <p>
+        In 30 days: ship and validate notebook-based risk/signal baselines with reproducible metrics and visuals. In 90 days: productionize the strongest calibration-aware model path and expand to live data ingestion.
+      </p>
     </section>
   </main>
+
+  <footer class="finance-footer">
+    <a href="index.html">Back to homepage</a>
+    <a href="finance/github-link.md">GitHub link</a>
+    <span>Last updated: 2026-02-25</span>
+  </footer>
 </body>
 </html>
