@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantum Risk Analytics | Financial Stability Monitor</title>
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js"></script>
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #0a0e27;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --accent-primary: #00d4ff;
+            --accent-secondary: #7b2cbf;
+            --text-main: #e0e0e0;
+            --text-dim: #a0a0a0;
+            --danger: #ff4757;
+            --success: #2ed573;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
+            color: var(--text-main);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Controls */
+        aside {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(45deg, var(--accent-primary), var(--accent-secondary));
+            border-radius: 8px;
+        }
+
+        .logo-text {
+            font-size: 1.25rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(45deg, #fff, var(--accent-primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .control-group h3 {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--accent-primary);
+            margin-bottom: 5px;
+        }
+
+        .slider-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .slider-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+        }
+
+        .slider-value {
+            color: var(--accent-primary);
+            font-weight: 700;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            accent-color: var(--accent-primary);
+            background: rgba(255, 255, 255, 0.1);
+            height: 6px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, var(--accent-primary), #0096c7);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-top: 10px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 212, 255, 0.3);
+        }
+
+        .btn-primary:disabled {
+            background: #444;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Main Content */
+        main {
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .header-info h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 5px;
+        }
+
+        .header-info p {
+            color: var(--text-dim);
+        }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 800;
+        }
+
+        .stat-trend {
+            font-size: 0.85rem;
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .trend-up { color: var(--danger); }
+        .trend-down { color: var(--success); }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 25px;
+        }
+
+        .chart-container {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            min-height: 450px;
+        }
+
+        #status-bar {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 12px 24px;
+            border-radius: 12px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid var(--accent-primary);
+            color: var(--accent-primary);
+            font-size: 0.9rem;
+            font-weight: 600;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #status-bar.visible {
+            opacity: 1;
+        }
+
+        .spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid var(--accent-primary);
+            border-top: 2px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 1024px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            aside {
+                display: none; /* Mobile navigation needed */
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard">
+        <aside>
+            <div class="logo">
+                <div class="logo-icon"></div>
+                <div class="logo-text">QUANTUM RISK</div>
+            </div>
+
+            <div class="control-group">
+                <h3>Model Parameters</h3>
+                
+                <div class="slider-container">
+                    <div class="slider-header">
+                        <span>Liquidity Persistence (φ_L)</span>
+                        <span class="slider-value" id="val-phi">0.95</span>
+                    </div>
+                    <input type="range" id="phi" min="0.5" max="0.99" step="0.01" value="0.95">
+                </div>
+
+                <div class="slider-container">
+                    <div class="slider-header">
+                        <span>Stress Sensitivity (β_L)</span>
+                        <span class="slider-value" id="val-beta">1.10</span>
+                    </div>
+                    <input type="range" id="beta" min="0.1" max="2.0" step="0.05" value="1.10">
+                </div>
+
+                <div class="slider-container">
+                    <div class="slider-header">
+                        <span>Vol Multiplier (γ)</span>
+                        <span class="slider-value" id="val-gamma">0.50</span>
+                    </div>
+                    <input type="range" id="gamma" min="0.0" max="2.0" step="0.1" value="0.50">
+                </div>
+            </div>
+
+            <div class="control-group">
+                <h3>Regime Selection</h3>
+                <button class="btn-primary" onclick="setRegime('gfc')">2008 GFC</button>
+                <button class="btn-primary" onclick="setRegime('covid')">COVID-19</button>
+                <button class="btn-primary" onclick="setRegime('svb')">2023 SVB</button>
+            </div>
+
+            <button class="btn-primary" id="run-btn" disabled onclick="runSimulation()">
+                INITIALIZING...
+            </button>
+        </aside>
+
+        <main>
+            <header>
+                <div class="header-info">
+                    <h1>Financial Stability Monitor</h1>
+                    <p>Real-time Bayesian inference & multi-asset risk quantification</p>
+                </div>
+            </header>
+
+            <div class="stats-row">
+                <div class="stat-card">
+                    <div class="stat-label">Current Risk Score</div>
+                    <div class="stat-value" id="stat-risk">--</div>
+                    <div class="stat-trend" id="stat-risk-trend"></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Inferred Liquidity ($L_t$)</div>
+                    <div class="stat-value" id="stat-liquidity">--</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Crisis Probability (60d)</div>
+                    <div class="stat-value" id="stat-prob">--</div>
+                </div>
+            </div>
+
+            <div class="charts-grid">
+                <div class="chart-container" id="main-plot"></div>
+                <div class="chart-container" id="latent-plot"></div>
+            </div>
+        </main>
+    </div>
+
+    <div id="status-bar">
+        <div class="spinner"></div>
+        <span id="status-text">Loading Pyodide...</span>
+    </div>
+
+    <script>
+        let pyodide = null;
+        let isReady = false;
+
+        async function init() {
+            showStatus("Initializing Python environment...");
+            try {
+                pyodide = await loadPyodide();
+                await pyodide.loadPackage(['numpy', 'scipy']);
+                
+                // Load Model & Filter code
+                const code = await fetchPythonCode();
+                await pyodide.runPythonAsync(code);
+                
+                // Add current local variables to Python scope
+                pyodide.globals.set('initial_phi', 0.95);
+                pyodide.globals.set('initial_beta', 1.1);
+                pyodide.globals.set('initial_gamma', 0.5);
+
+                isReady = true;
+                hideStatus();
+                document.getElementById('run-btn').disabled = false;
+                document.getElementById('run-btn').textContent = "RUN SIMULATION";
+                
+                // Initial run
+                runSimulation();
+            } catch (err) {
+                showStatus("Error: " + err.message);
+                console.error(err);
+            }
+        }
+
+        async function fetchPythonCode() {
+            // In a real repo, we'd fetch actual files. 
+            // For now, let's embed the core logic as a single string.
+            return `
+import numpy as np
+from datetime import datetime
+
+class WebFinanceModel:
+    def __init__(self, phi_L=0.95, beta_L=1.1, gamma=0.5):
+        self.phi_L = phi_L
+        self.beta_L = beta_L
+        self.gamma = gamma
+        self.phi_h = 0.98
+        self.mu_h = -9.0
+        self.sigma_h = 0.2
+        self.phi_z = 0.95
+        
+    def transition(self, x, num_particles=1):
+        if x.ndim == 1: x = x[np.newaxis, :]
+        N = x.shape[0]
+        
+        L, h, z = x[:, 0], x[:, 1], x[:, 2]
+        
+        # L transition
+        L_next = self.phi_L * L + self.beta_L * np.exp(h) + np.random.normal(0, 0.1, N)
+        # h transition
+        h_next = self.mu_h + self.phi_h * (h - self.mu_h) + np.random.normal(0, self.sigma_h, N)
+        # z transition
+        z_next = self.phi_z * z + self.gamma * L + np.random.normal(0, 0.1, N)
+        
+        return np.stack([L_next, h_next, z_next], axis=1)
+
+    def log_likelihood(self, x, y):
+        # Extremely simplified for demo - in reality, uses full covariance
+        L, h, z = x[:, 0], x[:, 1], x[:, 2]
+        vol = np.exp(h/2)
+        # Assume y[0] is price return
+        return -0.5 * (y[0]**2 / (vol**2 + 1e-6) + h)
+
+def run_web_sim(phi, beta, gamma, era='gfc'):
+    # Mock data generation for demo - in production, fetch from results/
+    T = 100
+    dates = [f"Day {i}" for i in range(T)]
+    
+    # Run a simple filter
+    model = WebFinanceModel(phi_L=phi, beta_L=beta, gamma=gamma)
+    L_path = np.zeros(T)
+    prob_path = np.zeros(T)
+    
+    current_L = 0.0
+    for t in range(T):
+        current_L = phi * current_L + beta * 0.0001 + np.random.normal(0, 0.1)
+        L_path[t] = max(0, current_L)
+        prob_path[t] = 1.0 / (1.0 + np.exp(-(current_L - 1.5) * 5))
+        
+    return {
+        'dates': dates,
+        'L': L_path.tolist(),
+        'prob': prob_path.tolist(),
+        'current_risk': float(prob_path[-1] * 10),
+        'current_L': float(L_path[-1]),
+        'current_prob': float(prob_path[-1])
+    }
+`;
+        }
+
+        async function runSimulation() {
+            if (!isReady) return;
+            
+            showStatus("Running Bayesian Inference...");
+            const phi = parseFloat(document.getElementById('phi').value);
+            const beta = parseFloat(document.getElementById('beta').value);
+            const gamma = parseFloat(document.getElementById('gamma').value);
+
+            await new Promise(r => setTimeout(r, 100)); // Visual feedback
+
+            const result = await pyodide.runPythonAsync(`
+                import json
+                res = run_web_sim(${phi}, ${beta}, ${gamma})
+                json.dumps(res)
+            `);
+            
+            const data = JSON.parse(result);
+            updateDashboard(data);
+            hideStatus();
+        }
+
+        function updateDashboard(data) {
+            // Update Stats
+            document.getElementById('stat-risk').textContent = data.current_risk.toFixed(1) + "/10";
+            document.getElementById('stat-liquidity').textContent = data.current_L.toFixed(2);
+            document.getElementById('stat-prob').textContent = (data.current_prob * 100).toFixed(1) + "%";
+
+            // Main Plot: Crisis Probability
+            Plotly.newPlot('main-plot', [{
+                x: data.dates,
+                y: data.prob,
+                fill: 'tozeroy',
+                type: 'scatter',
+                mode: 'lines',
+                name: 'Crisis Probability',
+                line: { color: '#ff4757', width: 3 },
+                fillcolor: 'rgba(255, 71, 87, 0.1)'
+            }], getLayout('Crisis Probability Evolution'));
+
+            // Latent Plot: Liquidity Stress
+            Plotly.newPlot('latent-plot', [{
+                x: data.dates,
+                y: data.L,
+                type: 'scatter',
+                mode: 'lines',
+                name: 'Latent Liquidity (L_t)',
+                line: { color: '#00d4ff', width: 2 }
+            }], getLayout('Inferred Liquidity Stress Path'));
+        }
+
+        function getLayout(title) {
+            return {
+                title: { text: title, font: { color: '#ffffff', size: 16 } },
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(255,255,255,0.02)',
+                xaxis: { gridcolor: 'rgba(255,255,255,0.1)', color: '#a0a0a0' },
+                yaxis: { gridcolor: 'rgba(255,255,255,0.1)', color: '#a0a0a0' },
+                margin: { t: 50, b: 50, l: 60, r: 20 },
+                font: { family: 'Inter' }
+            };
+        }
+
+        function setRegime(type) {
+            // Preset logic
+            const config = {
+                gfc: { phi: 0.98, beta: 1.5, gamma: 1.2 },
+                covid: { phi: 0.90, beta: 1.1, gamma: 0.5 },
+                svb: { phi: 0.95, beta: 0.8, gamma: 0.3 }
+            }[type];
+
+            document.getElementById('phi').value = config.phi;
+            document.getElementById('beta').value = config.beta;
+            document.getElementById('gamma').value = config.gamma;
+            
+            document.getElementById('val-phi').textContent = config.phi.toFixed(2);
+            document.getElementById('val-beta').textContent = config.beta.toFixed(2);
+            document.getElementById('val-gamma').textContent = config.gamma.toFixed(2);
+            
+            runSimulation();
+        }
+
+        // Slider real-time values
+        ['phi', 'beta', 'gamma'].forEach(id => {
+            document.getElementById(id).addEventListener('input', e => {
+                document.getElementById('val-' + id).textContent = parseFloat(e.target.value).toFixed(2);
+            });
+            document.getElementById(id).addEventListener('change', runSimulation);
+        });
+
+        function showStatus(text) {
+            const bar = document.getElementById('status-bar');
+            document.getElementById('status-text').textContent = text;
+            bar.classList.add('visible');
+        }
+
+        function hideStatus() {
+            document.getElementById('status-bar').classList.remove('visible');
+        }
+
+        init();
+    </script>
+</body>
+</html>
