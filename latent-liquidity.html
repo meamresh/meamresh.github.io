@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Latent Liquidity & Crisis Dashboard</title>
+  <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+  <style>
+    :root {
+      --bg: #050c1d;
+      --panel: rgba(18, 28, 52, 0.9);
+      --line: rgba(255, 255, 255, 0.12);
+      --text: #e8f0ff;
+      --muted: #9bb0d8;
+      --accent: #7fc7ff;
+      --accent-2: #ffa07a;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+      background: radial-gradient(circle at 18% 12%, #0b1b38 0%, #050c1d 55%, #030816 100%);
+      color: var(--text);
+      padding: 18px;
+    }
+    .page { max-width: 1200px; margin: 0 auto; }
+    header {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 18px;
+      margin-bottom: 14px;
+    }
+    h1 { margin: 0 0 6px; font-size: 1.9rem; }
+    p.lead { margin: 0; color: var(--muted); }
+    .actions { margin-top: 10px; display: flex; gap: 10px; flex-wrap: wrap; }
+    .btn {
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      text-decoration: none;
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.05);
+      font-weight: 600;
+    }
+    .btn.primary { background: linear-gradient(135deg, #7fc7ff, #5a8bff); color: #041024; border: none; }
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 14px;
+    }
+    .panel h2 { margin: 0 0 8px; font-size: 1.2rem; }
+    .controls { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .controls label { font-size: 0.95rem; color: var(--muted); }
+    .controls input { padding: 8px 10px; border-radius: 8px; border: 1px solid var(--line); background: rgba(255,255,255,0.05); color: var(--text); }
+    .plot { width: 100%; height: 380px; }
+    .media-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; }
+    figure { margin: 0; border: 1px solid var(--line); border-radius: 10px; background: rgba(255,255,255,0.02); overflow: hidden; }
+    figure img { width: 100%; display: block; }
+    figure figcaption { padding: 10px; color: var(--muted); font-size: 0.95rem; }
+    .note { color: var(--muted); font-size: 0.95rem; }
+    footer { margin: 16px 0 4px; color: var(--muted); }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <h1>Latent Liquidity & Crisis Dashboard</h1>
+      <p class="lead">Interactive crisis probability and latent-factor visualizer built from <code>latent_liquidity_quant</code> outputs.</p>
+      <div class="actions">
+        <a class="btn primary" href="https://github.com/meamresh/latent_liquidity_quant" target="_blank" rel="noreferrer">View Repository</a>
+        <a class="btn" href="assets/latent-liquidity/crisis_res.json" download>Download crisis_res.json</a>
+        <a class="btn" href="latent-liquidity.html">Reload</a>
+      </div>
+      <p class="note">Data source: <code>results/crisis_res.npz</code> converted to JSON. To regenerate: <code>python3 experiments/visualize_crisis.py</code> then re-run JSON export.</p>
+    </header>
+
+    <section class="panel">
+      <h2>Time Window</h2>
+      <div class="controls">
+        <label>Start <input type="date" id="startDate"></label>
+        <label>End <input type="date" id="endDate"></label>
+        <button class="btn" id="resetBtn">Reset</button>
+      </div>
+      <p class="note" id="summary">Loading data...</p>
+    </section>
+
+    <section class="panel">
+      <h2>Crisis Probability (next 60 days)</h2>
+      <div id="probPlot" class="plot"></div>
+    </section>
+
+    <section class="panel">
+      <h2>Liquidity Stress L<sub>t</sub> with 90% CI</h2>
+      <div id="stressPlot" class="plot"></div>
+    </section>
+
+    <section class="panel">
+      <h2>Latent Factors h, z</h2>
+      <div id="latentPlot" class="plot"></div>
+    </section>
+
+    <section class="panel">
+      <h2>Gallery (pre-rendered outputs)</h2>
+      <div class="media-grid">
+        <figure>
+          <img src="assets/latent-liquidity/crisis_analysis_advanced.png" alt="Static crisis analysis" />
+          <figcaption>Static dual-axis plot from <code>experiments/visualize_crisis.py</code></figcaption>
+        </figure>
+        <figure>
+          <img src="assets/latent-liquidity/vanguard_static_2008.png" alt="2008 static" />
+          <figcaption>2008 stress window</figcaption>
+        </figure>
+        <figure>
+          <img src="assets/latent-liquidity/vanguard_static_covid.png" alt="COVID static" />
+          <figcaption>COVID onset window</figcaption>
+        </figure>
+        <figure>
+          <img src="assets/latent-liquidity/crisis_evolution_refined.gif" alt="Crisis evolution animation" />
+          <figcaption>Refined crisis evolution (animated GIF)</figcaption>
+        </figure>
+        <figure>
+          <img src="assets/latent-liquidity/vanguard_risk_evolution.gif" alt="Vanguard risk evolution" />
+          <figcaption>Vanguard risk evolution (full series)</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Reproduction</h2>
+      <ul class="note">
+        <li>Recompute crisis data: <code>python3 main.py predict</code></li>
+        <li>Regenerate static plot: <code>python3 experiments/visualize_crisis.py</code></li>
+        <li>Create animations: <code>python3 experiments/animate_crisis.py</code></li>
+        <li>Export JSON for this page: run conversion script to <code>assets/latent-liquidity/crisis_res.json</code></li>
+      </ul>
+    </section>
+
+    <footer>Built from <code>latent_liquidity_quant/results/crisis_res.npz</code>. Last updated: 2026-03-11.</footer>
+  </div>
+
+  <script>
+    const dataUrl = 'assets/latent-liquidity/crisis_res.json';
+    let raw = null;
+
+    function filterData(start, end) {
+      const startMs = start ? new Date(start).getTime() : -Infinity;
+      const endMs = end ? new Date(end).getTime() : Infinity;
+      const mask = raw.dates.map((d) => {
+        const t = new Date(d).getTime();
+        return t >= startMs && t <= endMs;
+      });
+      const pick = (arr) => arr.filter((_, i) => mask[i]);
+      return {
+        dates: pick(raw.dates),
+        crisis: pick(raw.crisis_prob),
+        L: pick(raw.L_mean),
+        L05: pick(raw.L_q05),
+        L95: pick(raw.L_q95),
+        tail: pick(raw.P_L_gt_2),
+        h: pick(raw.h_mean),
+        z: pick(raw.z_mean),
+      };
+    }
+
+    function updateSummary(d) {
+      if (!d.dates.length) {
+        document.getElementById('summary').textContent = 'No data in selected range';
+        return;
+      }
+      const maxProb = Math.max(...d.crisis);
+      const maxIdx = d.crisis.indexOf(maxProb);
+      document.getElementById('summary').textContent = `Window: ${d.dates[0]} → ${d.dates[d.dates.length-1]} | Max crisis prob ${maxProb.toFixed(2)} on ${d.dates[maxIdx]} | Tail P(L>2): avg ${(d.tail.reduce((a,b)=>a+b,0)/d.tail.length).toFixed(2)}`;
+    }
+
+    function plotAll(d) {
+      updateSummary(d);
+      Plotly.newPlot('probPlot', [
+        { x: d.dates, y: d.crisis, type: 'scatter', mode: 'lines', fill: 'tozeroy', line: { color: '#ff6b6b' }, name: 'Crisis probability' }
+      ], {
+        margin: { t: 20, r: 10, l: 50, b: 40 },
+        yaxis: { range: [0, 1.05], title: 'Probability' },
+        shapes: [{ type: 'line', x0: d.dates[0], x1: d.dates[d.dates.length-1], y0: 0.5, y1: 0.5, line: { dash: 'dot', color: '#ffa07a' } }],
+        hovermode: 'x unified',
+        paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)'
+      }, {responsive: true});
+
+      Plotly.newPlot('stressPlot', [
+        { x: d.dates, y: d.L95, type: 'scatter', mode: 'lines', line: { color: 'rgba(127,199,255,0)' }, showlegend: false },
+        { x: d.dates, y: d.L05, type: 'scatter', mode: 'lines', fill: 'tonexty', fillcolor: 'rgba(127,199,255,0.18)', line: { color: 'rgba(127,199,255,0)' }, showlegend: false },
+        { x: d.dates, y: d.L, type: 'scatter', mode: 'lines', line: { color: '#7fc7ff', width: 2 }, name: 'L_mean' },
+        { x: d.dates, y: d.tail, type: 'bar', marker: { color: 'rgba(255,160,122,0.35)' }, name: 'P(L>2)', yaxis: 'y2' }
+      ], {
+        margin: { t: 20, r: 50, l: 50, b: 40 },
+        yaxis: { title: 'L_t' },
+        yaxis2: { title: 'Tail prob', overlaying: 'y', side: 'right', range: [0, 1.05] },
+        hovermode: 'x unified',
+        shapes: [{ type: 'line', x0: d.dates[0], x1: d.dates[d.dates.length-1], y0: 2, y1: 2, line: { dash: 'dot', color: '#8be28b' } }],
+        paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)'
+      }, {responsive: true});
+
+      Plotly.newPlot('latentPlot', [
+        { x: d.dates, y: d.h, type: 'scatter', mode: 'lines', line: { color: '#9b8bff' }, name: 'h_mean' },
+        { x: d.dates, y: d.z, type: 'scatter', mode: 'lines', line: { color: '#f6c344' }, name: 'z_mean' }
+      ], {
+        margin: { t: 20, r: 10, l: 50, b: 40 },
+        hovermode: 'x unified',
+        paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)'
+      }, {responsive: true});
+    }
+
+    async function init() {
+      const res = await fetch(dataUrl);
+      raw = await res.json();
+      const startInput = document.getElementById('startDate');
+      const endInput = document.getElementById('endDate');
+      const applyFilter = () => {
+        const d = filterData(startInput.value, endInput.value);
+        plotAll(d);
+      };
+      document.getElementById('resetBtn').onclick = () => {
+        startInput.value = '';
+        endInput.value = '';
+        applyFilter();
+      };
+      startInput.onchange = applyFilter;
+      endInput.onchange = applyFilter;
+      plotAll(filterData());
+    }
+
+    init().catch(err => {
+      document.getElementById('summary').textContent = 'Error loading data: ' + err;
+    });
+  </script>
+</body>
+</html>
