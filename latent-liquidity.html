@@ -144,6 +144,14 @@
     <footer>Built from <code>latent_liquidity_quant/results/crisis_res.npz</code>. Last updated: 2026-03-11.</footer>
   </div>
 
+  
+    <div id="modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:9999; align-items:center; justify-content:center; padding:20px;">
+      <div style="max-width:1200px; width:100%; background:rgba(10,18,35,0.95); border:1px solid rgba(255,255,255,0.2); border-radius:12px; padding:12px; position:relative;">
+        <button id="modalClose" style="position:absolute; top:8px; right:8px; background:#ff6b6b; color:#0a0a0a; border:none; padding:6px 10px; border-radius:8px; cursor:pointer; z-index:2;">Close</button>
+        <img id="modalImg" src="" alt="" style="width:85vw; max-width:1200px; height:auto; max-height:90vh; border-radius:8px; object-fit:contain;" />
+        <p id="modalLink" style="margin:8px 0 0; color:#9bb0d8; font-size:0.95rem;"></p>
+      </div>
+    </div>
   <script>
     const dataUrl = 'assets/latent-liquidity/crisis_res.json';
     let raw = null;
@@ -229,6 +237,13 @@
         applyFilter();
       };
       document.getElementById('applyBtn').onclick = applyFilter;
+      document.querySelectorAll('[data-start][data-end]').forEach(btn => {
+        btn.onclick = () => {
+          startInput.value = btn.dataset.start;
+          endInput.value = btn.dataset.end;
+          applyFilter();
+        };
+      });
       plotAll(filterData());
     }
 
@@ -249,22 +264,15 @@
     const hideModal = () => {
       document.getElementById('modal').style.display = 'none';
     };
-    document.getElementById('modalClose').onclick = (e) => { e.stopPropagation(); hideModal(); };
-    document.getElementById('modal').addEventListener('click', (e) => {
-      if (e.target.id === 'modal') { hideModal(); }
-    });
-    window.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') { hideModal(); }
-    });
+    const modalEl = document.getElementById('modal');
+    const modalClose = document.getElementById('modalClose');
+    if (modalClose) { modalClose.onclick = (e) => { e.stopPropagation(); hideModal(); }; }
+    if (modalEl) {
+      modalEl.addEventListener('click', (e) => { if (e.target.id === 'modal') { hideModal(); } });
+    }
+    window.addEventListener('keydown', (e) => { if (e.key === 'Escape') { hideModal(); } });
 
   </script>
 
-    <div id="modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:9999; align-items:center; justify-content:center; padding:20px;">
-      <div style="max-width:1200px; width:100%; background:rgba(10,18,35,0.95); border:1px solid rgba(255,255,255,0.2); border-radius:12px; padding:12px; position:relative;">
-        <button id="modalClose" style="position:absolute; top:8px; right:8px; background:#ff6b6b; color:#0a0a0a; border:none; padding:6px 10px; border-radius:8px; cursor:pointer; z-index:2;">Close</button>
-        <img id="modalImg" src="" alt="" style="width:85vw; max-width:1200px; height:auto; max-height:90vh; border-radius:8px; object-fit:contain;" />
-        <p id="modalLink" style="margin:8px 0 0; color:#9bb0d8; font-size:0.95rem;"></p>
-      </div>
-    </div>
     </body>
 </html>
