@@ -75,11 +75,11 @@
         <a class="btn" href="portfolio.html">Back to Portfolio</a>
         <a class="btn" href="latent-liquidity.html">Reload</a>
       </div>
-      <p class="note">Data source: <code>results/crisis_res.npz</code> converted to JSON. To regenerate: <code>python3 experiments/visualize_crisis.py</code> then re-run JSON export.</p>
+      <p class="note">Data source: <code>results/crisis_res.npz</code> converted to JSON.</p>
     </header>
 
     <section class="panel">
-      <h2>Time Window</h2>
+      <h2>Time Window [Enter Dates Below]</h2>
       <div class="controls">
         <label>Start <input type="date" id="startDate"></label>
         <label>End <input type="date" id="endDate"></label>
@@ -174,7 +174,7 @@
       }
       const maxProb = Math.max(...d.crisis);
       const maxIdx = d.crisis.indexOf(maxProb);
-      document.getElementById('summary').textContent = `Window: ${d.dates[0]} → ${d.dates[d.dates.length-1]} | Max crisis prob ${maxProb.toFixed(2)} on ${d.dates[maxIdx]} | Tail P(L>2): avg ${(d.tail.reduce((a,b)=>a+b,0)/d.tail.length).toFixed(2)}`;
+      document.getElementById('summary').textContent = `Allowed Window: ${d.dates[0]} → ${d.dates[d.dates.length-1]} (Latest data available at the time of project completion) | Tail P(L>2): avg ${(d.tail.reduce((a,b)=>a+b,0)/d.tail.length).toFixed(2)}`;
     }
 
     function plotAll(d) {
