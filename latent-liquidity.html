@@ -72,6 +72,7 @@
       <div class="actions">
         <a class="btn primary" href="https://github.com/meamresh/latent_liquidity_quant" target="_blank" rel="noreferrer">View Repository</a>
         <a class="btn" href="assets/latent-liquidity/crisis_res.json" download>Download crisis_res.json</a>
+        <a class="btn" href="portfolio.html">Back to Portfolio</a>
         <a class="btn" href="latent-liquidity.html">Reload</a>
       </div>
       <p class="note">Data source: <code>results/crisis_res.npz</code> converted to JSON. To regenerate: <code>python3 experiments/visualize_crisis.py</code> then re-run JSON export.</p>
@@ -82,6 +83,7 @@
       <div class="controls">
         <label>Start <input type="date" id="startDate"></label>
         <label>End <input type="date" id="endDate"></label>
+        <button class="btn primary" id="applyBtn">Apply</button>
         <button class="btn" id="resetBtn">Reset</button>
       </div>
       <p class="note" id="summary">Loading data...</p>
@@ -225,8 +227,7 @@
         endInput.value = '';
         applyFilter();
       };
-      startInput.onchange = applyFilter;
-      endInput.onchange = applyFilter;
+      document.getElementById('applyBtn').onclick = applyFilter;
       plotAll(filterData());
     }
 
