@@ -107,23 +107,19 @@
     <section class="panel">
       <h2>Gallery (pre-rendered outputs)</h2>
       <div class="media-grid">
-        <figure>
+        <figure class="zoomable" data-src="assets/latent-liquidity/crisis_analysis_advanced.png" data-link="https://github.com/meamresh/latent_liquidity_quant/blob/main/results/crisis_analysis_advanced.png">
           <img src="assets/latent-liquidity/crisis_analysis_advanced.png" alt="Static crisis analysis" />
           <figcaption>Static dual-axis plot from <code>experiments/visualize_crisis.py</code></figcaption>
         </figure>
-        <figure>
+        <figure class="zoomable" data-src="assets/latent-liquidity/vanguard_static_2008.png" data-link="https://github.com/meamresh/latent_liquidity_quant/blob/main/results/vanguard_static_2008.png">
           <img src="assets/latent-liquidity/vanguard_static_2008.png" alt="2008 static" />
           <figcaption>2008 stress window</figcaption>
         </figure>
-        <figure>
+        <figure class="zoomable" data-src="assets/latent-liquidity/vanguard_static_covid.png" data-link="https://github.com/meamresh/latent_liquidity_quant/blob/main/results/vanguard_static_covid.png">
           <img src="assets/latent-liquidity/vanguard_static_covid.png" alt="COVID static" />
           <figcaption>COVID onset window</figcaption>
         </figure>
-        <figure>
-          <img src="assets/latent-liquidity/crisis_evolution_refined.gif" alt="Crisis evolution animation" />
-          <figcaption>Refined crisis evolution (animated GIF)</figcaption>
-        </figure>
-        <figure>
+        <figure class="zoomable" data-src="assets/latent-liquidity/vanguard_risk_evolution.gif" data-link="https://github.com/meamresh/latent_liquidity_quant/blob/main/results/vanguard_risk_evolution.gif">
           <img src="assets/latent-liquidity/vanguard_risk_evolution.gif" alt="Vanguard risk evolution" />
           <figcaption>Vanguard risk evolution (full series)</figcaption>
         </figure>
@@ -234,6 +230,34 @@
     init().catch(err => {
       document.getElementById('summary').textContent = 'Error loading data: ' + err;
     });
+
+    document.querySelectorAll('.zoomable').forEach(fig => {
+      fig.style.cursor = 'zoom-in';
+      fig.onclick = () => {
+        const src = fig.dataset.src;
+        const link = fig.dataset.link;
+        document.getElementById('modalImg').src = src;
+        document.getElementById('modalLink').innerHTML = `Source: <a href="${link}" target="_blank" rel="noreferrer">${link}</a>`;
+        document.getElementById('modal').style.display = 'flex';
+      };
+    });
+    document.getElementById('modalClose').onclick = () => {
+      document.getElementById('modal').style.display = 'none';
+    };
+    document.getElementById('modal').addEventListener('click', (e) => {
+      if (e.target.id === 'modal') {
+        document.getElementById('modal').style.display = 'none';
+      }
+    });
+
   </script>
-</body>
+
+    <div id="modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:9999; align-items:center; justify-content:center; padding:20px;">
+      <div style="max-width:1200px; width:100%; background:rgba(10,18,35,0.95); border:1px solid rgba(255,255,255,0.2); border-radius:12px; padding:12px; position:relative;">
+        <button id="modalClose" style="position:absolute; top:8px; right:8px; background:#ff6b6b; color:#0a0a0a; border:none; padding:6px 10px; border-radius:8px; cursor:pointer;">Close</button>
+        <img id="modalImg" src="" alt="" style="width:100%; height:auto; border-radius:8px;" />
+        <p id="modalLink" style="margin:8px 0 0; color:#9bb0d8; font-size:0.95rem;"></p>
+      </div>
+    </div>
+    </body>
 </html>
