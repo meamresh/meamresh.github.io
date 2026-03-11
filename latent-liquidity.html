@@ -86,6 +86,11 @@
         <button class="btn primary" id="applyBtn">Apply</button>
         <button class="btn" id="resetBtn">Reset</button>
       </div>
+      <div class="controls" style="margin-top:8px; gap:8px;">
+        <button class="btn" data-start="2007-06-01" data-end="2008-10-01" id="era2008">2008 Crisis</button>
+        <button class="btn" data-start="2015-08-24" data-end="2016-12-24" id="eraBrexit">Brexit Vote</button>
+        <button class="btn" data-start="2022-08-24" data-end="2023-06-24" id="eraSVB">SVB Collapse</button>
+      </div>
       <p class="note" id="summary">Loading data...</p>
     </section>
 
@@ -241,18 +246,15 @@
         document.getElementById('modal').style.display = 'flex';
       };
     });
-    document.getElementById('modalClose').onclick = () => {
+    const hideModal = () => {
       document.getElementById('modal').style.display = 'none';
     };
+    document.getElementById('modalClose').onclick = (e) => { e.stopPropagation(); hideModal(); };
     document.getElementById('modal').addEventListener('click', (e) => {
-      if (e.target.id === 'modal') {
-        document.getElementById('modal').style.display = 'none';
-      }
+      if (e.target.id === 'modal') { hideModal(); }
     });
     window.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
-        document.getElementById('modal').style.display = 'none';
-      }
+      if (e.key === 'Escape') { hideModal(); }
     });
 
   </script>
