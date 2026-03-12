@@ -766,19 +766,20 @@ body > .modal {
 .panel-row {
   display: flex;
   gap: 12px;
-  flex-wrap: wrap;
+  align-items: flex-start; /* keeps top aligned */
 }
 
-.panel-column {
-  flex: 1 1 0; /* Flexible columns */
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+.time-window-column {
+  flex: 0 0 450px; /* narrower width for the panel */
 }
 
-.animation-panel {
-  flex: 0 0 400px; /* Fixed width for animation */
-  min-width: 300px;
+.animation-column {
+  flex: 1; /* take remaining space */
+  min-width: 300px; /* optional: ensures GIF isn’t too small */
+}
+
+.panel-row .panel {
+  margin-bottom: 0; /* remove extra vertical margin inside row */
 }
 
 .footer-copyright {
