@@ -77,6 +77,9 @@
       <p class="note">Data source: <code>results/crisis_res.npz</code> converted to JSON.</p>
     </header>
 
+    <section class="panel-row">
+  <!-- Time Window panel on the left -->
+  <div class="panel-column time-window-column">
     <section class="panel">
       <h2>Time Window [Enter Dates Below]</h2>
       <div class="controls">
@@ -88,10 +91,22 @@
       <div class="controls" style="margin-top:8px; gap:8px;">
         <button class="btn" data-start="2007-06-01" data-end="2008-10-01" id="era2008">2008 Crisis</button>
         <button class="btn" data-start="2015-08-24" data-end="2016-12-24" id="eraBrexit">Brexit Vote</button>
-        <button class="btn" data-start="2022-08-24" data-end="2023-06-24" id="eraSVB">SVB Collapse</button>
+        <button class="btn" data-start="2022-02-24" data-end="2023-06-24" id="eraSVB">SVB Collapse</button>
       </div>
       <p class="note" id="summary">Loading data...</p>
     </section>
+  </div>
+
+  <!-- Animation panel on the right -->
+  <div class="panel-column animation-column">
+    <section class="panel" style="height:100%;">
+      <h2>Vanguard Risk Evolution (Full Series)</h2>
+      <img src="assets/latent-liquidity/vanguard_risk_evolution.gif" 
+           alt="Vanguard risk evolution" 
+           style="width:100%; display:block; border-radius:10px;">
+    </section>
+  </div>
+</section>
 
     <section class="panel">
       <h2>Crisis Probability (next 60 days)</h2>
