@@ -153,6 +153,7 @@
       </div>
     </div>
   <script>
+    document.addEventListener("DOMContentLoaded", () => {
     const dataUrl = 'assets/latent-liquidity/crisis_res.json';
     let raw = null;
 
@@ -271,6 +272,7 @@
       modalEl.addEventListener('click', (e) => { if (e.target.id === 'modal') { hideModal(); } });
     }
     window.addEventListener('keydown', (e) => { if (e.key === 'Escape') { hideModal(); } });
+    });
 
   </script>
 
