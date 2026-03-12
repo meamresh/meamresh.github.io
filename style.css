@@ -763,6 +763,24 @@ body > .modal {
     color: #fbbf24;
 }
 
+.panel-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.panel-column {
+  flex: 1 1 0; /* Flexible columns */
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.animation-panel {
+  flex: 0 0 400px; /* Fixed width for animation */
+  min-width: 300px;
+}
+
 .footer-copyright {
     color: #9ca3af;
 }
