@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Latent Liquidity | Theory & Methods</title>
+  <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+  <style>
+    :root {
+      --bg: #050c1d;
+      --panel: rgba(18, 28, 52, 0.9);
+      --line: rgba(255, 255, 255, 0.12);
+      --text: #e8f0ff;
+      --muted: #9bb0d8;
+      --accent: #7fc7ff;
+      --accent-2: #ffa07a;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+      background: radial-gradient(circle at 18% 12%, #0b1b38 0%, #050c1d 55%, #030816 100%);
+      color: var(--text);
+      padding: 18px;
+      line-height: 1.6;
+    }
+    .page { max-width: 1100px; margin: 0 auto; }
+    header {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 18px;
+      margin-bottom: 14px;
+    }
+    h1 { margin: 0 0 6px; font-size: 1.9rem; }
+    p.lead { margin: 0; color: var(--muted); }
+    .actions { margin-top: 10px; display: flex; gap: 10px; flex-wrap: wrap; }
+    .btn {
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      text-decoration: none;
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.05);
+      font-weight: 600;
+    }
+    .btn.primary { background: linear-gradient(135deg, #7fc7ff, #5a8bff); color: #041024; border: none; }
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 14px;
+    }
+    .panel h2 { margin: 0 0 8px; font-size: 1.25rem; }
+    .panel h3 { margin: 10px 0 6px; font-size: 1.05rem; }
+    .muted { color: var(--muted); }
+    ul { margin: 6px 0 10px 18px; }
+    code { background: rgba(255,255,255,0.06); padding: 2px 6px; border-radius: 6px; }
+    .math { font-family: "IBM Plex Mono", monospace; }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <h1>Latent Liquidity | Theory & Methods</h1>
+      <p class="lead">State-space formulation, inference pipeline, and crisis prediction methodology behind <code>latent_liquidity_quant</code>.</p>
+      <div class="actions">
+        <a class="btn" href="latent-liquidity.html">Back to Dashboard</a>
+        <a class="btn" href="portfolio.html">Back to Portfolio</a>
+        <a class="btn" href="https://github.com/meamresh/latent_liquidity_quant" target="_blank" rel="noreferrer">Repository</a>
+        <a class="btn primary" href="https://github.com/meamresh/latent_liquidity_quant/tree/main/models">State-Space Code</a>
+      </div>
+    </header>
+
+    <section class="panel">
+      <h2>1. Model Overview</h2>
+      <p>The latent-liquidity project detects and forecasts financial crises by inferring a hidden liquidity factor that drives volatility, correlations, and credit risk. A state-space framework captures the temporal evolution of these hidden drivers while linking them to observed market data, enabling filtering (past/present) and forecasting (future) within one coherent probabilistic model.</p>
+      <ul class="muted">
+        <li><strong>Goal:</strong> estimate latent market stress and produce probabilistic crisis warnings.</li>
+        <li><strong>Why SSM:</strong> hidden liquidity conditions are not directly observed; SSMs naturally separate latent dynamics (state) from noisy measurements (observations) and support sequential Bayesian updates.</li>
+      </ul>
+    </section>
+
+    <section class="panel">
+      <h2>2. State-Space Model Structure</h2>
+      <h3>Latent state vector</h3>
+      <p class="math">x_t = [L_t,\ h_t,\ z_t]</p>
+      <ul>
+        <li><strong>L_t</strong>: latent liquidity / systemic stress factor.</li>
+        <li><strong>h_t</strong>: log-volatility (so variance is <span class="math">\sigma_t^2 = e^{h_t}</span>).</li>
+        <li><strong>z_t</strong>: latent correlation driver (<span class="math">\rho_t = \tanh(z_t)</span> keeps correlations in [-1,1]).</li>
+      </ul>
+      <h3>State transitions</h3>
+      <p class="math">\begin{aligned}
+      L_{t+1} &= \phi_L L_t + \beta_L e^{h_t} + \epsilon_L,\\
+      h_{t+1} &= \mu_h + \phi_h (h_t - \mu_h) + \epsilon_h,\\
+      z_{t+1} &= \phi_z z_t + \gamma L_t + \epsilon_z,
+      \end{aligned}</p>
+      <p class="muted">Process noises <span class="math">\epsilon_L, \epsilon_h, \epsilon_z \sim \mathcal N(0, \Sigma_Q)</span> allow stochastic evolution and capture regime shifts.</p>
+      <h3>Observation model</h3>
+      <p>Observables <span class="math">y_t = [r_{SPY}, r_{TLT}, r_{HYG}, VIX, Spread, Corr]</span> are linked to the latent states:</p>
+      <ul>
+        <li><strong>Returns:</strong> <span class="math">r_t \sim \mathcal N(0, \Sigma_t)</span> with <span class="math">\Sigma_t = e^{h_t} R(\rho_t)</span>; <span class="math">R(\rho_t)</span> is an equicorrelation matrix driven by <span class="math">\rho_t = \tanh(z_t)</span>.</li>
+        <li><strong>VIX:</strong> <span class="math">VIX_t \sim \mathcal N(a_{vix} + b_{vix} e^{h_t/2}, \sigma_{vix}^2)</span>.</li>
+        <li><strong>Credit Spread:</strong> <span class="math">Spread_t \sim \mathcal N(a_{sp} + b_{sp} L_t, \sigma_{sp}^2)</span>.</li>
+        <li><strong>Rolling Corr:</strong> <span class="math">Corr_t \sim \mathcal N(a_{corr} + b_{corr} \rho_t, \sigma_{corr}^2)</span>.</li>
+      </ul>
+    </section>
+
+    <section class="panel">
+      <h2>3. Data Inputs</h2>
+      <ul>
+        <li><strong>SPY returns:</strong> equity risk proxy.</li>
+        <li><strong>TLT returns:</strong> rates/liquidity flight-to-quality proxy.</li>
+        <li><strong>HYG returns:</strong> credit risk and funding stress.</li>
+        <li><strong>VIX:</strong> implied volatility linked to <span class="math">h_t</span>.</li>
+        <li><strong>Credit spreads:</strong> widen as liquidity deteriorates (<span class="math">L_t</span>).</li>
+        <li><strong>Rolling correlations:</strong> capture market co-movement driven by <span class="math">\rho_t</span>.</li>
+      </ul>
+    </section>
+
+    <section class="panel">
+      <h2>4. Inference Method</h2>
+      <p>The latent states are inferred with particle filtering (Sequential Monte Carlo), approximating <span class="math">p(x_t \mid y_{1:t})</span> by weighted particles.</p>
+      <ol>
+        <li><strong>Prediction:</strong> propagate particles via transition model.</li>
+        <li><strong>Weighting:</strong> compute likelihood <span class="math">w_t^{(i)} \propto p(y_t \mid x_t^{(i)})</span>.</li>
+        <li><strong>Resampling:</strong> focus on high-weight particles to avoid degeneracy.</li>
+      </ol>
+      <p>Posterior summaries (means, quantiles) of <span class="math">L_t, h_t, z_t</span> are saved to <code>results/crisis_res.npz</code> and surfaced in the dashboard.</p>
+    </section>
+
+    <section class="panel">
+      <h2>5. Crisis Prediction Methodology</h2>
+      <p>Based on <code>crisis_predictor.py</code>, forward simulations use the filtered state as a starting distribution:</p>
+      <ol>
+        <li>Sample particles from current posterior.</li>
+        <li>Simulate transitions forward over the forecast horizon.</li>
+        <li>Compute crisis risk metrics, e.g. <span class="math">P(L_{t+h} > L_{crit})</span>, tail probabilities, or composite risk signals.</li>
+      </ol>
+      <p>These simulations produce crisis probability paths and risk cones visualized in the dashboard/animations.</p>
+    </section>
+
+    <section class="panel">
+      <h2>6. Interpretation</h2>
+      <ul>
+        <li><strong>Liquidity spirals:</strong> rising <span class="math">L_t</span> signals funding pressure and spread widening.</li>
+        <li><strong>Volatility clustering:</strong> persistent high <span class="math">h_t</span> captures risk-on/off cycles.</li>
+        <li><strong>Correlation breakdown:</strong> high <span class="math">\rho_t</span> reflects market co-movement during stress.</li>
+      </ul>
+      <p>Jointly, these mechanisms provide early warnings of systemic instability and support crisis monitoring across regimes.</p>
+    </section>
+
+    <footer class="muted">This page summarizes the SSM in <code>latent_liquidity_quant</code>. See <code>models/finance_state_space.py</code>, <code>experiments/visualize_crisis.py</code>, and <code>experiments/animate_crisis.py</code> for implementation details.</footer>
+  </div>
+</body>
+</html>
