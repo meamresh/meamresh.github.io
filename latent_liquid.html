@@ -1,549 +1,979 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quantum Risk Analytics | Financial Stability Monitor</title>
-    <script src="https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js"></script>
-    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
-    <style>
-        :root {
-            --bg-color: #0a0e27;
-            --card-bg: rgba(255, 255, 255, 0.05);
-            --accent-primary: #00d4ff;
-            --accent-secondary: #7b2cbf;
-            --text-main: #e0e0e0;
-            --text-dim: #a0a0a0;
-            --danger: #ff4757;
-            --success: #2ed573;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Latent Liquidity & Crisis Dashboard</title>
+  <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:        #04080f;
+      --surface-1: #080f1e;
+      --surface-2: #0c1528;
+      --border:    rgba(100,150,255,0.10);
+      --border-hi: rgba(100,180,255,0.22);
+      --text:      #dce9ff;
+      --muted:     #6a85b0;
+      --dim:       #374b6d;
+      --accent:    #3ec6ff;
+      --accent2:   #ff7c5c;
+      --accent3:   #5cf5b2;
+      --accent4:   #b88dff;
+      --glow:      rgba(62,198,255,0.15);
+    }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color);
-            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
-            color: var(--text-main);
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
+    html { scroll-behavior: smooth; }
 
-        .dashboard {
-            display: grid;
-            grid-template-columns: 300px 1fr;
-            min-height: 100vh;
-        }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 24px 20px 60px;
+      overflow-x: hidden;
+    }
 
-        /* Sidebar Controls */
-        aside {
-            background: rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(20px);
-            border-right: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 30px;
-            display: flex;
-            flex-direction: column;
-            gap: 25px;
-        }
+    /* ── Background grid ── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: -1;
+      background-image:
+        linear-gradient(rgba(62,198,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(62,198,255,0.03) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+    }
 
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 20px;
-        }
+    .page { max-width: 1200px; margin: 0 auto; }
 
-        .logo-icon {
-            width: 32px;
-            height: 32px;
-            background: linear-gradient(45deg, var(--accent-primary), var(--accent-secondary));
-            border-radius: 8px;
-        }
+    /* ══════ HEADER ══════ */
+    header {
+      position: relative;
+      border: 1px solid var(--border-hi);
+      border-radius: 16px;
+      padding: 32px 36px 28px;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, rgba(12,21,40,0.95) 0%, rgba(8,15,30,0.98) 100%);
+      overflow: hidden;
+    }
+    header::after {
+      content: '';
+      position: absolute;
+      top: -60px; right: -80px;
+      width: 340px; height: 340px;
+      background: radial-gradient(circle, rgba(62,198,255,0.07) 0%, transparent 70%);
+      pointer-events: none;
+    }
 
-        .logo-text {
-            font-size: 1.25rem;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-            background: linear-gradient(45deg, #fff, var(--accent-primary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+    .header-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; flex-wrap: wrap; }
 
-        .control-group {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
+    .header-left { flex: 1; min-width: 280px; }
 
-        .control-group h3 {
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--accent-primary);
-            margin-bottom: 5px;
-        }
+    .eyebrow {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.18em;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .eyebrow::before {
+      content: '';
+      display: inline-block;
+      width: 18px; height: 2px;
+      background: var(--accent);
+    }
 
-        .slider-container {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: 2.2rem;
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      color: #fff;
+      margin-bottom: 12px;
+    }
 
-        .slider-header {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.85rem;
-        }
+    .tagline {
+      font-size: 0.97rem;
+      color: var(--muted);
+      line-height: 1.65;
+      max-width: 560px;
+    }
 
-        .slider-value {
-            color: var(--accent-primary);
-            font-weight: 700;
-        }
+    .header-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 18px;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 11px;
+      border-radius: 20px;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.06em;
+      border: 1px solid;
+    }
+    .badge-blue  { color: var(--accent);  border-color: rgba(62,198,255,0.3);  background: rgba(62,198,255,0.07);  }
+    .badge-green { color: var(--accent3); border-color: rgba(92,245,178,0.3);  background: rgba(92,245,178,0.07);  }
+    .badge-purple{ color: var(--accent4); border-color: rgba(184,141,255,0.3); background: rgba(184,141,255,0.07); }
+    .badge-orange{ color: var(--accent2); border-color: rgba(255,124,92,0.3);  background: rgba(255,124,92,0.07);  }
 
-        input[type="range"] {
-            width: 100%;
-            accent-color: var(--accent-primary);
-            background: rgba(255, 255, 255, 0.1);
-            height: 6px;
-            border-radius: 3px;
-            cursor: pointer;
-        }
+    .header-actions {
+      display: flex;
+      gap: 10px;
+      flex-direction: column;
+      align-items: flex-end;
+      flex-shrink: 0;
+    }
 
-        .btn-primary {
-            background: linear-gradient(45deg, var(--accent-primary), #0096c7);
-            color: white;
-            border: none;
-            padding: 14px;
-            border-radius: 10px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            margin-top: 10px;
-        }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 10px 18px;
+      border-radius: 10px;
+      border: 1px solid var(--border-hi);
+      text-decoration: none;
+      color: var(--text);
+      background: rgba(255,255,255,0.04);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 500;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all .18s ease;
+      white-space: nowrap;
+    }
+    .btn:hover { background: rgba(255,255,255,0.08); border-color: var(--accent); color: #fff; }
 
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0, 212, 255, 0.3);
-        }
+    .btn.primary {
+      background: linear-gradient(135deg, var(--accent) 0%, #5a8bff 100%);
+      color: #04080f;
+      border: none;
+      font-weight: 700;
+    }
+    .btn.primary:hover { opacity: 0.88; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(62,198,255,0.25); }
 
-        .btn-primary:disabled {
-            background: #444;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
+    /* ══════ KPI ROW ══════ */
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    @media (max-width: 780px) { .kpi-row { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 440px) { .kpi-row { grid-template-columns: 1fr; } }
 
-        /* Main Content */
-        main {
-            padding: 40px;
-            display: flex;
-            flex-direction: column;
-            gap: 30px;
-            max-width: 1400px;
-            margin: 0 auto;
-            width: 100%;
-        }
+    .kpi {
+      background: var(--surface-1);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px 20px;
+      position: relative;
+      overflow: hidden;
+      transition: border-color .2s;
+    }
+    .kpi:hover { border-color: var(--border-hi); }
+    .kpi::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      border-radius: 14px 14px 0 0;
+    }
+    .kpi:nth-child(1)::before { background: var(--accent2); }
+    .kpi:nth-child(2)::before { background: var(--accent);  }
+    .kpi:nth-child(3)::before { background: var(--accent3); }
+    .kpi:nth-child(4)::before { background: var(--accent4); }
 
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-        }
+    .kpi-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .kpi-value {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.85rem;
+      font-weight: 700;
+      line-height: 1;
+      letter-spacing: -0.02em;
+    }
+    .kpi-value.red    { color: var(--accent2); }
+    .kpi-value.blue   { color: var(--accent);  }
+    .kpi-value.green  { color: var(--accent3); }
+    .kpi-value.purple { color: var(--accent4); }
+    .kpi-sub {
+      margin-top: 6px;
+      font-size: 0.78rem;
+      color: var(--dim);
+      font-family: 'DM Mono', monospace;
+    }
 
-        .header-info h1 {
-            font-size: 2rem;
-            font-weight: 800;
-            margin-bottom: 5px;
-        }
+    /* ══════ PANEL ══════ */
+    .panel {
+      background: var(--surface-1);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 22px 24px;
+      margin-bottom: 16px;
+      transition: border-color .2s;
+    }
+    .panel:hover { border-color: var(--border-hi); }
 
-        .header-info p {
-            color: var(--text-dim);
-        }
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
 
-        .stats-row {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-        }
+    h2 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+    h2 .dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    h2 .dot-red    { background: var(--accent2); box-shadow: 0 0 6px var(--accent2); }
+    h2 .dot-blue   { background: var(--accent);  box-shadow: 0 0 6px var(--accent);  }
+    h2 .dot-purple { background: var(--accent4); box-shadow: 0 0 6px var(--accent4); }
+    h2 .dot-green  { background: var(--accent3); box-shadow: 0 0 6px var(--accent3); }
 
-        .stat-card {
-            background: var(--card-bg);
-            border-radius: 20px;
-            padding: 25px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-        }
+    /* ══════ CONTROLS ══════ */
+    .controls-grid {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      margin-bottom: 14px;
+    }
 
-        .stat-label {
-            font-size: 0.8rem;
-            color: var(--text-dim);
-            margin-bottom: 8px;
-        }
+    .input-group { display: flex; flex-direction: column; gap: 5px; }
+    .input-group label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .input-group input[type="date"] {
+      padding: 9px 12px;
+      border-radius: 9px;
+      border: 1px solid var(--border-hi);
+      background: var(--surface-2);
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.88rem;
+      outline: none;
+      transition: border-color .18s;
+      color-scheme: dark;
+    }
+    .input-group input[type="date"]:focus { border-color: var(--accent); }
 
-        .stat-value {
-            font-size: 1.8rem;
-            font-weight: 800;
-        }
+    .era-buttons {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
 
-        .stat-trend {
-            font-size: 0.85rem;
-            margin-top: 8px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
+    .era-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border-radius: 9px;
+      border: 1px solid;
+      background: transparent;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.78rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all .18s ease;
+    }
+    .era-btn::before {
+      content: '';
+      width: 6px; height: 6px;
+      border-radius: 50%;
+    }
+    .era-btn:hover { transform: translateY(-1px); }
 
-        .trend-up { color: var(--danger); }
-        .trend-down { color: var(--success); }
+    .era-btn.crisis { color: var(--accent2); border-color: rgba(255,124,92,0.35); }
+    .era-btn.crisis::before { background: var(--accent2); box-shadow: 0 0 5px var(--accent2); }
+    .era-btn.crisis:hover { background: rgba(255,124,92,0.1); border-color: var(--accent2); }
 
-        .charts-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 25px;
-        }
+    .era-btn.brexit { color: #f6c344; border-color: rgba(246,195,68,0.35); }
+    .era-btn.brexit::before { background: #f6c344; box-shadow: 0 0 5px #f6c344; }
+    .era-btn.brexit:hover { background: rgba(246,195,68,0.1); border-color: #f6c344; }
 
-        .chart-container {
-            background: var(--card-bg);
-            border-radius: 24px;
-            padding: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            min-height: 450px;
-        }
+    .era-btn.covid { color: var(--accent3); border-color: rgba(92,245,178,0.35); }
+    .era-btn.covid::before { background: var(--accent3); box-shadow: 0 0 5px var(--accent3); }
+    .era-btn.covid:hover { background: rgba(92,245,178,0.1); border-color: var(--accent3); }
 
-        #status-bar {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            padding: 12px 24px;
-            border-radius: 12px;
-            background: rgba(0, 0, 0, 0.8);
-            border: 1px solid var(--accent-primary);
-            color: var(--accent-primary);
-            font-size: 0.9rem;
-            font-weight: 600;
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            transition: all 0.3s;
-            opacity: 0;
-            pointer-events: none;
-        }
+    .era-btn.svb { color: var(--accent4); border-color: rgba(184,141,255,0.35); }
+    .era-btn.svb::before { background: var(--accent4); box-shadow: 0 0 5px var(--accent4); }
+    .era-btn.svb:hover { background: rgba(184,141,255,0.1); border-color: var(--accent4); }
 
-        #status-bar.visible {
-            opacity: 1;
-        }
+    .summary-bar {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      padding: 10px 14px;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    .summary-bar span { color: var(--accent); }
 
-        .spinner {
-            width: 16px;
-            height: 16px;
-            border: 2px solid var(--accent-primary);
-            border-top: 2px solid transparent;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
+    /* ══════ PLOT ══════ */
+    .plot { width: 100%; height: 360px; }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
+    /* ══════ LOADING ══════ */
+    .loader {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 360px;
+      gap: 12px;
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.85rem;
+    }
+    .spinner {
+      width: 20px; height: 20px;
+      border: 2px solid var(--border-hi);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
-        @media (max-width: 1024px) {
-            .dashboard {
-                grid-template-columns: 1fr;
-            }
-            aside {
-                display: none; /* Mobile navigation needed */
-            }
-        }
-    </style>
+    /* ══════ GALLERY ══════ */
+    .media-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 14px;
+    }
+
+    figure {
+      margin: 0;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--surface-2);
+      overflow: hidden;
+      cursor: zoom-in;
+      transition: border-color .2s, transform .2s;
+    }
+    figure:hover {
+      border-color: var(--border-hi);
+      transform: translateY(-2px);
+    }
+    figure img { width: 100%; display: block; aspect-ratio: 16/9; object-fit: cover; }
+    figure figcaption {
+      padding: 10px 12px;
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      line-height: 1.5;
+    }
+    figure figcaption code {
+      color: var(--accent);
+      font-family: 'DM Mono', monospace;
+    }
+
+    /* ══════ REPRODUCTION ══════ */
+    .terminal {
+      background: #020609;
+      border: 1px solid rgba(62,198,255,0.15);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .terminal-bar {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 10px 14px;
+      background: rgba(255,255,255,0.03);
+      border-bottom: 1px solid rgba(62,198,255,0.1);
+    }
+    .terminal-bar span {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+    }
+    .terminal-bar .r { background: #ff5f57; }
+    .terminal-bar .y { background: #febc2e; }
+    .terminal-bar .g { background: #28c840; }
+    .terminal-title {
+      margin-left: 8px;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--dim);
+      letter-spacing: 0.06em;
+    }
+    .terminal-body {
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .cmd {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.83rem;
+      line-height: 1.5;
+    }
+    .cmd .prompt { color: var(--accent3); user-select: none; flex-shrink: 0; }
+    .cmd .command { color: var(--text); }
+    .cmd .comment { color: var(--dim); }
+
+    /* ══════ MODAL ══════ */
+    #modal {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(2,5,12,0.92);
+      z-index: 9999;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      backdrop-filter: blur(6px);
+    }
+    .modal-inner {
+      max-width: 1100px;
+      width: 100%;
+      background: var(--surface-2);
+      border: 1px solid var(--border-hi);
+      border-radius: 14px;
+      padding: 14px;
+      position: relative;
+    }
+    #modalClose {
+      position: absolute;
+      top: 10px; right: 10px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid var(--border-hi);
+      color: var(--text);
+      padding: 6px 12px;
+      border-radius: 7px;
+      cursor: pointer;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.78rem;
+      z-index: 2;
+      transition: background .15s;
+    }
+    #modalClose:hover { background: rgba(255,255,255,0.14); }
+    #modalImg {
+      width: 100%;
+      max-height: 82vh;
+      border-radius: 8px;
+      object-fit: contain;
+    }
+    #modalLink {
+      margin-top: 10px;
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+    }
+    #modalLink a { color: var(--accent); text-decoration: none; }
+    #modalLink a:hover { text-decoration: underline; }
+
+    /* ══════ FOOTER ══════ */
+    footer {
+      margin-top: 24px;
+      padding-top: 18px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .footer-note {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--dim);
+    }
+    .footer-note code { color: var(--muted); }
+
+    /* ══════ ANIMS ══════ */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .page > * {
+      animation: fadeUp .4s ease both;
+    }
+    .page > *:nth-child(1) { animation-delay: .05s; }
+    .page > *:nth-child(2) { animation-delay: .10s; }
+    .page > *:nth-child(3) { animation-delay: .15s; }
+    .page > *:nth-child(4) { animation-delay: .20s; }
+    .page > *:nth-child(5) { animation-delay: .25s; }
+    .page > *:nth-child(6) { animation-delay: .30s; }
+
+    @media (max-width: 600px) {
+      h1 { font-size: 1.6rem; }
+      .header-actions { align-items: flex-start; }
+      body { padding: 14px 12px 48px; }
+    }
+  </style>
 </head>
 <body>
+<div class="page">
 
-    <div class="dashboard">
-        <aside>
-            <div class="logo">
-                <div class="logo-icon"></div>
-                <div class="logo-text">QUANTUM RISK</div>
-            </div>
+  <!-- HEADER -->
+  <header>
+    <div class="header-top">
+      <div class="header-left">
+        <div class="eyebrow">Quantitative Research · Portfolio Project</div>
+        <h1>Latent Liquidity &amp;<br>Crisis Dashboard</h1>
+        <p class="tagline">
+          A Bayesian state-space model that estimates systemic liquidity stress and forward crisis probability
+          from market microstructure data. Latent factors <em>h</em> and <em>z</em> are inferred via MCMC;
+          crisis signals are generated as 60-day predictive probabilities.
+        </p>
+        <div class="header-badges">
+          <span class="badge badge-blue">Bayesian State-Space</span>
+          <span class="badge badge-green">MCMC Inference</span>
+          <span class="badge badge-purple">Latent Factor Model</span>
+          <span class="badge badge-orange">Crisis Prediction</span>
+        </div>
+      </div>
+      <div class="header-actions">
+        <a class="btn primary" href="https://github.com/meamresh/latent_liquidity_quant" target="_blank" rel="noreferrer">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.21 11.39.6.11.82-.26.82-.58v-2.03c-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.74.08-.73.08-.73 1.2.08 1.84 1.23 1.84 1.23 1.07 1.84 2.81 1.31 3.49 1 .11-.78.42-1.31.76-1.61-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.12-.3-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 3-.4c1.02.004 2.04.14 3 .4 2.28-1.55 3.29-1.23 3.29-1.23.66 1.66.24 2.88.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.61-2.81 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.22.7.82.58C20.56 21.8 24 17.3 24 12c0-6.63-5.37-12-12-12z"/></svg>
+          View Repository
+        </a>
+        <a class="btn" href="theory-methods.html">Theory &amp; Methods →</a>
+        <a class="btn" href="portfolio.html">← Back to Portfolio</a>
+      </div>
+    </div>
+  </header>
 
-            <div class="control-group">
-                <h3>Model Parameters</h3>
-                
-                <div class="slider-container">
-                    <div class="slider-header">
-                        <span>Liquidity Persistence (φ_L)</span>
-                        <span class="slider-value" id="val-phi">0.95</span>
-                    </div>
-                    <input type="range" id="phi" min="0.5" max="0.99" step="0.01" value="0.95">
-                </div>
+  <!-- KPI ROW -->
+  <div class="kpi-row" id="kpiRow">
+    <div class="kpi">
+      <div class="kpi-label">Peak Crisis Probability</div>
+      <div class="kpi-value red" id="kpiPeakProb">—</div>
+      <div class="kpi-sub" id="kpiPeakProbDate">loading…</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Max Liquidity Stress L<sub>t</sub></div>
+      <div class="kpi-value blue" id="kpiMaxStress">—</div>
+      <div class="kpi-sub" id="kpiMaxStressDate">loading…</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Avg Tail Probability P(L&gt;2)</div>
+      <div class="kpi-value green" id="kpiAvgTail">—</div>
+      <div class="kpi-sub">across selected window</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Data Window</div>
+      <div class="kpi-value purple" id="kpiSpan">—</div>
+      <div class="kpi-sub" id="kpiSpanSub">observations in range</div>
+    </div>
+  </div>
 
-                <div class="slider-container">
-                    <div class="slider-header">
-                        <span>Stress Sensitivity (β_L)</span>
-                        <span class="slider-value" id="val-beta">1.10</span>
-                    </div>
-                    <input type="range" id="beta" min="0.1" max="2.0" step="0.05" value="1.10">
-                </div>
-
-                <div class="slider-container">
-                    <div class="slider-header">
-                        <span>Vol Multiplier (γ)</span>
-                        <span class="slider-value" id="val-gamma">0.50</span>
-                    </div>
-                    <input type="range" id="gamma" min="0.0" max="2.0" step="0.1" value="0.50">
-                </div>
-            </div>
-
-            <div class="control-group">
-                <h3>Regime Selection</h3>
-                <button class="btn-primary" onclick="setRegime('gfc')">2008 GFC</button>
-                <button class="btn-primary" onclick="setRegime('covid')">COVID-19</button>
-                <button class="btn-primary" onclick="setRegime('svb')">2023 SVB</button>
-            </div>
-
-            <button class="btn-primary" id="run-btn" disabled onclick="runSimulation()">
-                INITIALIZING...
-            </button>
-        </aside>
-
-        <main>
-            <header>
-                <div class="header-info">
-                    <h1>Financial Stability Monitor</h1>
-                    <p>Real-time Bayesian inference & multi-asset risk quantification</p>
-                </div>
-            </header>
-
-            <div class="stats-row">
-                <div class="stat-card">
-                    <div class="stat-label">Current Risk Score</div>
-                    <div class="stat-value" id="stat-risk">--</div>
-                    <div class="stat-trend" id="stat-risk-trend"></div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Inferred Liquidity ($L_t$)</div>
-                    <div class="stat-value" id="stat-liquidity">--</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Crisis Probability (60d)</div>
-                    <div class="stat-value" id="stat-prob">--</div>
-                </div>
-            </div>
-
-            <div class="charts-grid">
-                <div class="chart-container" id="main-plot"></div>
-                <div class="chart-container" id="latent-plot"></div>
-            </div>
-        </main>
+  <!-- CONTROLS -->
+  <div class="panel">
+    <div class="panel-header">
+      <h2><span class="dot dot-blue"></span>Filter Time Window</h2>
+      <div style="font-family:'DM Mono',monospace;font-size:0.72rem;color:var(--dim);">Select a range or use an era preset</div>
     </div>
 
-    <div id="status-bar">
-        <div class="spinner"></div>
-        <span id="status-text">Loading Pyodide...</span>
+    <div class="era-buttons">
+      <button class="era-btn crisis" data-start="2007-06-01" data-end="2008-10-01">2008 GFC</button>
+      <button class="era-btn brexit" data-start="2015-08-24" data-end="2016-12-24">Brexit</button>
+      <button class="era-btn covid"  data-start="2019-11-24" data-end="2020-11-24">COVID-19</button>
+      <button class="era-btn svb"    data-start="2022-02-24" data-end="2023-06-24">SVB Collapse</button>
     </div>
 
-    <script>
-        let pyodide = null;
-        let isReady = false;
+    <div class="controls-grid">
+      <div class="input-group">
+        <label>Start Date</label>
+        <input type="date" id="startDate">
+      </div>
+      <div class="input-group">
+        <label>End Date</label>
+        <input type="date" id="endDate">
+      </div>
+      <button class="btn primary" id="applyBtn">Apply Range</button>
+      <button class="btn" id="resetBtn">Reset</button>
+    </div>
 
-        async function init() {
-            showStatus("Initializing Python environment...");
-            try {
-                pyodide = await loadPyodide();
-                await pyodide.loadPackage(['numpy', 'scipy']);
-                
-                // Load Model & Filter code
-                const code = await fetchPythonCode();
-                await pyodide.runPythonAsync(code);
-                
-                // Add current local variables to Python scope
-                pyodide.globals.set('initial_phi', 0.95);
-                pyodide.globals.set('initial_beta', 1.1);
-                pyodide.globals.set('initial_gamma', 0.5);
+    <div class="summary-bar" id="summary">Loading data…</div>
+  </div>
 
-                isReady = true;
-                hideStatus();
-                document.getElementById('run-btn').disabled = false;
-                document.getElementById('run-btn').textContent = "RUN SIMULATION";
-                
-                // Initial run
-                runSimulation();
-            } catch (err) {
-                showStatus("Error: " + err.message);
-                console.error(err);
-            }
-        }
+  <!-- CRISIS PROB -->
+  <div class="panel">
+    <div class="panel-header">
+      <h2><span class="dot dot-red"></span>Crisis Probability (next 60 days)</h2>
+      <span style="font-family:'DM Mono',monospace;font-size:0.72rem;color:var(--dim);">Dashed line = 0.50 threshold</span>
+    </div>
+    <div id="probPlot" class="plot">
+      <div class="loader"><div class="spinner"></div>Rendering…</div>
+    </div>
+  </div>
 
-        async function fetchPythonCode() {
-            // In a real repo, we'd fetch actual files. 
-            // For now, let's embed the core logic as a single string.
-            return `
-import numpy as np
-from datetime import datetime
+  <!-- STRESS -->
+  <div class="panel">
+    <div class="panel-header">
+      <h2><span class="dot dot-blue"></span>Liquidity Stress L<sub>t</sub> with 90% CI</h2>
+      <span style="font-family:'DM Mono',monospace;font-size:0.72rem;color:var(--dim);">Green dashed line = threshold L=2</span>
+    </div>
+    <div id="stressPlot" class="plot">
+      <div class="loader"><div class="spinner"></div>Rendering…</div>
+    </div>
+  </div>
 
-class WebFinanceModel:
-    def __init__(self, phi_L=0.95, beta_L=1.1, gamma=0.5):
-        self.phi_L = phi_L
-        self.beta_L = beta_L
-        self.gamma = gamma
-        self.phi_h = 0.98
-        self.mu_h = -9.0
-        self.sigma_h = 0.2
-        self.phi_z = 0.95
-        
-    def transition(self, x, num_particles=1):
-        if x.ndim == 1: x = x[np.newaxis, :]
-        N = x.shape[0]
-        
-        L, h, z = x[:, 0], x[:, 1], x[:, 2]
-        
-        # L transition
-        L_next = self.phi_L * L + self.beta_L * np.exp(h) + np.random.normal(0, 0.1, N)
-        # h transition
-        h_next = self.mu_h + self.phi_h * (h - self.mu_h) + np.random.normal(0, self.sigma_h, N)
-        # z transition
-        z_next = self.phi_z * z + self.gamma * L + np.random.normal(0, 0.1, N)
-        
-        return np.stack([L_next, h_next, z_next], axis=1)
+  <!-- LATENT -->
+  <div class="panel">
+    <div class="panel-header">
+      <h2><span class="dot dot-purple"></span>Latent Factors h, z</h2>
+      <span style="font-family:'DM Mono',monospace;font-size:0.72rem;color:var(--dim);">Posterior mean estimates</span>
+    </div>
+    <div id="latentPlot" class="plot">
+      <div class="loader"><div class="spinner"></div>Rendering…</div>
+    </div>
+  </div>
 
-    def log_likelihood(self, x, y):
-        # Extremely simplified for demo - in reality, uses full covariance
-        L, h, z = x[:, 0], x[:, 1], x[:, 2]
-        vol = np.exp(h/2)
-        # Assume y[0] is price return
-        return -0.5 * (y[0]**2 / (vol**2 + 1e-6) + h)
+  <!-- GALLERY -->
+  <div class="panel">
+    <div class="panel-header">
+      <h2><span class="dot dot-green"></span>Pre-rendered Outputs</h2>
+      <span style="font-family:'DM Mono',monospace;font-size:0.72rem;color:var(--dim);">Click any image to enlarge</span>
+    </div>
+    <div class="media-grid">
+      <figure class="zoomable"
+        data-src="assets/latent-liquidity/crisis_analysis_advanced.png"
+        data-link="https://github.com/meamresh/latent_liquidity_quant/blob/main/results/crisis_analysis_advanced.png">
+        <img src="assets/latent-liquidity/crisis_analysis_advanced.png" alt="Static crisis analysis">
+        <figcaption>Full-series dual-axis · <code>experiments/visualize_crisis.py</code></figcaption>
+      </figure>
+      <figure class="zoomable"
+        data-src="assets/latent-liquidity/vanguard_static_2008.png"
+        data-link="https://github.com/meamresh/latent_liquidity_quant/blob/main/results/vanguard_static_2008.png">
+        <img src="assets/latent-liquidity/vanguard_static_2008.png" alt="2008 stress window">
+        <figcaption>2008 GFC stress window</figcaption>
+      </figure>
+      <figure class="zoomable"
+        data-src="assets/latent-liquidity/vanguard_static_covid.png"
+        data-link="https://github.com/meamresh/latent_liquidity_quant/blob/main/results/vanguard_static_covid.png">
+        <img src="assets/latent-liquidity/vanguard_static_covid.png" alt="COVID onset window">
+        <figcaption>COVID-19 onset window</figcaption>
+      </figure>
+      <figure class="zoomable"
+        data-src="assets/latent-liquidity/vanguard_risk_evolution.gif"
+        data-link="https://github.com/meamresh/latent_liquidity_quant/blob/main/results/vanguard_risk_evolution.gif">
+        <img src="assets/latent-liquidity/vanguard_risk_evolution.gif" alt="Vanguard risk evolution">
+        <figcaption>Vanguard risk evolution · animated full series</figcaption>
+      </figure>
+    </div>
+  </div>
 
-def run_web_sim(phi, beta, gamma, era='gfc'):
-    # Mock data generation for demo - in production, fetch from results/
-    T = 100
-    dates = [f"Day {i}" for i in range(T)]
-    
-    # Run a simple filter
-    model = WebFinanceModel(phi_L=phi, beta_L=beta, gamma=gamma)
-    L_path = np.zeros(T)
-    prob_path = np.zeros(T)
-    
-    current_L = 0.0
-    for t in range(T):
-        current_L = phi * current_L + beta * 0.0001 + np.random.normal(0, 0.1)
-        L_path[t] = max(0, current_L)
-        prob_path[t] = 1.0 / (1.0 + np.exp(-(current_L - 1.5) * 5))
-        
+  <!-- REPRODUCTION -->
+  <div class="panel">
+    <div class="panel-header">
+      <h2><span class="dot dot-green"></span>Reproduce Results</h2>
+    </div>
+    <div class="terminal">
+      <div class="terminal-bar">
+        <span class="r"></span><span class="y"></span><span class="g"></span>
+        <span class="terminal-title">bash · latent_liquidity_quant/</span>
+      </div>
+      <div class="terminal-body">
+        <div class="cmd">
+          <span class="prompt">$</span>
+          <span><span class="command">python3 main.py predict</span>
+          <span class="comment">  # recompute crisis data → results/crisis_res.npz</span></span>
+        </div>
+        <div class="cmd">
+          <span class="prompt">$</span>
+          <span><span class="command">python3 experiments/visualize_crisis.py</span>
+          <span class="comment">  # regenerate static plots</span></span>
+        </div>
+        <div class="cmd">
+          <span class="prompt">$</span>
+          <span><span class="command">python3 experiments/animate_crisis.py</span>
+          <span class="comment">  # create animated GIFs</span></span>
+        </div>
+        <div class="cmd">
+          <span class="prompt">$</span>
+          <span><span class="command">python3 scripts/export_json.py</span>
+          <span class="comment">  # export crisis_res.json for this dashboard</span></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-note">
+      Data source: <code>results/crisis_res.npz</code> · Last updated 2026-03-11
+    </div>
+    <div class="footer-note">
+      Built with Plotly.js · <a href="https://github.com/meamresh/latent_liquidity_quant" style="color:var(--accent);text-decoration:none;" target="_blank">github.com/meamresh/latent_liquidity_quant</a>
+    </div>
+  </footer>
+
+</div><!-- .page -->
+
+<!-- MODAL -->
+<div id="modal">
+  <div class="modal-inner">
+    <button id="modalClose">✕ Close</button>
+    <img id="modalImg" src="" alt="">
+    <p id="modalLink"></p>
+  </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const dataUrl = 'assets/latent-liquidity/crisis_res.json';
+  let raw = null;
+
+  const plotLayout = (extra = {}) => ({
+    margin: { t: 10, r: 55, l: 55, b: 40 },
+    hovermode: 'x unified',
+    paper_bgcolor: 'rgba(0,0,0,0)',
+    plot_bgcolor:  'rgba(0,0,0,0)',
+    font: { family: "'DM Mono', monospace", color: '#6a85b0', size: 11 },
+    xaxis: {
+      gridcolor: 'rgba(100,150,255,0.07)',
+      linecolor: 'rgba(100,150,255,0.15)',
+      tickcolor: 'rgba(100,150,255,0.15)',
+      zerolinecolor: 'rgba(100,150,255,0.1)',
+    },
+    yaxis: {
+      gridcolor: 'rgba(100,150,255,0.07)',
+      linecolor: 'rgba(100,150,255,0.15)',
+      tickcolor: 'rgba(100,150,255,0.15)',
+      zerolinecolor: 'rgba(100,150,255,0.1)',
+    },
+    legend: { bgcolor: 'rgba(0,0,0,0)', font: { color: '#9bb0d8' } },
+    hoverlabel: {
+      bgcolor: '#0c1528',
+      bordercolor: 'rgba(100,180,255,0.3)',
+      font: { family: "'DM Mono', monospace", color: '#dce9ff', size: 11 }
+    },
+    ...extra
+  });
+
+  function filterData(start, end) {
+    const startMs = start ? new Date(start).getTime() : -Infinity;
+    const endMs   = end   ? new Date(end).getTime()   :  Infinity;
+    const mask = raw.dates.map(d => {
+      const t = new Date(d).getTime();
+      return t >= startMs && t <= endMs;
+    });
+    const pick = arr => arr.filter((_, i) => mask[i]);
     return {
-        'dates': dates,
-        'L': L_path.tolist(),
-        'prob': prob_path.tolist(),
-        'current_risk': float(prob_path[-1] * 10),
-        'current_L': float(L_path[-1]),
-        'current_prob': float(prob_path[-1])
+      dates:  pick(raw.dates),
+      crisis: pick(raw.crisis_prob),
+      L:      pick(raw.L_mean),
+      L05:    pick(raw.L_q05),
+      L95:    pick(raw.L_q95),
+      tail:   pick(raw.P_L_gt_2),
+      h:      pick(raw.h_mean),
+      z:      pick(raw.z_mean),
+    };
+  }
+
+  function updateKPIs(d) {
+    if (!d.dates.length) return;
+    const peakProb = Math.max(...d.crisis);
+    const peakProbIdx = d.crisis.indexOf(peakProb);
+    const maxL = Math.max(...d.L);
+    const maxLIdx = d.L.indexOf(maxL);
+    const avgTail = d.tail.reduce((a, b) => a + b, 0) / d.tail.length;
+
+    document.getElementById('kpiPeakProb').textContent  = (peakProb * 100).toFixed(1) + '%';
+    document.getElementById('kpiPeakProbDate').textContent = d.dates[peakProbIdx];
+    document.getElementById('kpiMaxStress').textContent  = maxL.toFixed(2);
+    document.getElementById('kpiMaxStressDate').textContent = d.dates[maxLIdx];
+    document.getElementById('kpiAvgTail').textContent    = (avgTail * 100).toFixed(1) + '%';
+    document.getElementById('kpiSpan').textContent       = d.dates.length.toLocaleString();
+    document.getElementById('kpiSpanSub').textContent    = `${d.dates[0]} → ${d.dates[d.dates.length - 1]}`;
+  }
+
+  function updateSummary(d) {
+    if (!d.dates.length) {
+      document.getElementById('summary').innerHTML = 'No data in selected range.';
+      return;
     }
-`;
-        }
+    const avgTail = (d.tail.reduce((a, b) => a + b, 0) / d.tail.length).toFixed(3);
+    document.getElementById('summary').innerHTML =
+      `<span>Window:</span> ${d.dates[0]} → ${d.dates[d.dates.length - 1]} &nbsp;·&nbsp; ` +
+      `<span>N:</span> ${d.dates.length} obs &nbsp;·&nbsp; ` +
+      `<span>Avg P(L&gt;2):</span> ${avgTail}`;
+  }
 
-        async function runSimulation() {
-            if (!isReady) return;
-            
-            showStatus("Running Bayesian Inference...");
-            const phi = parseFloat(document.getElementById('phi').value);
-            const beta = parseFloat(document.getElementById('beta').value);
-            const gamma = parseFloat(document.getElementById('gamma').value);
+  function plotAll(d) {
+    updateKPIs(d);
+    updateSummary(d);
 
-            await new Promise(r => setTimeout(r, 100)); // Visual feedback
+    // Crisis probability
+    Plotly.newPlot('probPlot', [
+      {
+        x: d.dates, y: d.crisis,
+        type: 'scatter', mode: 'lines',
+        fill: 'tozeroy',
+        fillcolor: 'rgba(255,124,92,0.10)',
+        line: { color: '#ff7c5c', width: 2 },
+        name: 'Crisis probability',
+        hovertemplate: '<b>%{x}</b><br>Prob: %{y:.3f}<extra></extra>'
+      }
+    ], plotLayout({
+      yaxis: { title: 'Probability', range: [0, 1.05], gridcolor: 'rgba(100,150,255,0.07)' },
+      shapes: [{
+        type: 'line',
+        x0: d.dates[0], x1: d.dates[d.dates.length - 1],
+        y0: 0.5, y1: 0.5,
+        line: { dash: 'dot', color: 'rgba(255,124,92,0.5)', width: 1.5 }
+      }]
+    }), { responsive: true });
 
-            const result = await pyodide.runPythonAsync(`
-                import json
-                res = run_web_sim(${phi}, ${beta}, ${gamma})
-                json.dumps(res)
-            `);
-            
-            const data = JSON.parse(result);
-            updateDashboard(data);
-            hideStatus();
-        }
+    // Liquidity stress
+    Plotly.newPlot('stressPlot', [
+      {
+        x: d.dates, y: d.L95,
+        type: 'scatter', mode: 'lines',
+        line: { color: 'rgba(62,198,255,0)' }, showlegend: false,
+        hoverinfo: 'skip'
+      },
+      {
+        x: d.dates, y: d.L05,
+        type: 'scatter', mode: 'lines',
+        fill: 'tonexty',
+        fillcolor: 'rgba(62,198,255,0.10)',
+        line: { color: 'rgba(62,198,255,0)' }, showlegend: false,
+        hoverinfo: 'skip'
+      },
+      {
+        x: d.dates, y: d.L,
+        type: 'scatter', mode: 'lines',
+        line: { color: '#3ec6ff', width: 2 },
+        name: 'L_mean',
+        hovertemplate: '<b>%{x}</b><br>L_t: %{y:.3f}<extra></extra>'
+      },
+      {
+        x: d.dates, y: d.tail,
+        type: 'bar',
+        marker: { color: 'rgba(255,124,92,0.28)', line: { width: 0 } },
+        name: 'P(L>2)',
+        yaxis: 'y2',
+        hovertemplate: 'P(L>2): %{y:.3f}<extra></extra>'
+      }
+    ], plotLayout({
+      yaxis:  { title: 'L_t', gridcolor: 'rgba(100,150,255,0.07)' },
+      yaxis2: { title: 'Tail prob', overlaying: 'y', side: 'right', range: [0, 1.05], gridcolor: 'rgba(0,0,0,0)' },
+      shapes: [{
+        type: 'line',
+        x0: d.dates[0], x1: d.dates[d.dates.length - 1],
+        y0: 2, y1: 2,
+        line: { dash: 'dot', color: 'rgba(92,245,178,0.5)', width: 1.5 }
+      }],
+      bargap: 0
+    }), { responsive: true });
 
-        function updateDashboard(data) {
-            // Update Stats
-            document.getElementById('stat-risk').textContent = data.current_risk.toFixed(1) + "/10";
-            document.getElementById('stat-liquidity').textContent = data.current_L.toFixed(2);
-            document.getElementById('stat-prob').textContent = (data.current_prob * 100).toFixed(1) + "%";
+    // Latent factors
+    Plotly.newPlot('latentPlot', [
+      {
+        x: d.dates, y: d.h,
+        type: 'scatter', mode: 'lines',
+        line: { color: '#b88dff', width: 2 },
+        name: 'h_mean',
+        hovertemplate: '<b>%{x}</b><br>h: %{y:.4f}<extra></extra>'
+      },
+      {
+        x: d.dates, y: d.z,
+        type: 'scatter', mode: 'lines',
+        line: { color: '#f6c344', width: 2 },
+        name: 'z_mean',
+        hovertemplate: 'z: %{y:.4f}<extra></extra>'
+      }
+    ], plotLayout(), { responsive: true });
+  }
 
-            // Main Plot: Crisis Probability
-            Plotly.newPlot('main-plot', [{
-                x: data.dates,
-                y: data.prob,
-                fill: 'tozeroy',
-                type: 'scatter',
-                mode: 'lines',
-                name: 'Crisis Probability',
-                line: { color: '#ff4757', width: 3 },
-                fillcolor: 'rgba(255, 71, 87, 0.1)'
-            }], getLayout('Crisis Probability Evolution'));
+  async function init() {
+    try {
+      const res = await fetch(dataUrl);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      raw = await res.json();
 
-            // Latent Plot: Liquidity Stress
-            Plotly.newPlot('latent-plot', [{
-                x: data.dates,
-                y: data.L,
-                type: 'scatter',
-                mode: 'lines',
-                name: 'Latent Liquidity (L_t)',
-                line: { color: '#00d4ff', width: 2 }
-            }], getLayout('Inferred Liquidity Stress Path'));
-        }
+      const startInput = document.getElementById('startDate');
+      const endInput   = document.getElementById('endDate');
 
-        function getLayout(title) {
-            return {
-                title: { text: title, font: { color: '#ffffff', size: 16 } },
-                paper_bgcolor: 'rgba(0,0,0,0)',
-                plot_bgcolor: 'rgba(255,255,255,0.02)',
-                xaxis: { gridcolor: 'rgba(255,255,255,0.1)', color: '#a0a0a0' },
-                yaxis: { gridcolor: 'rgba(255,255,255,0.1)', color: '#a0a0a0' },
-                margin: { t: 50, b: 50, l: 60, r: 20 },
-                font: { family: 'Inter' }
-            };
-        }
+      const applyFilter = () => plotAll(filterData(startInput.value, endInput.value));
 
-        function setRegime(type) {
-            // Preset logic
-            const config = {
-                gfc: { phi: 0.98, beta: 1.5, gamma: 1.2 },
-                covid: { phi: 0.90, beta: 1.1, gamma: 0.5 },
-                svb: { phi: 0.95, beta: 0.8, gamma: 0.3 }
-            }[type];
+      document.getElementById('resetBtn').onclick = () => {
+        startInput.value = '';
+        endInput.value   = '';
+        applyFilter();
+      };
+      document.getElementById('applyBtn').onclick = applyFilter;
 
-            document.getElementById('phi').value = config.phi;
-            document.getElementById('beta').value = config.beta;
-            document.getElementById('gamma').value = config.gamma;
-            
-            document.getElementById('val-phi').textContent = config.phi.toFixed(2);
-            document.getElementById('val-beta').textContent = config.beta.toFixed(2);
-            document.getElementById('val-gamma').textContent = config.gamma.toFixed(2);
-            
-            runSimulation();
-        }
+      document.querySelectorAll('[data-start][data-end]').forEach(btn => {
+        btn.onclick = () => {
+          startInput.value = btn.dataset.start;
+          endInput.value   = btn.dataset.end;
+          applyFilter();
+        };
+      });
 
-        // Slider real-time values
-        ['phi', 'beta', 'gamma'].forEach(id => {
-            document.getElementById(id).addEventListener('input', e => {
-                document.getElementById('val-' + id).textContent = parseFloat(e.target.value).toFixed(2);
-            });
-            document.getElementById(id).addEventListener('change', runSimulation);
-        });
+      plotAll(filterData());
 
-        function showStatus(text) {
-            const bar = document.getElementById('status-bar');
-            document.getElementById('status-text').textContent = text;
-            bar.classList.add('visible');
-        }
+    } catch (err) {
+      document.getElementById('summary').textContent = '⚠ Error loading data: ' + err.message;
+      ['probPlot', 'stressPlot', 'latentPlot'].forEach(id => {
+        document.getElementById(id).innerHTML =
+          `<div class="loader" style="color:#ff7c5c;">Failed to load chart data.</div>`;
+      });
+    }
+  }
 
-        function hideStatus() {
-            document.getElementById('status-bar').classList.remove('visible');
-        }
+  init();
 
-        init();
-    </script>
+  // Gallery modal
+  document.querySelectorAll('.zoomable').forEach(fig => {
+    fig.onclick = () => {
+      document.getElementById('modalImg').src   = fig.dataset.src;
+      document.getElementById('modalLink').innerHTML =
+        `Source: <a href="${fig.dataset.link}" target="_blank" rel="noreferrer">${fig.dataset.link}</a>`;
+      document.getElementById('modal').style.display = 'flex';
+    };
+  });
+
+  const hideModal = () => { document.getElementById('modal').style.display = 'none'; };
+  document.getElementById('modalClose').onclick = e => { e.stopPropagation(); hideModal(); };
+  document.getElementById('modal').addEventListener('click', e => {
+    if (e.target.id === 'modal') hideModal();
+  });
+  window.addEventListener('keydown', e => { if (e.key === 'Escape') hideModal(); });
+});
+</script>
 </body>
 </html>
