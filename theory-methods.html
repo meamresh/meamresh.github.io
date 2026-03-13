@@ -1,137 +1,759 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Latent Liquidity | Theory & Methods</title>
-  
-  <!-- MathJax for LaTeX rendering -->
-  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Theory & Methods · Latent Liquidity</title>
+
   <script id="MathJax-script" async
     src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['$','$'], ['\\(','\\)']], displayMath: [['$$','$$']] },
+      options: { skipHtmlTags: ['script','noscript','style','textarea'] }
+    };
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 
   <style>
-    body { 
-      font-family: "Inter", sans-serif; 
-      margin: 0; 
-      background: #050c1d; 
-      color: #e8f0ff; 
-      padding: 18px; 
-      line-height: 1.6; 
+    :root {
+      --bg:        #04080f;
+      --surface-1: #080f1e;
+      --surface-2: #0c1528;
+      --border:    rgba(100,150,255,0.10);
+      --border-hi: rgba(100,180,255,0.22);
+      --text:      #dce9ff;
+      --muted:     #6a85b0;
+      --dim:       #374b6d;
+      --accent:    #3ec6ff;
+      --accent2:   #ff7c5c;
+      --accent3:   #5cf5b2;
+      --accent4:   #b88dff;
     }
-    .page { max-width: 1100px; margin: 0 auto; }
-    header, .panel { background: rgba(18,28,52,0.9); padding: 16px; border-radius: 12px; margin-bottom: 14px; border: 1px solid rgba(255,255,255,0.12);}
-    h1 { margin: 0 0 6px; font-size: 1.9rem; }
-    h2 { margin: 12px 0 6px; font-size: 1.4rem; }
-    h3 { margin: 8px 0 4px; font-size: 1.1rem; }
-    p { margin: 6px 0; }
-    ul, ol { margin: 6px 0 10px 20px; }
-    a.btn { text-decoration: none; padding: 10px 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.12); color: #e8f0ff; background: rgba(255,255,255,0.05); margin-right: 6px; display: inline-block; font-weight: 600; }
-    a.btn.primary { background: linear-gradient(135deg, #7fc7ff, #5a8bff); color: #041024; border: none; }
-    .muted { color: #9bb0d8; }
-    code { background: rgba(255,255,255,0.06); padding: 2px 6px; border-radius: 6px; }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 24px 20px 60px;
+      overflow-x: hidden;
+      line-height: 1.7;
+    }
+
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: -1;
+      background-image:
+        linear-gradient(rgba(62,198,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(62,198,255,0.03) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+    }
+
+    .page { max-width: 900px; margin: 0 auto; }
+
+    /* ── HEADER ── */
+    header {
+      position: relative;
+      border: 1px solid var(--border-hi);
+      border-radius: 16px;
+      padding: 32px 36px 28px;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, rgba(12,21,40,0.95) 0%, rgba(8,15,30,0.98) 100%);
+      overflow: hidden;
+    }
+    header::after {
+      content: '';
+      position: absolute;
+      top: -60px; right: -80px;
+      width: 320px; height: 320px;
+      background: radial-gradient(circle, rgba(184,141,255,0.07) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .eyebrow {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.18em;
+      color: var(--accent4);
+      text-transform: uppercase;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .eyebrow::before {
+      content: '';
+      display: inline-block;
+      width: 18px; height: 2px;
+      background: var(--accent4);
+    }
+
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: #fff;
+      margin-bottom: 10px;
+      line-height: 1.15;
+    }
+
+    .tagline {
+      font-size: 0.96rem;
+      color: var(--muted);
+      max-width: 580px;
+      margin-bottom: 20px;
+    }
+
+    .nav-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 9px 16px;
+      border-radius: 10px;
+      border: 1px solid var(--border-hi);
+      text-decoration: none;
+      color: var(--text);
+      background: rgba(255,255,255,0.04);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 500;
+      font-size: 0.88rem;
+      cursor: pointer;
+      transition: all .18s ease;
+      white-space: nowrap;
+    }
+    .btn:hover { background: rgba(255,255,255,0.08); border-color: var(--accent); color: #fff; }
+    .btn.primary {
+      background: linear-gradient(135deg, var(--accent) 0%, #5a8bff 100%);
+      color: #04080f;
+      border: none;
+      font-weight: 700;
+    }
+    .btn.primary:hover { opacity: 0.88; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(62,198,255,0.25); }
+
+    /* ── TOC ── */
+    .toc {
+      background: var(--surface-1);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent4);
+      border-radius: 12px;
+      padding: 18px 22px;
+      margin-bottom: 20px;
+    }
+    .toc-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent4);
+      margin-bottom: 12px;
+    }
+    .toc ol {
+      list-style: none;
+      padding: 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 24px;
+      counter-reset: toc-counter;
+    }
+    .toc li { counter-increment: toc-counter; }
+    .toc a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.88rem;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      transition: color .15s;
+    }
+    .toc a::before {
+      content: counter(toc-counter, decimal-leading-zero);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      color: var(--dim);
+    }
+    .toc a:hover { color: var(--text); }
+
+    /* ── SECTION PANEL ── */
+    .panel {
+      background: var(--surface-1);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px 30px;
+      margin-bottom: 16px;
+      transition: border-color .2s;
+      scroll-margin-top: 24px;
+    }
+    .panel:hover { border-color: var(--border-hi); }
+
+    .section-number {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--dim);
+      margin-bottom: 6px;
+    }
+
+    h2 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.3rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: #fff;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    h2 .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .dot-blue   { background: var(--accent);  box-shadow: 0 0 7px var(--accent);  }
+    .dot-orange { background: var(--accent2); box-shadow: 0 0 7px var(--accent2); }
+    .dot-green  { background: var(--accent3); box-shadow: 0 0 7px var(--accent3); }
+    .dot-purple { background: var(--accent4); box-shadow: 0 0 7px var(--accent4); }
+    .dot-yellow { background: #f6c344;        box-shadow: 0 0 7px #f6c344;        }
+
+    h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--accent);
+      margin: 22px 0 8px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    p { margin-bottom: 10px; color: #b8cce8; font-size: 0.95rem; }
+    p:last-child { margin-bottom: 0; }
+
+    ul, ol {
+      margin: 8px 0 14px 0;
+      padding-left: 0;
+      list-style: none;
+    }
+    li {
+      position: relative;
+      padding: 5px 0 5px 22px;
+      color: #b8cce8;
+      font-size: 0.93rem;
+      line-height: 1.6;
+    }
+    li::before {
+      content: '›';
+      position: absolute;
+      left: 6px;
+      color: var(--accent);
+      font-weight: 700;
+    }
+    ol { counter-reset: ol-counter; }
+    ol li { counter-increment: ol-counter; }
+    ol li::before {
+      content: counter(ol-counter);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      color: var(--accent4);
+      top: 7px;
+      left: 2px;
+    }
+
+    strong { color: var(--text); font-weight: 600; }
+
+    code {
+      background: rgba(62,198,255,0.07);
+      border: 1px solid rgba(62,198,255,0.15);
+      padding: 2px 7px;
+      border-radius: 5px;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.82rem;
+      color: var(--accent);
+    }
+
+    /* ── EQUATION BLOCK ── */
+    .eq-block {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent4);
+      border-radius: 10px;
+      padding: 16px 20px;
+      margin: 14px 0;
+      overflow-x: auto;
+    }
+    .eq-block .eq-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent4);
+      margin-bottom: 10px;
+    }
+    .eq-block .MathJax,
+    .eq-block mjx-container {
+      color: var(--text) !important;
+    }
+
+    /* ── VARIABLE TABLE ── */
+    .var-grid {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 0;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      margin: 14px 0;
+    }
+    .var-grid .vg-row {
+      display: contents;
+    }
+    .var-grid .vg-row:not(:last-child) > * {
+      border-bottom: 1px solid var(--border);
+    }
+    .vg-sym {
+      padding: 11px 16px;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.85rem;
+      color: var(--accent4);
+      background: rgba(184,141,255,0.04);
+      border-right: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    .vg-desc {
+      padding: 11px 16px;
+      font-size: 0.88rem;
+      color: #b8cce8;
+      line-height: 1.5;
+    }
+
+    /* ── STEP CARDS ── */
+    .step-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+      margin: 14px 0;
+    }
+    .step-card {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+    .step-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+    }
+    .step-card:nth-child(1)::before { background: var(--accent);  }
+    .step-card:nth-child(2)::before { background: var(--accent4); }
+    .step-card:nth-child(3)::before { background: var(--accent3); }
+    .step-num {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.14em;
+      color: var(--dim);
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .step-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+    .step-desc {
+      font-size: 0.83rem;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    /* ── ANIMATION SECTION ── */
+    .anim-panel {
+      background: var(--surface-1);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+    .anim-header {
+      padding: 20px 28px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .anim-body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #020609;
+      padding: 0;
+      min-height: 300px;
+      position: relative;
+    }
+    .anim-body img {
+      width: 100%;
+      max-width: 100%;
+      display: block;
+      border-radius: 0 0 16px 16px;
+    }
+    .anim-footer {
+      padding: 14px 28px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .anim-caption {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+    .anim-caption span { color: var(--accent3); }
+
+    /* ── FOOTER ── */
+    footer {
+      margin-top: 24px;
+      padding-top: 18px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .footer-note {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--dim);
+    }
+    .footer-note a { color: var(--accent); text-decoration: none; }
+    .footer-note a:hover { text-decoration: underline; }
+
+    /* ── ANIMS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .page > * {
+      animation: fadeUp .4s ease both;
+    }
+    .page > *:nth-child(1) { animation-delay: .04s; }
+    .page > *:nth-child(2) { animation-delay: .08s; }
+    .page > *:nth-child(3) { animation-delay: .12s; }
+    .page > *:nth-child(4) { animation-delay: .16s; }
+    .page > *:nth-child(5) { animation-delay: .20s; }
+    .page > *:nth-child(6) { animation-delay: .24s; }
+    .page > *:nth-child(7) { animation-delay: .28s; }
+    .page > *:nth-child(8) { animation-delay: .32s; }
+    .page > *:nth-child(9) { animation-delay: .36s; }
+
+    @media (max-width: 600px) {
+      h1 { font-size: 1.55rem; }
+      .panel { padding: 20px 18px; }
+      body { padding: 14px 12px 48px; }
+    }
   </style>
 </head>
 <body>
-  <div class="page">
-    <header>
-      <h1>Latent Liquidity | Theory & Methods</h1>
-      <p class="muted">State-space formulation, inference pipeline, and crisis prediction methodology behind <code>latent_liquidity_quant</code>.</p>
-      <div>
-        <a class="btn" href="latent-liquidity.html">Back to Dashboard</a>
-        <a class="btn" href="portfolio.html">Back to Portfolio</a>
-        <a class="btn" href="https://github.com/meamresh/latent_liquidity_quant" target="_blank">Repository</a>
-        <a class="btn primary" href="https://github.com/meamresh/latent_liquidity_quant/tree/main/models">SSM Code</a>
+<div class="page">
+
+  <!-- HEADER -->
+  <header>
+    <div class="eyebrow">Quantitative Research · Theory &amp; Methods</div>
+    <h1>State-Space Formulation,<br>Inference &amp; Crisis Prediction</h1>
+    <p class="tagline">
+      Mathematical foundations of <code>latent_liquidity_quant</code> — covering the hidden state model,
+      observation equations, particle filter inference, and forward crisis probability estimation.
+    </p>
+    <div class="nav-row">
+      <a class="btn" href="latent-liquidity.html">← Dashboard</a>
+      <a class="btn" href="portfolio.html">← Portfolio</a>
+      <a class="btn primary" href="https://github.com/meamresh/latent_liquidity_quant/tree/main/models" target="_blank" rel="noreferrer">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.21 11.39.6.11.82-.26.82-.58v-2.03c-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.74.08-.73.08-.73 1.2.08 1.84 1.23 1.84 1.23 1.07 1.84 2.81 1.31 3.49 1 .11-.78.42-1.31.76-1.61-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.12-.3-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 3-.4c1.02.004 2.04.14 3 .4 2.28-1.55 3.29-1.23 3.29-1.23.66 1.66.24 2.88.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.61-2.81 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.22.7.82.58C20.56 21.8 24 17.3 24 12c0-6.63-5.37-12-12-12z"/></svg>
+        SSM Source Code
+      </a>
+    </div>
+  </header>
+
+  <!-- TOC -->
+  <nav class="toc">
+    <div class="toc-label">Contents</div>
+    <ol>
+      <li><a href="#sec-overview">Model Overview</a></li>
+      <li><a href="#sec-ssm">State-Space Structure</a></li>
+      <li><a href="#sec-data">Data Inputs</a></li>
+      <li><a href="#sec-inference">Inference Method</a></li>
+      <li><a href="#sec-crisis">Crisis Prediction</a></li>
+      <li><a href="#sec-interpretation">Interpretation</a></li>
+      <li><a href="#sec-animation">Risk Evolution</a></li>
+    </ol>
+  </nav>
+
+  <!-- 1. OVERVIEW -->
+  <section class="panel" id="sec-overview">
+    <div class="section-number">Section 01</div>
+    <h2><span class="dot dot-blue"></span>Model Overview</h2>
+    <p>
+      The latent-liquidity model detects and forecasts financial crises by inferring a <strong>hidden liquidity factor</strong>
+      that drives volatility, cross-asset correlations, and credit risk. A state-space framework captures the
+      temporal evolution of these hidden drivers while linking them to observed market data — enabling both
+      <em>filtering</em> (past/present state estimation) and <em>forecasting</em> (future crisis probability) within
+      a coherent probabilistic model.
+    </p>
+    <ul>
+      <li><strong>Goal:</strong> estimate latent market stress and produce probabilistic crisis warnings with calibrated uncertainty.</li>
+      <li><strong>Why SSM:</strong> liquidity conditions are unobserved; state-space models naturally separate latent dynamics from noisy measurements and support sequential Bayesian updates without reprocessing the full history at each step.</li>
+      <li><strong>Output:</strong> posterior means and 90% credible intervals for \(L_t\), \(h_t\), \(z_t\), plus 60-day forward crisis probabilities.</li>
+    </ul>
+  </section>
+
+  <!-- 2. SSM STRUCTURE -->
+  <section class="panel" id="sec-ssm">
+    <div class="section-number">Section 02</div>
+    <h2><span class="dot dot-purple"></span>State-Space Model Structure</h2>
+
+    <h3>Latent State Vector</h3>
+    <p>The three-dimensional latent state at time \(t\) is:</p>
+    <div class="eq-block">
+      <div class="eq-label">State definition</div>
+      $$ x_t = [L_t,\; h_t,\; z_t]^\top $$
+    </div>
+
+    <div class="var-grid">
+      <div class="vg-row">
+        <div class="vg-sym">\(L_t\)</div>
+        <div class="vg-desc">Latent liquidity / systemic stress factor — rises during funding crunches and spread widening events.</div>
       </div>
-    </header>
+      <div class="vg-row">
+        <div class="vg-sym">\(h_t\)</div>
+        <div class="vg-desc">Log-volatility: instantaneous variance is \(\sigma_t^2 = e^{h_t}\). Log parameterisation guarantees positivity without constraint.</div>
+      </div>
+      <div class="vg-row">
+        <div class="vg-sym">\(z_t\)</div>
+        <div class="vg-desc">Latent correlation driver: \(\rho_t = \tanh(z_t)\) maps \(\mathbb{R}\) to \((-1,1)\), ensuring valid correlation values at all times.</div>
+      </div>
+    </div>
 
-    <section class="panel">
-      <h2>1. Model Overview</h2>
-      <p>The latent-liquidity project detects and forecasts financial crises by inferring a hidden liquidity factor that drives volatility, correlations, and credit risk. A state-space framework captures the temporal evolution of these hidden drivers while linking them to observed market data, enabling both filtering (past/present) and forecasting (future) within a coherent probabilistic model.</p>
-      <ul class="muted">
-        <li><strong>Goal:</strong> estimate latent market stress and produce probabilistic crisis warnings.</li>
-        <li><strong>Why SSM:</strong> hidden liquidity conditions are unobserved; state-space models naturally separate latent dynamics (state) from noisy measurements (observations) and support sequential Bayesian updates.</li>
-      </ul>
-    </section>
-
-    <section class="panel">
-      <h2>2. State-Space Model Structure</h2>
-      <h3>Latent State Vector</h3>
-      <p>We define the latent state as:</p>
-      <p>$$ x_t = [L_t,\, h_t,\, z_t] $$</p>
-      <ul>
-        <li><strong>L<sub>t</sub></strong>: latent liquidity / systemic stress factor</li>
-        <li><strong>h<sub>t</sub></strong>: log-volatility, so variance is $$\sigma_t^2 = e^{h_t}$$</li>
-        <li><strong>z<sub>t</sub></strong>: latent correlation driver, $$\rho_t = \tanh(z_t)$$ ensures correlations stay in [-1,1]</li>
-      </ul>
-
-      <h3>Transition Dynamics</h3>
-      <p>Latent states evolve according to autoregressive stochastic dynamics:</p>
-      <p>$$
+    <h3>Transition Dynamics</h3>
+    <p>Each latent state evolves as an autoregressive stochastic process, allowing regime persistence and mean reversion:</p>
+    <div class="eq-block">
+      <div class="eq-label">State transition equations</div>
+      $$
       \begin{aligned}
-      L_{t+1} &= \phi_L L_t + \beta_L e^{h_t} + \epsilon_L,\\
-      h_{t+1} &= \mu_h + \phi_h (h_t - \mu_h) + \epsilon_h,\\
-      z_{t+1} &= \phi_z z_t + \gamma L_t + \epsilon_z,
+        L_{t+1} &= \phi_L\, L_t + \beta_L\, e^{h_t} + \epsilon_L \\[4pt]
+        h_{t+1} &= \mu_h + \phi_h\,(h_t - \mu_h) + \epsilon_h \\[4pt]
+        z_{t+1} &= \phi_z\, z_t + \gamma\, L_t + \epsilon_z
       \end{aligned}
-      $$</p>
-      <p class="muted">Process noises $$\epsilon_L, \epsilon_h, \epsilon_z \sim \mathcal{N}(0, \sigma^2)$$ allow stochastic evolution and capture regime shifts.</p>
+      $$
+    </div>
+    <p>
+      Process noises \(\epsilon_L, \epsilon_h, \epsilon_z \sim \mathcal{N}(0, \sigma^2)\) allow stochastic regime shifts.
+      The coupling \(\beta_L e^{h_t}\) in the liquidity equation means rising volatility feeds directly into stress —
+      capturing the empirical liquidity-volatility spiral.
+    </p>
 
-      <h3>Observation Model</h3>
-      <p>Observables:</p>
-      <p>$$ y_t = [r_{SPY}, r_{TLT}, r_{HYG}, VIX, Spread, Corr] $$</p>
-      <ul>
-        <li><strong>Returns:</strong> $$ r_t \sim \mathcal{N}(0, \Sigma_t), \quad \Sigma_t = e^{h_t} R(\rho_t) $$, where R is an equicorrelation matrix.</li>
-        <li><strong>VIX:</strong> $$ VIX_t \sim \mathcal{N}(a_{vix} + b_{vix} e^{h_t/2}, \sigma_{vix}^2) $$</li>
-        <li><strong>Credit Spread:</strong> $$ Spread_t \sim \mathcal{N}(a_{sp} + b_{sp} L_t, \sigma_{sp}^2) $$</li>
-        <li><strong>Rolling Correlation:</strong> $$ Corr_t \sim \mathcal{N}(a_{corr} + b_{corr} \rho_t, \sigma_{corr}^2) $$</li>
-      </ul>
-    </section>
+    <h3>Observation Model</h3>
+    <p>The observable vector at each time step is:</p>
+    <div class="eq-block">
+      <div class="eq-label">Observation vector</div>
+      $$ y_t = [r_{\text{SPY}},\; r_{\text{TLT}},\; r_{\text{HYG}},\; \text{VIX}_t,\; \text{Spread}_t,\; \text{Corr}_t] $$
+    </div>
 
-    <section class="panel">
-      <h2>3. Data Inputs</h2>
-      <ul>
-        <li><strong>SPY returns:</strong> equity risk proxy</li>
-        <li><strong>TLT returns:</strong> flight-to-quality / rates proxy</li>
-        <li><strong>HYG returns:</strong> credit risk & funding stress</li>
-        <li><strong>VIX:</strong> implied volatility linked to $$h_t$$</li>
-        <li><strong>Credit Spreads:</strong> widen as liquidity deteriorates $$L_t$$</li>
-        <li><strong>Rolling Correlations:</strong> capture market co-movement driven by $$\rho_t$$</li>
-      </ul>
-    </section>
+    <p>Each observable links to the latent state through a dedicated measurement equation:</p>
+    <div class="eq-block">
+      <div class="eq-label">Measurement equations</div>
+      $$
+      \begin{aligned}
+        r_t &\sim \mathcal{N}\!\left(0,\; \Sigma_t\right), \quad \Sigma_t = e^{h_t} R(\rho_t) \\[6pt]
+        \text{VIX}_t &\sim \mathcal{N}\!\left(a_{\text{vix}} + b_{\text{vix}}\, e^{h_t/2},\; \sigma_{\text{vix}}^2\right) \\[6pt]
+        \text{Spread}_t &\sim \mathcal{N}\!\left(a_{\text{sp}} + b_{\text{sp}}\, L_t,\; \sigma_{\text{sp}}^2\right) \\[6pt]
+        \text{Corr}_t &\sim \mathcal{N}\!\left(a_{\text{corr}} + b_{\text{corr}}\, \rho_t,\; \sigma_{\text{corr}}^2\right)
+      \end{aligned}
+      $$
+    </div>
+    <p>where \(R(\rho_t)\) is an equicorrelation matrix with off-diagonal entries \(\rho_t = \tanh(z_t)\).</p>
+  </section>
 
-    <section class="panel">
-      <h2>4. Inference Method</h2>
-      <p>Latent states are inferred using <strong>particle filtering (Sequential Monte Carlo)</strong>, approximating the posterior:</p>
-      <p>$$ p(x_t \mid y_{1:t}) \approx \sum_i w_t^{(i)} \delta(x_t - x_t^{(i)}) $$</p>
-      <ol>
-        <li><strong>Prediction:</strong> propagate particles through the transition model.</li>
-        <li><strong>Weighting:</strong> compute likelihood $$w_t^{(i)} \propto p(y_t \mid x_t^{(i)})$$.</li>
-        <li><strong>Resampling:</strong> focus on high-weight particles to avoid degeneracy.</li>
-      </ol>
-      <p>Posterior summaries (means, quantiles) of $$L_t, h_t, z_t$$ are saved to <code>results/crisis_res.npz</code> and displayed in the dashboard.</p>
-    </section>
+  <!-- 3. DATA -->
+  <section class="panel" id="sec-data">
+    <div class="section-number">Section 03</div>
+    <h2><span class="dot dot-green"></span>Data Inputs</h2>
+    <p>Six market observables are used, each targeting a distinct dimension of systemic risk:</p>
 
-    <section class="panel">
-      <h2>5. Crisis Prediction Methodology</h2>
-      <ol>
-        <li>Sample particles from the current posterior.</li>
-        <li>Simulate forward using the transition model over forecast horizon.</li>
-        <li>Compute crisis risk metrics, e.g. $$P(L_{t+h} > L_{crit})$$, tail probabilities, or composite risk signals.</li>
-      </ol>
-      <p>These forward simulations produce probabilistic crisis paths and visual risk cones in the dashboard.</p>
-    </section>
+    <div class="var-grid">
+      <div class="vg-row">
+        <div class="vg-sym">SPY</div>
+        <div class="vg-desc">Equity returns — broad market risk appetite proxy. Loaded into \(\Sigma_t\) via \(e^{h_t}\).</div>
+      </div>
+      <div class="vg-row">
+        <div class="vg-sym">TLT</div>
+        <div class="vg-desc">Long-duration Treasury returns — flight-to-quality and interest rate risk proxy.</div>
+      </div>
+      <div class="vg-row">
+        <div class="vg-sym">HYG</div>
+        <div class="vg-desc">High-yield corporate bond returns — funding stress and credit risk signal linked to \(L_t\).</div>
+      </div>
+      <div class="vg-row">
+        <div class="vg-sym">VIX</div>
+        <div class="vg-desc">CBOE implied volatility index — observed proxy for latent log-volatility \(h_t\).</div>
+      </div>
+      <div class="vg-row">
+        <div class="vg-sym">Spread</div>
+        <div class="vg-desc">Credit/OAS spread — widens as liquidity deteriorates; directly regressed on \(L_t\).</div>
+      </div>
+      <div class="vg-row">
+        <div class="vg-sym">Corr</div>
+        <div class="vg-desc">30-day rolling cross-asset correlation — captures market co-movement driven by \(\rho_t = \tanh(z_t)\).</div>
+      </div>
+    </div>
+  </section>
 
-    <section class="panel">
-      <h2>6. Interpretation</h2>
-      <ul>
-        <li><strong>Liquidity spirals:</strong> rising $$L_t$$ signals funding pressure and spread widening.</li>
-        <li><strong>Volatility clustering:</strong> persistent high $$h_t$$ captures risk-on/off cycles.</li>
-        <li><strong>Correlation breakdown:</strong> high $$\rho_t$$ reflects market co-movement during stress.</li>
-      </ul>
-      <p>Jointly, these mechanisms provide early warnings of systemic instability across market regimes.</p>
-    </section>
+  <!-- 4. INFERENCE -->
+  <section class="panel" id="sec-inference">
+    <div class="section-number">Section 04</div>
+    <h2><span class="dot dot-orange"></span>Inference Method</h2>
+    <p>
+      The non-linear observation equations make the posterior intractable in closed form.
+      Latent states are therefore inferred using <strong>Sequential Monte Carlo (particle filtering)</strong>,
+      which approximates the filtering distribution as a weighted empirical measure:
+    </p>
+    <div class="eq-block">
+      <div class="eq-label">Particle filter posterior approximation</div>
+      $$ p(x_t \mid y_{1:t}) \;\approx\; \sum_{i=1}^{N} w_t^{(i)}\, \delta\!\left(x_t - x_t^{(i)}\right) $$
+    </div>
 
-    <footer class="muted">Implementation: <code>models/finance_state_space.py</code>, <code>experiments/visualize_crisis.py</code>, <code>experiments/animate_crisis.py</code></footer>
-  </div>
+    <div class="step-row">
+      <div class="step-card">
+        <div class="step-num">Step 01</div>
+        <div class="step-title">Prediction</div>
+        <div class="step-desc">Propagate each particle \(x_{t-1}^{(i)}\) forward through the transition model to obtain prior samples \(\tilde{x}_t^{(i)}\).</div>
+      </div>
+      <div class="step-card">
+        <div class="step-num">Step 02</div>
+        <div class="step-title">Weighting</div>
+        <div class="step-desc">Compute unnormalised importance weights \(w_t^{(i)} \propto p(y_t \mid \tilde{x}_t^{(i)})\) via the observation likelihood.</div>
+      </div>
+      <div class="step-card">
+        <div class="step-num">Step 03</div>
+        <div class="step-title">Resampling</div>
+        <div class="step-desc">Resample particles proportional to \(w_t^{(i)}\) to concentrate mass on high-likelihood regions and prevent weight degeneracy.</div>
+      </div>
+    </div>
+
+    <p>
+      Posterior summaries — means and 5th/95th percentile bands for \(L_t, h_t, z_t\) — are
+      saved to <code>results/crisis_res.npz</code> and visualised in the interactive dashboard.
+    </p>
+  </section>
+
+  <!-- 5. CRISIS PREDICTION -->
+  <section class="panel" id="sec-crisis">
+    <div class="section-number">Section 05</div>
+    <h2><span class="dot dot-yellow"></span>Crisis Prediction Methodology</h2>
+    <p>
+      Forward crisis probabilities are produced by extending the particle filter into a Monte Carlo forecasting step.
+      For a horizon of \(H = 60\) trading days:
+    </p>
+    <ol>
+      <li><strong>Sample</strong> a set of particles from the current filtering posterior \(p(x_t \mid y_{1:t})\).</li>
+      <li><strong>Simulate</strong> each particle forward \(H\) steps using the transition dynamics, accumulating stochastic paths.</li>
+      <li><strong>Aggregate</strong> crisis risk metrics across paths — e.g. \(P(L_{t+H} > L_{\text{crit}})\), tail stress quantiles, and composite risk signals.</li>
+    </ol>
+    <div class="eq-block">
+      <div class="eq-label">60-day forward crisis probability</div>
+      $$ P_{\text{crisis}}(t) = P\!\left(L_{t+60} > L_{\text{crit}} \;\middle|\; y_{1:t}\right) \;\approx\; \frac{1}{N}\sum_{i=1}^{N} \mathbf{1}\!\left[L_{t+60}^{(i)} > L_{\text{crit}}\right] $$
+    </div>
+    <p>
+      These forward simulations produce probabilistic crisis cones. The <strong>tail probability</strong>
+      \(P(L_t > 2)\) is also tracked at each time step as a contemporaneous stress indicator,
+      shown as the orange bar overlay in the dashboard's stress chart.
+    </p>
+  </section>
+
+  <!-- 6. INTERPRETATION -->
+  <section class="panel" id="sec-interpretation">
+    <div class="section-number">Section 06</div>
+    <h2><span class="dot dot-green"></span>Interpretation</h2>
+    <p>The three latent factors jointly cover the main channels of systemic risk:</p>
+
+    <div class="var-grid">
+      <div class="vg-row">
+        <div class="vg-sym">↑ \(L_t\)</div>
+        <div class="vg-desc"><strong>Liquidity spiral:</strong> rising stress signals funding pressure, spread widening, and deteriorating market depth. The primary crisis indicator.</div>
+      </div>
+      <div class="vg-row">
+        <div class="vg-sym">↑ \(h_t\)</div>
+        <div class="vg-desc"><strong>Volatility clustering:</strong> persistent high log-volatility captures risk-on/off cycles. Feeds back into \(L_{t+1}\) via the \(\beta_L e^{h_t}\) coupling.</div>
+      </div>
+      <div class="vg-row">
+        <div class="vg-sym">↑ \(\rho_t\)</div>
+        <div class="vg-desc"><strong>Correlation breakdown:</strong> when \(z_t\) is high, cross-asset correlations approach 1, reflecting the loss of diversification typical of systemic stress episodes.</div>
+      </div>
+    </div>
+
+    <p>
+      Jointly, these mechanisms provide early-warning signals of systemic instability — the model
+      identifies stress build-up days to weeks before peak realised volatility, as visible in the
+      2008 GFC and COVID-19 windows in the dashboard.
+    </p>
+  </section>
+
+  <!-- 7. ANIMATION -->
+  <section class="anim-panel" id="sec-animation">
+    <div class="anim-header">
+      <div class="section-number">Section 07</div>
+      <h2><span class="dot dot-purple"></span>Vanguard Risk Evolution — Full Series</h2>
+      <p style="margin-top:6px;">
+        Animated output from <code>experiments/animate_crisis.py</code> — showing how the
+        three latent factors and crisis probability evolve over the full sample.
+        Watch for the sharp spikes aligning with the 2008 GFC, 2020 COVID onset, and 2022–23 tightening cycle.
+      </p>
+    </div>
+    <div class="anim-body">
+      <img
+        src="assets/latent-liquidity/vanguard_risk_evolution.gif"
+        alt="Vanguard risk evolution — animated full series"
+        loading="lazy"
+      >
+    </div>
+    <div class="anim-footer">
+      <div class="anim-caption">
+        Source: <code>results/vanguard_risk_evolution.gif</code> &nbsp;·&nbsp;
+        Generated via <code>experiments/animate_crisis.py</code> &nbsp;·&nbsp;
+        <span>Full sample · daily resolution</span>
+      </div>
+      <a class="btn" href="https://github.com/meamresh/latent_liquidity_quant/blob/main/results/vanguard_risk_evolution.gif" target="_blank" rel="noreferrer">View on GitHub →</a>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-note">
+      Implementation: <code>models/finance_state_space.py</code> · <code>experiments/visualize_crisis.py</code> · <code>experiments/animate_crisis.py</code>
+    </div>
+    <div class="footer-note">
+      <a href="https://github.com/meamresh/latent_liquidity_quant" target="_blank" rel="noreferrer">github.com/meamresh/latent_liquidity_quant</a>
+    </div>
+  </footer>
+
+</div>
 </body>
 </html>
