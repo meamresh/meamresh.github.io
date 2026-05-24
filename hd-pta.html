@@ -248,16 +248,29 @@ a { color: inherit; text-decoration: none; }
   box-shadow: var(--shadow-md);
 }
 .diagram-title { font-size: var(--text-sm); font-weight: 600; color: var(--color-text-muted); margin-bottom: var(--space-6); letter-spacing: 0.04em; text-transform: uppercase; }
-.pulsar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: var(--space-2); margin-bottom: var(--space-6); }
-.pulsar-dot {
-  aspect-ratio: 1; border-radius: 50%;
+.sky-diagram { padding: var(--space-5) var(--space-6) var(--space-4); }
+.sky-map-wrap { position: relative; }
+#skyCanvas { display: block; width: 100%; height: auto; border-radius: var(--radius-md); }
+.sky-tooltip {
+  position: absolute; pointer-events: none;
   background: var(--color-surface-offset);
   border: 1px solid var(--color-border);
-  position: relative; display: flex; align-items: center; justify-content: center;
-  transition: background var(--transition);
+  border-radius: var(--radius-md);
+  padding: var(--space-1) var(--space-3);
+  font-size: var(--text-xs); color: var(--color-text);
+  white-space: nowrap; opacity: 0;
+  transition: opacity 0.12s ease; z-index: 10;
 }
-.pulsar-dot.active { background: var(--color-primary-highlight); border-color: var(--color-primary); }
-.pulsar-dot.active::after { content: ''; position: absolute; width: 40%; height: 40%; border-radius: 50%; background: var(--color-primary); }
+.sky-legend {
+  display: flex; flex-wrap: wrap; gap: var(--space-4);
+  margin: var(--space-3) 0; font-size: var(--text-xs);
+  color: var(--color-text-muted); align-items: center;
+}
+.sky-legend-item { display: flex; align-items: center; gap: var(--space-2); }
+.sky-legend-hint { color: var(--color-text-faint); font-style: italic; }
+.sky-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.sky-dot-pos { background: #d4a017; }
+.sky-dot-neg { background: #4f98a3; }
 .diagram-note { font-size: var(--text-xs); color: var(--color-text-faint); line-height: 1.6; }
 
 /* ── PIPELINE ── */
@@ -560,13 +573,21 @@ a { color: inherit; text-decoration: none; }
       </div>
 
       <div>
-        <div class="what-diagram">
-          <div class="diagram-title">67 Pulsars → 2,211 Pairs</div>
-          <div class="pulsar-grid" id="pulsarGrid"></div>
+        <div class="what-diagram sky-diagram">
+          <div class="diagram-title">NANOGrav 15-year Array &mdash; 67 Pulsars, All-Sky</div>
+          <div class="sky-map-wrap">
+            <canvas id="skyCanvas" width="560" height="268" aria-label="Hammer-Aitoff sky map of the 67 NANOGrav pulsars"></canvas>
+            <div id="skyTooltip" class="sky-tooltip"></div>
+          </div>
+          <div class="sky-legend">
+            <span class="sky-legend-item"><span class="sky-dot sky-dot-pos"></span>Positive HD correlation</span>
+            <span class="sky-legend-item"><span class="sky-dot sky-dot-neg"></span>Negative HD correlation</span>
+            <span class="sky-legend-hint">&middot;&thinsp;hover a pulsar to see its 66 pair arcs</span>
+          </div>
           <div class="diagram-note">
-            Each dot is a pulsar. Highlighted pairs contribute a single
-            cross-correlation estimate ρ<sub>ab</sub> — the building block of the HD curve.
-            With N = 67 pulsars, you get N(N−1)/2 = 2,211 such estimates.
+            Hammer&ndash;Aitoff equal-area projection. Hover any pulsar to draw
+            arcs to all 66 partners, coloured by the expected Hellings&ndash;Downs sign.
+            N&thinsp;=&thinsp;67 pulsars yield N(N&minus;1)/2&thinsp;=&thinsp;<strong>2,211 unique pairs</strong>, each contributing one &rho;<sub>ab</sub>.
           </div>
         </div>
       </div>
@@ -942,16 +963,144 @@ a { color: inherit; text-decoration: none; }
   }
 })();
 
-// Pulsar grid
+// Sky map — Hammer-Aitoff projection
 (function() {
-  const grid = document.getElementById('pulsarGrid');
-  if (!grid) return;
-  const activeSet = new Set([2,5,8,9,14,18,22,26,30,33,37,40,41,44,48]);
-  for (let i = 0; i < 49; i++) {
-    const d = document.createElement('div');
-    d.className = 'pulsar-dot' + (activeSet.has(i) ? ' active' : '');
-    grid.appendChild(d);
+  var canvas = document.getElementById('skyCanvas');
+  if (!canvas) return;
+  var ctx = canvas.getContext('2d');
+  var tip = document.getElementById('skyTooltip');
+  var W = canvas.width, H = canvas.height;
+  var pulsars = [{"n": "J0023+0923", "ra": 5.8, "dec": 9.4}, {"n": "J0030+0451", "ra": 7.5, "dec": 4.9}, {"n": "J0101-6422", "ra": 15.4, "dec": -64.2}, {"n": "J0125-2327", "ra": 21.3, "dec": -23.5}, {"n": "J0218+4232", "ra": 34.6, "dec": 42.5}, {"n": "J0251+2606", "ra": 42.8, "dec": 26.1}, {"n": "J0340+4130", "ra": 55.1, "dec": 41.5}, {"n": "J0437-4715", "ra": 69.3, "dec": -47.3}, {"n": "J0509+0856", "ra": 77.3, "dec": 8.9}, {"n": "J0514-4002", "ra": 78.7, "dec": -40.0}, {"n": "J0557+1550", "ra": 89.4, "dec": 15.8}, {"n": "J0610-2100", "ra": 92.5, "dec": -21.0}, {"n": "J0613-0200", "ra": 93.4, "dec": -2.0}, {"n": "J0614-3329", "ra": 93.6, "dec": -33.5}, {"n": "J0636+5128", "ra": 99.1, "dec": 51.5}, {"n": "J0645+5158", "ra": 101.3, "dec": 51.9}, {"n": "J0740+6620", "ra": 115.1, "dec": 66.3}, {"n": "J0751+1807", "ra": 117.8, "dec": 18.1}, {"n": "J0931-1902", "ra": 142.9, "dec": -19.0}, {"n": "J1012+5307", "ra": 153.1, "dec": 53.1}, {"n": "J1012-4235", "ra": 153.2, "dec": -42.6}, {"n": "J1022+1001", "ra": 155.5, "dec": 10.0}, {"n": "J1024-0719", "ra": 156.1, "dec": -7.3}, {"n": "J1045-4509", "ra": 161.4, "dec": -45.2}, {"n": "J1125+7819", "ra": 171.4, "dec": 78.3}, {"n": "J1312+0051", "ra": 198.0, "dec": 0.9}, {"n": "J1453+1902", "ra": 223.3, "dec": 19.0}, {"n": "J1455-3330", "ra": 223.7, "dec": -33.5}, {"n": "J1518+0204C", "ra": 229.6, "dec": 2.1}, {"n": "J1600-3053", "ra": 240.0, "dec": -30.9}, {"n": "J1614-2230", "ra": 243.5, "dec": -22.5}, {"n": "J1629-6902", "ra": 247.5, "dec": -69.0}, {"n": "J1640+2224", "ra": 250.1, "dec": 22.4}, {"n": "J1643-1224", "ra": 250.9, "dec": -12.4}, {"n": "J1702-4310", "ra": 255.6, "dec": -43.2}, {"n": "J1713+0747", "ra": 258.4, "dec": 7.8}, {"n": "J1730-2304", "ra": 262.5, "dec": -23.1}, {"n": "J1732-5049", "ra": 263.1, "dec": -50.8}, {"n": "J1738+0333", "ra": 264.5, "dec": 3.6}, {"n": "J1741+1351", "ra": 265.4, "dec": 13.9}, {"n": "J1744-1134", "ra": 266.1, "dec": -11.6}, {"n": "J1747-4036", "ra": 266.9, "dec": -40.6}, {"n": "J1751-2857", "ra": 267.9, "dec": -28.9}, {"n": "J1832-0836", "ra": 278.1, "dec": -8.6}, {"n": "J1857+0943", "ra": 284.4, "dec": 9.7}, {"n": "J1903+0327", "ra": 285.8, "dec": 3.5}, {"n": "J1909-3744", "ra": 287.4, "dec": -37.7}, {"n": "J1910+1256", "ra": 287.6, "dec": 12.9}, {"n": "J1911+1347", "ra": 287.8, "dec": 13.8}, {"n": "J1918-0642", "ra": 289.6, "dec": -6.7}, {"n": "J1923+2515", "ra": 290.8, "dec": 25.3}, {"n": "J1944+0907", "ra": 296.1, "dec": 9.1}, {"n": "J1946+3417", "ra": 296.6, "dec": 34.3}, {"n": "J2010-1323", "ra": 302.5, "dec": -13.4}, {"n": "J2017+0603", "ra": 304.4, "dec": 6.1}, {"n": "J2033+1734", "ra": 308.4, "dec": 17.6}, {"n": "J2043+1711", "ra": 310.9, "dec": 17.2}, {"n": "J2124-3358", "ra": 321.0, "dec": -33.9}, {"n": "J2145-0750", "ra": 326.3, "dec": -7.8}, {"n": "J2214+3000", "ra": 333.5, "dec": 30.0}, {"n": "J2229+2643", "ra": 337.3, "dec": 26.7}, {"n": "J2234+0611", "ra": 338.5, "dec": 6.2}, {"n": "J2234+0944", "ra": 338.5, "dec": 9.7}, {"n": "J2302+4442", "ra": 345.5, "dec": 44.7}, {"n": "J2317+1439", "ra": 349.3, "dec": 14.7}, {"n": "J2322+2057", "ra": 350.5, "dec": 20.9}, {"n": "J1600-3053B", "ra": 240.3, "dec": -31.2}];
+
+  function hdCorr(sep) {
+    var x = (1 - Math.cos(sep)) / 2;
+    if (x < 1e-12) x = 1e-12;
+    return 1.5 * x * Math.log(x) - 0.25 * x + 0.5;
   }
+  function angSep(ra1,d1,ra2,d2) {
+    var r1=ra1*Math.PI/180,p1=d1*Math.PI/180,r2=ra2*Math.PI/180,p2=d2*Math.PI/180;
+    return Math.acos(Math.max(-1,Math.min(1,Math.sin(p1)*Math.sin(p2)+Math.cos(p1)*Math.cos(p2)*Math.cos(r1-r2))));
+  }
+  function project(ra,dec) {
+    var lam=(ra-180)*Math.PI/180, phi=dec*Math.PI/180;
+    var z=Math.sqrt(1+Math.cos(phi)*Math.cos(lam/2));
+    var px=2*Math.SQRT2*Math.cos(phi)*Math.sin(lam/2)/z;
+    var py=Math.SQRT2*Math.sin(phi)/z;
+    var sc=(W-48)/(4*Math.SQRT2);
+    return {x:W/2+px*sc, y:H/2-py*sc};
+  }
+  var pts=pulsars.map(function(p){var pos=project(p.ra,p.dec);return{name:p.n,ra:p.ra,dec:p.dec,x:pos.x,y:pos.y};});
+
+  function getC() {
+    var dk=document.documentElement.getAttribute('data-theme')!=='light';
+    return {
+      bg:     dk?'#141310':'#f8f7f4',
+      grid:   dk?'rgba(255,255,255,0.05)':'rgba(0,0,0,0.07)',
+      lbl:    dk?'rgba(255,255,255,0.22)':'rgba(0,0,0,0.25)',
+      dot:    dk?'rgba(212,160,23,0.85)':'rgba(176,122,0,0.9)',
+      dotH:   dk?'#f5cc4a':'#7a5200',
+      glow:   dk?'rgba(212,160,23,0.22)':'rgba(176,122,0,0.15)',
+      arcP:   dk?[212,160,23]:[176,122,0],
+      arcN:   dk?[79,152,163]:[1,105,111],
+      rim:    dk?'rgba(255,255,255,0.07)':'rgba(0,0,0,0.1)',
+    };
+  }
+
+  function drawGrid(c) {
+    ctx.strokeStyle=c.grid; ctx.lineWidth=0.5;
+    [-60,-30,0,30,60].forEach(function(dv){
+      ctx.beginPath();
+      for(var r=0;r<=360;r++){var p=project(r,dv);r===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y);}
+      ctx.stroke();
+    });
+    [0,60,120,180,240,300].forEach(function(rv){
+      ctx.beginPath();
+      for(var d=-90;d<=90;d++){var p=project(rv,d);d===-90?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y);}
+      ctx.stroke();
+    });
+    ctx.fillStyle=c.lbl; ctx.font='8px Satoshi,Inter,sans-serif'; ctx.textAlign='center';
+    [[0,'0h'],[60,'4h'],[120,'8h'],[180,'12h'],[240,'16h'],[300,'20h']].forEach(function(x){
+      var p=project(x[0],-44); ctx.fillText(x[1],p.x,p.y);
+    });
+    ctx.textAlign='right';
+    [[-55,'-60°'],[-25,'-30°'],[28,'+30°'],[58,'+60°']].forEach(function(x){
+      var p=project(180,x[0]); ctx.fillText(x[1],p.x-3,p.y+3);
+    });
+    ctx.beginPath(); ctx.strokeStyle=c.rim; ctx.lineWidth=1;
+    for(var i=0;i<=360;i++){
+      var phi2=(i-180)*Math.PI/180, z2=Math.sqrt(1+Math.cos(phi2)*Math.cos(Math.PI/2));
+      var px2=2*Math.SQRT2*Math.cos(phi2)*Math.sin(Math.PI/2)/z2;
+      var py2=Math.SQRT2*Math.sin(phi2)/z2;
+      var sc2=(W-48)/(4*Math.SQRT2);
+      var xx=W/2+px2*sc2, yy=H/2-py2*sc2;
+      i===0?ctx.moveTo(xx,yy):ctx.lineTo(xx,yy);
+    }
+    ctx.stroke();
+  }
+
+  var hov=-1;
+  function draw() {
+    var c=getC();
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle=c.bg; ctx.fillRect(0,0,W,H);
+    drawGrid(c);
+    if(hov>=0){
+      var p1=pts[hov];
+      for(var i=0;i<pts.length;i++){
+        if(i===hov) continue;
+        var p2=pts[i];
+        var sep=angSep(p1.ra,p1.dec,p2.ra,p2.dec);
+        var hd=hdCorr(sep);
+        var alp=0.1+Math.abs(hd)*0.65;
+        var rgb=hd>=0?c.arcP:c.arcN;
+        ctx.beginPath();
+        for(var s=0;s<=32;s++){
+          var t=s/32, ra=p1.ra+t*(p2.ra-p1.ra), dec=p1.dec+t*(p2.dec-p1.dec);
+          var pp=project(ra,dec); s===0?ctx.moveTo(pp.x,pp.y):ctx.lineTo(pp.x,pp.y);
+        }
+        ctx.strokeStyle='rgba('+rgb[0]+','+rgb[1]+','+rgb[2]+','+alp.toFixed(2)+')';
+        ctx.lineWidth=0.85; ctx.stroke();
+      }
+    }
+    pts.forEach(function(p,i){
+      var isH=i===hov, r=isH?5.5:2.8;
+      if(isH){
+        var g=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,13);
+        g.addColorStop(0,c.glow); g.addColorStop(1,'transparent');
+        ctx.beginPath(); ctx.arc(p.x,p.y,13,0,Math.PI*2); ctx.fillStyle=g; ctx.fill();
+      }
+      ctx.beginPath(); ctx.arc(p.x,p.y,r,0,Math.PI*2);
+      ctx.fillStyle=isH?c.dotH:c.dot; ctx.fill();
+    });
+  }
+
+  function nearest(mx,my){
+    var rect=canvas.getBoundingClientRect();
+    var sx=canvas.width/rect.width, sy=canvas.height/rect.height;
+    var cx2=mx*sx, cy2=my*sy, best=-1, bd=22*22;
+    pts.forEach(function(p,i){var d=(p.x-cx2)*(p.x-cx2)+(p.y-cy2)*(p.y-cy2);if(d<bd){bd=d;best=i;}});
+    return best;
+  }
+  canvas.addEventListener('mousemove',function(e){
+    var r=canvas.getBoundingClientRect();
+    var idx=nearest(e.clientX-r.left,e.clientY-r.top);
+    if(idx!==hov){hov=idx;draw();}
+    if(idx>=0){
+      var p=pts[idx];
+      tip.style.opacity='1';
+      tip.style.left=(e.clientX-r.left+14)+'px';
+      tip.style.top=(e.clientY-r.top-34)+'px';
+      tip.innerHTML='<strong>'+p.name+'</strong>&nbsp; RA '+p.ra.toFixed(1)+'° · Dec '+p.dec.toFixed(1)+'°';
+    } else tip.style.opacity='0';
+  });
+  canvas.addEventListener('mouseleave',function(){hov=-1;tip.style.opacity='0';draw();});
+  canvas.addEventListener('touchstart',function(e){
+    e.preventDefault();
+    var r=canvas.getBoundingClientRect(),t=e.touches[0];
+    hov=nearest(t.clientX-r.left,t.clientY-r.top); draw();
+  },{passive:false});
+  new MutationObserver(draw).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+  draw();
 })();
 
 // Tabs
