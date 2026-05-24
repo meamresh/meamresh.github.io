@@ -152,7 +152,31 @@ a { color: inherit; text-decoration: none; }
               radial-gradient(ellipse 50% 40% at 20% 70%, rgba(80,60,180,0.05) 0%, transparent 60%);
   pointer-events: none;
 }
-.hero-inner { max-width: var(--content-wide); margin-inline: auto; position: relative; z-index: 1; width: 100%; }
+.hero-inner {
+  max-width: var(--content-wide); margin-inline: auto;
+  position: relative; z-index: 1; width: 100%;
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: var(--space-12); align-items: center;
+}
+.hero-left { display: flex; flex-direction: column; }
+.hero-right {
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+}
+.hero-visual {
+  width: 100%; max-width: 480px;
+  aspect-ratio: 1;
+  position: relative;
+}
+#heroCanvas {
+  width: 100%; height: 100%;
+  border-radius: 50%;
+  filter: drop-shadow(0 0 40px var(--color-accent-glow));
+}
+@media (max-width: 900px) {
+  .hero-inner { grid-template-columns: 1fr; }
+  .hero-right { display: none; }
+}
 .hero-badge {
   display: inline-flex; align-items: center; gap: var(--space-2);
   background: var(--color-primary-highlight);
@@ -508,6 +532,7 @@ a { color: inherit; text-decoration: none; }
   <div class="starfield" id="starfield"></div>
   <div class="hero-bg"></div>
   <div class="hero-inner">
+    <div class="hero-left">
     <div class="hero-badge">
       <div class="hero-badge-dot"></div>
       NANOGrav 15-year Data Set
@@ -531,6 +556,12 @@ a { color: inherit; text-decoration: none; }
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
         Quick Start
       </a>
+    </div>
+    </div><!-- /.hero-left -->
+    <div class="hero-right">
+      <div class="hero-visual">
+        <canvas id="heroCanvas" width="480" height="480" aria-label="Animated Hellings-Downs correlation diagram"></canvas>
+      </div>
     </div>
   </div>
   <div class="hero-scroll">
@@ -961,6 +992,179 @@ a { color: inherit; text-decoration: none; }
     `;
     sf.appendChild(s);
   }
+})();
+
+
+// Hero canvas — animated HD diagram
+(function() {
+  var canvas = document.getElementById('heroCanvas');
+  if (!canvas) return;
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height, CX = W/2, CY = H/2;
+  var R = W * 0.38; // pulsar ring radius
+  var N_PSR = 24;   // pulsars on the ring
+  var frame = 0;
+  var activeIdx = 0;
+
+  // Fixed pulsar angles (randomly seeded but stable)
+  var pAngles = [];
+  var rng = 42;
+  function lcg() { rng = (rng * 1664525 + 1013904223) & 0xffffffff; return (rng >>> 0) / 0xffffffff; }
+  for (var i = 0; i < N_PSR; i++) pAngles.push(lcg() * Math.PI * 2);
+  pAngles.sort(function(a,b){return a-b;});
+
+  function hdCorr(sep) {
+    var x = (1 - Math.cos(sep)) / 2;
+    if (x < 1e-12) x = 1e-12;
+    return 1.5 * x * Math.log(x) - 0.25 * x + 0.5;
+  }
+
+  function getC() {
+    var dk = document.documentElement.getAttribute('data-theme') !== 'light';
+    return {
+      bg:      dk ? '#0e0d0b' : '#f5f4f0',
+      ring:    dk ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.05)',
+      dot:     dk ? 'rgba(212,160,23,0.55)' : 'rgba(176,122,0,0.55)',
+      dotA:    dk ? '#f5cc4a' : '#7a5200',
+      glowA:   dk ? 'rgba(212,160,23,0.25)' : 'rgba(176,122,0,0.15)',
+      arcPos:  dk ? [212,160,23]  : [176,122,0],
+      arcNeg:  dk ? [79,152,163]  : [1,105,111],
+      curve:   dk ? '#d4a017' : '#b07a00',
+      curveGl: dk ? 'rgba(212,160,23,0.12)' : 'rgba(176,122,0,0.10)',
+      grid:    dk ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.06)',
+      label:   dk ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)',
+      zero:    dk ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)',
+    };
+  }
+
+  // Polar coords: angle = angular separation (0..π), radius scaled to HD value
+  // Map HD value (-0.2..0.5) to radius (inner..outer zone in center circle)
+  var INNER_R = W * 0.06;
+  var OUTER_R = W * 0.22;
+  function hdToR(hd) {
+    return INNER_R + (hd + 0.2) / 0.7 * (OUTER_R - INNER_R);
+  }
+
+  function drawHDCurveCenter(c, progress) {
+    // Draw a mini HD curve in the center as a polar-ish plot
+    // x-axis mapped to a small horizontal span, y-axis to vertical
+    var pw = W * 0.30, ph = W * 0.18;
+    var ox = CX - pw/2, oy = CY;
+
+    // Zero line
+    ctx.beginPath();
+    ctx.strokeStyle = c.zero; ctx.lineWidth = 0.5;
+    ctx.moveTo(ox, oy); ctx.lineTo(ox + pw, oy);
+    ctx.stroke();
+
+    // Glow band
+    var maxSteps = Math.floor(progress * 180);
+    if (maxSteps < 2) return;
+
+    // Draw filled area under curve
+    ctx.beginPath();
+    for (var deg = 1; deg <= maxSteps; deg++) {
+      var theta = deg * Math.PI / 180;
+      var hd = hdCorr(theta);
+      var x = ox + (deg / 180) * pw;
+      var y = oy - hd * ph * 2.2;
+      deg === 1 ? ctx.moveTo(x, oy) : ctx.moveTo(x - 0.01, oy);
+      ctx.lineTo(x, y);
+    }
+    ctx.strokeStyle = c.curveGl; ctx.lineWidth = 6;
+    ctx.lineCap = 'round'; ctx.stroke();
+
+    // Draw the actual curve
+    ctx.beginPath();
+    for (var deg2 = 1; deg2 <= maxSteps; deg2++) {
+      var theta2 = deg2 * Math.PI / 180;
+      var hd2 = hdCorr(theta2);
+      var x2 = ox + (deg2 / 180) * pw;
+      var y2 = oy - hd2 * ph * 2.2;
+      deg2 === 1 ? ctx.moveTo(x2, y2) : ctx.lineTo(x2, y2);
+    }
+    ctx.strokeStyle = c.curve;
+    ctx.lineWidth = 1.8; ctx.lineCap = 'round';
+    ctx.stroke();
+
+    // Axis labels
+    ctx.fillStyle = c.label;
+    ctx.font = '9px Satoshi,Inter,sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('0°', ox, oy + 14);
+    ctx.fillText('90°', ox + pw/2, oy + 14);
+    ctx.fillText('180°', ox + pw, oy + 14);
+    ctx.textAlign = 'right';
+    ctx.fillText('Γ(θ)', ox - 4, oy - 2);
+  }
+
+  function draw() {
+    var c = getC();
+    ctx.clearRect(0, 0, W, H);
+
+    // Background circle (very subtle)
+    ctx.beginPath();
+    ctx.arc(CX, CY, R + 18, 0, Math.PI * 2);
+    ctx.strokeStyle = c.ring; ctx.lineWidth = 1; ctx.stroke();
+
+    // Concentric grid rings
+    [0.25, 0.5, 0.75, 1.0].forEach(function(f) {
+      ctx.beginPath();
+      ctx.arc(CX, CY, (R + 18) * f, 0, Math.PI * 2);
+      ctx.strokeStyle = c.grid; ctx.lineWidth = 0.4; ctx.stroke();
+    });
+
+    // Slowly move active pulsar every ~90 frames
+    var t = frame / 240; // 0..1 cycle
+    activeIdx = Math.floor((frame / 90) % N_PSR);
+
+    var ax = CX + R * Math.cos(pAngles[activeIdx]);
+    var ay = CY + R * Math.sin(pAngles[activeIdx]);
+
+    // Draw arcs from active to all others
+    for (var i = 0; i < N_PSR; i++) {
+      if (i === activeIdx) continue;
+      var sep = Math.abs(pAngles[i] - pAngles[activeIdx]);
+      if (sep > Math.PI) sep = 2 * Math.PI - sep;
+      var hd = hdCorr(sep);
+      var alp = 0.08 + Math.abs(hd) * 0.45;
+      var rgb = hd >= 0 ? c.arcPos : c.arcNeg;
+      var bx = CX + R * Math.cos(pAngles[i]);
+      var by = CY + R * Math.sin(pAngles[i]);
+      ctx.beginPath();
+      // Bezier through center for elegance
+      ctx.moveTo(ax, ay);
+      ctx.quadraticCurveTo(CX, CY, bx, by);
+      ctx.strokeStyle = 'rgba('+rgb[0]+','+rgb[1]+','+rgb[2]+','+alp.toFixed(2)+')';
+      ctx.lineWidth = 0.9; ctx.stroke();
+    }
+
+    // Draw HD curve in center
+    var curveProgress = Math.min(1, (frame % 360) / 180);
+    drawHDCurveCenter(c, curveProgress);
+
+    // Draw all pulsar dots
+    for (var j = 0; j < N_PSR; j++) {
+      var px = CX + R * Math.cos(pAngles[j]);
+      var py = CY + R * Math.sin(pAngles[j]);
+      var isA = j === activeIdx;
+      var r = isA ? 5 : 2.5;
+      if (isA) {
+        var g = ctx.createRadialGradient(px, py, 0, px, py, 14);
+        g.addColorStop(0, c.glowA); g.addColorStop(1, 'transparent');
+        ctx.beginPath(); ctx.arc(px, py, 14, 0, Math.PI*2);
+        ctx.fillStyle = g; ctx.fill();
+      }
+      ctx.beginPath(); ctx.arc(px, py, r, 0, Math.PI * 2);
+      ctx.fillStyle = isA ? c.dotA : c.dot; ctx.fill();
+    }
+
+    frame++;
+    requestAnimationFrame(draw);
+  }
+
+  new MutationObserver(function(){}).observe(document.documentElement, {attributes:true,attributeFilter:['data-theme']});
+  draw();
 })();
 
 // Sky map — Hammer-Aitoff projection
