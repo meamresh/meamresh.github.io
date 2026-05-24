@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>hd-pta — The Hellings–Downs Signal | Amresh Verma</title>
+<meta name="description" content="Reconstructing the gravitational-wave background detection from a pulsar timing array — the way NANOGrav did it — watching the Hellings–Downs signal emerge, pair by pair.">
+<meta property="og:title" content="hd-pta — The Hellings–Downs Signal in Pulsar Timing Data">
+<meta property="og:description" content="A pulsar timing array reconstruction of the NANOGrav 15-year GWB detection, with simulation and real-data optimal statistics.">
+<meta property="og:type" content="website">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300..600&display=swap" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,600&display=swap" rel="stylesheet">
+
+<style>
+/* ── Art direction: Astrophysics research page
+   Palette: deep-space dark, cool neutral, amber-gold accent
+   Typography: Instrument Serif (display) + Satoshi (body)
+   Density: spacious, editorial ── */
+
+:root, [data-theme="light"] {
+  --color-bg:             #f5f4f0;
+  --color-surface:        #f8f7f4;
+  --color-surface-2:      #fafaf7;
+  --color-surface-offset: #eeecea;
+  --color-divider:        #dbd9d4;
+  --color-border:         #ccc9c3;
+  --color-text:           #1c1a14;
+  --color-text-muted:     #6b6860;
+  --color-text-faint:     #aaa89e;
+  --color-text-inverse:   #f5f4f0;
+  --color-primary:        #b07a00;
+  --color-primary-hover:  #8a5e00;
+  --color-primary-active: #664500;
+  --color-primary-highlight: #e8dfc6;
+  --color-accent-glow:    rgba(176,122,0,0.12);
+  --shadow-sm: 0 1px 2px rgba(28,26,20,0.06);
+  --shadow-md: 0 4px 16px rgba(28,26,20,0.09);
+  --shadow-lg: 0 12px 40px rgba(28,26,20,0.13);
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-full: 9999px;
+  --transition: 180ms cubic-bezier(0.16, 1, 0.3, 1);
+  --font-display: 'Instrument Serif', Georgia, serif;
+  --font-body: 'Satoshi', 'Inter', sans-serif;
+  --content-default: 920px;
+  --content-wide: 1200px;
+  --text-xs:   clamp(0.75rem,  0.7rem  + 0.25vw, 0.875rem);
+  --text-sm:   clamp(0.875rem, 0.8rem  + 0.35vw, 1rem);
+  --text-base: clamp(1rem,     0.95rem + 0.25vw, 1.125rem);
+  --text-lg:   clamp(1.125rem, 1rem    + 0.75vw, 1.5rem);
+  --text-xl:   clamp(1.5rem,   1.2rem  + 1.25vw, 2.25rem);
+  --text-2xl:  clamp(2rem,     1.2rem  + 2.5vw,  3.5rem);
+  --text-hero: clamp(2.8rem,   0.5rem  + 6vw,    6.5rem);
+  --space-1: 0.25rem; --space-2: 0.5rem; --space-3: 0.75rem;
+  --space-4: 1rem;    --space-5: 1.25rem; --space-6: 1.5rem;
+  --space-8: 2rem;    --space-10: 2.5rem; --space-12: 3rem;
+  --space-16: 4rem;   --space-20: 5rem;   --space-24: 6rem;
+}
+
+[data-theme="dark"] {
+  --color-bg:             #0e0d0b;
+  --color-surface:        #141310;
+  --color-surface-2:      #181612;
+  --color-surface-offset: #1d1b17;
+  --color-divider:        #252320;
+  --color-border:         #302e2a;
+  --color-text:           #e2e0db;
+  --color-text-muted:     #857f75;
+  --color-text-faint:     #504d47;
+  --color-text-inverse:   #0e0d0b;
+  --color-primary:        #d4a017;
+  --color-primary-hover:  #e8b830;
+  --color-primary-active: #f5cc4a;
+  --color-primary-highlight: #2d2618;
+  --color-accent-glow:    rgba(212,160,23,0.10);
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.4);
+  --shadow-lg: 0 12px 40px rgba(0,0,0,0.55);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --color-bg:#0e0d0b; --color-surface:#141310; --color-surface-2:#181612;
+    --color-surface-offset:#1d1b17; --color-divider:#252320; --color-border:#302e2a;
+    --color-text:#e2e0db; --color-text-muted:#857f75; --color-text-faint:#504d47;
+    --color-text-inverse:#0e0d0b; --color-primary:#d4a017; --color-primary-hover:#e8b830;
+    --color-primary-active:#f5cc4a; --color-primary-highlight:#2d2618;
+    --color-accent-glow:rgba(212,160,23,0.10);
+    --shadow-sm:0 1px 2px rgba(0,0,0,0.3); --shadow-md:0 4px 16px rgba(0,0,0,0.4);
+    --shadow-lg:0 12px 40px rgba(0,0,0,0.55);
+  }
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; scroll-padding-top: var(--space-20); -webkit-font-smoothing: antialiased; }
+body { min-height: 100dvh; font-family: var(--font-body); font-size: var(--text-base); color: var(--color-text); background: var(--color-bg); line-height: 1.65; }
+img, svg { display: block; max-width: 100%; }
+h1,h2,h3,h4 { text-wrap: balance; line-height: 1.15; }
+p, li { text-wrap: pretty; }
+button { cursor: pointer; background: none; border: none; font: inherit; color: inherit; }
+a { color: inherit; text-decoration: none; }
+::selection { background: var(--color-primary-highlight); color: var(--color-text); }
+:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 3px; border-radius: var(--radius-sm); }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }
+
+/* ── NAV ── */
+.nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  padding: var(--space-4) var(--space-6);
+  display: flex; align-items: center; justify-content: space-between;
+  background: color-mix(in oklab, var(--color-bg) 85%, transparent);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid oklch(from var(--color-text) l c h / 0.06);
+  transition: background var(--transition);
+}
+.nav-logo {
+  display: flex; align-items: center; gap: var(--space-3);
+  font-family: var(--font-display); font-size: var(--text-lg);
+  color: var(--color-text);
+}
+.nav-logo svg { flex-shrink: 0; }
+.nav-right { display: flex; align-items: center; gap: var(--space-4); }
+.nav-link {
+  font-size: var(--text-sm); color: var(--color-text-muted);
+  transition: color var(--transition);
+}
+.nav-link:hover { color: var(--color-text); }
+.theme-toggle {
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: var(--radius-full);
+  color: var(--color-text-muted);
+  transition: background var(--transition), color var(--transition);
+}
+.theme-toggle:hover { background: var(--color-surface-offset); color: var(--color-text); }
+
+/* ── HERO ── */
+.hero {
+  min-height: 100svh;
+  display: flex; flex-direction: column; justify-content: center;
+  padding: clamp(var(--space-24), 12vw, 9rem) var(--space-6) var(--space-20);
+  position: relative; overflow: hidden;
+}
+.hero-bg {
+  position: absolute; inset: 0; z-index: 0;
+  background: radial-gradient(ellipse 80% 60% at 60% 30%, var(--color-accent-glow) 0%, transparent 70%),
+              radial-gradient(ellipse 50% 40% at 20% 70%, rgba(80,60,180,0.05) 0%, transparent 60%);
+  pointer-events: none;
+}
+.hero-inner { max-width: var(--content-wide); margin-inline: auto; position: relative; z-index: 1; width: 100%; }
+.hero-badge {
+  display: inline-flex; align-items: center; gap: var(--space-2);
+  background: var(--color-primary-highlight);
+  color: var(--color-primary);
+  font-size: var(--text-xs); font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-full);
+  margin-bottom: var(--space-8);
+}
+.hero-badge-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--color-primary); }
+.hero-title {
+  font-family: var(--font-display);
+  font-size: var(--text-hero);
+  font-weight: 400;
+  line-height: 1.05;
+  max-width: 14ch;
+  margin-bottom: var(--space-6);
+  color: var(--color-text);
+}
+.hero-title em { font-style: italic; color: var(--color-primary); }
+.hero-subtitle {
+  font-size: var(--text-lg); color: var(--color-text-muted);
+  max-width: 55ch; line-height: 1.6;
+  margin-bottom: var(--space-10);
+}
+.hero-ctas { display: flex; flex-wrap: wrap; gap: var(--space-3); }
+.btn {
+  display: inline-flex; align-items: center; gap: var(--space-2);
+  font-size: var(--text-sm); font-weight: 500;
+  padding: var(--space-3) var(--space-6);
+  border-radius: var(--radius-md);
+  transition: background var(--transition), color var(--transition), box-shadow var(--transition);
+  white-space: nowrap;
+}
+.btn-primary {
+  background: var(--color-primary); color: var(--color-text-inverse);
+}
+.btn-primary:hover { background: var(--color-primary-hover); box-shadow: var(--shadow-md); }
+.btn-ghost {
+  border: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  background: transparent;
+}
+.btn-ghost:hover { background: var(--color-surface-offset); color: var(--color-text); }
+.hero-scroll {
+  position: absolute; bottom: var(--space-8); left: var(--space-6);
+  display: flex; align-items: center; gap: var(--space-2);
+  font-size: var(--text-xs); color: var(--color-text-faint); letter-spacing: 0.08em; text-transform: uppercase;
+}
+.hero-scroll-line { width: 40px; height: 1px; background: var(--color-text-faint); }
+
+/* ── STAR FIELD ── */
+.starfield { position: absolute; inset: 0; overflow: hidden; z-index: 0; }
+.star { position: absolute; border-radius: 50%; background: var(--color-text); opacity: 0; animation: twinkle var(--dur, 4s) var(--delay, 0s) ease-in-out infinite; }
+@keyframes twinkle {
+  0%, 100% { opacity: 0; transform: scale(0.8); }
+  50% { opacity: var(--max-op, 0.4); transform: scale(1); }
+}
+
+/* ── SECTION ── */
+.section { padding: clamp(var(--space-16), 8vw, var(--space-24)) var(--space-6); }
+.section-inner { max-width: var(--content-default); margin-inline: auto; }
+.section-wide { max-width: var(--content-wide); }
+.section-label {
+  display: flex; align-items: center; gap: var(--space-3);
+  font-size: var(--text-xs); color: var(--color-primary);
+  font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+  margin-bottom: var(--space-4);
+}
+.section-label::before { content: ''; width: 24px; height: 1px; background: var(--color-primary); }
+.section-heading {
+  font-family: var(--font-display);
+  font-size: var(--text-2xl); font-weight: 400;
+  margin-bottom: var(--space-4);
+  line-height: 1.1;
+}
+.section-sub { font-size: var(--text-base); color: var(--color-text-muted); max-width: 58ch; line-height: 1.7; margin-bottom: var(--space-12); }
+.divider { border: none; border-top: 1px solid var(--color-divider); }
+
+/* ── WHAT SECTION ── */
+.what-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: var(--space-12);
+  align-items: start;
+}
+.what-text p { color: var(--color-text-muted); line-height: 1.8; margin-bottom: var(--space-4); }
+.what-text p:last-child { margin-bottom: 0; }
+.what-diagram {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-8);
+  box-shadow: var(--shadow-md);
+}
+.diagram-title { font-size: var(--text-sm); font-weight: 600; color: var(--color-text-muted); margin-bottom: var(--space-6); letter-spacing: 0.04em; text-transform: uppercase; }
+.pulsar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: var(--space-2); margin-bottom: var(--space-6); }
+.pulsar-dot {
+  aspect-ratio: 1; border-radius: 50%;
+  background: var(--color-surface-offset);
+  border: 1px solid var(--color-border);
+  position: relative; display: flex; align-items: center; justify-content: center;
+  transition: background var(--transition);
+}
+.pulsar-dot.active { background: var(--color-primary-highlight); border-color: var(--color-primary); }
+.pulsar-dot.active::after { content: ''; position: absolute; width: 40%; height: 40%; border-radius: 50%; background: var(--color-primary); }
+.diagram-note { font-size: var(--text-xs); color: var(--color-text-faint); line-height: 1.6; }
+
+/* ── PIPELINE ── */
+.pipeline { display: flex; flex-direction: column; gap: 0; }
+.pipeline-step {
+  display: grid; grid-template-columns: 48px 1fr;
+  gap: var(--space-5);
+  padding: var(--space-6) 0;
+  position: relative;
+}
+.pipeline-step:not(:last-child)::after {
+  content: ''; position: absolute;
+  left: 23px; top: 70px; bottom: 0;
+  width: 1px; background: var(--color-divider);
+}
+.step-number {
+  width: 48px; height: 48px; flex-shrink: 0;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  display: flex; align-items: center; justify-content: center;
+  font-size: var(--text-sm); font-weight: 600; color: var(--color-primary);
+  position: relative; z-index: 1;
+}
+.step-content h3 { font-size: var(--text-base); font-weight: 600; margin-bottom: var(--space-1); }
+.step-content p { font-size: var(--text-sm); color: var(--color-text-muted); line-height: 1.7; max-width: 54ch; }
+.step-formula {
+  display: inline-block; margin-top: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  background: var(--color-surface-offset);
+  border-radius: var(--radius-sm);
+  font-family: 'Courier New', monospace; font-size: var(--text-xs);
+  color: var(--color-primary); letter-spacing: 0.03em;
+}
+
+/* ── RESULTS CARDS ── */
+.results-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-6); margin-bottom: var(--space-6); }
+.result-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-8);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--transition), transform var(--transition);
+}
+.result-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-2px); }
+.result-card-label {
+  font-size: var(--text-xs); font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--color-primary); margin-bottom: var(--space-4);
+}
+.result-card h3 { font-family: var(--font-display); font-size: var(--text-xl); font-weight: 400; margin-bottom: var(--space-3); }
+.result-card p { font-size: var(--text-sm); color: var(--color-text-muted); line-height: 1.7; }
+.result-stat {
+  display: inline-flex; align-items: baseline; gap: var(--space-2);
+  margin-top: var(--space-4);
+  padding: var(--space-2) var(--space-4);
+  background: var(--color-primary-highlight);
+  border-radius: var(--radius-md);
+}
+.result-stat-value { font-size: var(--text-xl); font-family: var(--font-display); color: var(--color-primary); }
+.result-stat-unit { font-size: var(--text-sm); color: var(--color-text-muted); }
+
+/* ── HD CURVE SVG ── */
+.hd-curve-container {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-8);
+  box-shadow: var(--shadow-md);
+  margin-top: var(--space-6);
+}
+.hd-curve-title { font-size: var(--text-sm); font-weight: 600; color: var(--color-text-muted); margin-bottom: var(--space-5); letter-spacing: 0.04em; }
+
+/* ── MEMORY TABLE ── */
+.memory-table {
+  width: 100%; border-collapse: collapse;
+  font-size: var(--text-sm); margin-top: var(--space-4);
+}
+.memory-table th {
+  text-align: left; padding: var(--space-3) var(--space-4);
+  font-size: var(--text-xs); font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--color-text-muted);
+  border-bottom: 1px solid var(--color-divider);
+}
+.memory-table td { padding: var(--space-3) var(--space-4); border-bottom: 1px solid var(--color-divider); color: var(--color-text-muted); }
+.memory-table tr:last-child td { border-bottom: none; }
+.memory-table .ram-bar { display: flex; align-items: center; gap: var(--space-2); }
+.memory-table .bar { height: 6px; border-radius: var(--radius-full); background: var(--color-primary); opacity: 0.7; }
+.badge-full {
+  display: inline-block; padding: 2px 8px;
+  background: var(--color-primary-highlight);
+  color: var(--color-primary); border-radius: var(--radius-full);
+  font-size: var(--text-xs); font-weight: 600;
+}
+
+/* ── FILE TREE ── */
+.file-tree {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-6);
+  font-family: 'Courier New', monospace;
+  font-size: var(--text-xs);
+  line-height: 2;
+  overflow-x: auto;
+}
+.file-tree .tree-dir { color: var(--color-primary); font-weight: 600; }
+.file-tree .tree-file { color: var(--color-text-muted); }
+.file-tree .tree-comment { color: var(--color-text-faint); }
+
+/* ── HOW TO RUN ── */
+.run-tabs { display: flex; gap: var(--space-2); margin-bottom: var(--space-4); }
+.tab-btn {
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm); font-weight: 500;
+  color: var(--color-text-muted);
+  transition: background var(--transition), color var(--transition);
+}
+.tab-btn.active { background: var(--color-primary-highlight); color: var(--color-primary); }
+.tab-btn:hover:not(.active) { background: var(--color-surface-offset); color: var(--color-text); }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+.code-block {
+  background: var(--color-surface-offset);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5) var(--space-6);
+  font-family: 'Courier New', monospace;
+  font-size: var(--text-xs);
+  line-height: 1.9; overflow-x: auto;
+  position: relative;
+}
+.code-comment { color: var(--color-text-faint); }
+.code-cmd { color: var(--color-text); }
+.code-arg { color: var(--color-primary); }
+.copy-btn {
+  position: absolute; top: var(--space-3); right: var(--space-3);
+  padding: var(--space-1) var(--space-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-xs); color: var(--color-text-muted);
+  transition: background var(--transition), color var(--transition);
+}
+.copy-btn:hover { background: var(--color-primary-highlight); color: var(--color-primary); }
+
+/* ── CITATIONS ── */
+.citation-list { list-style: none; display: flex; flex-direction: column; gap: var(--space-3); }
+.citation-item {
+  display: grid; grid-template-columns: 28px 1fr;
+  gap: var(--space-3); align-items: start;
+  padding: var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  font-size: var(--text-sm);
+}
+.citation-num {
+  width: 28px; height: 28px;
+  background: var(--color-primary-highlight);
+  color: var(--color-primary);
+  border-radius: var(--radius-full);
+  display: flex; align-items: center; justify-content: center;
+  font-size: var(--text-xs); font-weight: 700; flex-shrink: 0;
+}
+.citation-item a { color: var(--color-primary); text-decoration: underline; text-underline-offset: 3px; }
+.citation-item a:hover { color: var(--color-primary-hover); }
+.citation-meta { color: var(--color-text-muted); font-size: var(--text-xs); margin-top: var(--space-1); }
+
+/* ── FOOTER ── */
+.footer {
+  padding: var(--space-12) var(--space-6);
+  border-top: 1px solid var(--color-divider);
+  text-align: center;
+}
+.footer-inner { max-width: var(--content-default); margin-inline: auto; }
+.footer-author { font-family: var(--font-display); font-size: var(--text-lg); margin-bottom: var(--space-2); }
+.footer-sub { font-size: var(--text-sm); color: var(--color-text-muted); margin-bottom: var(--space-6); }
+.footer-links { display: flex; justify-content: center; flex-wrap: wrap; gap: var(--space-5); }
+.footer-link { font-size: var(--text-sm); color: var(--color-text-muted); transition: color var(--transition); }
+.footer-link:hover { color: var(--color-primary); }
+.footer-copy { margin-top: var(--space-8); font-size: var(--text-xs); color: var(--color-text-faint); }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  .what-grid { grid-template-columns: 1fr; }
+  .results-grid { grid-template-columns: 1fr; }
+  .hero-title { max-width: 100%; }
+  .nav-link { display: none; }
+  .pipeline-step { grid-template-columns: 36px 1fr; gap: var(--space-3); }
+  .step-number { width: 36px; height: 36px; }
+  .pipeline-step:not(:last-child)::after { left: 17px; }
+}
+@media (max-width: 480px) {
+  .run-tabs { flex-wrap: wrap; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <a href="https://meamresh.github.io" class="nav-logo" target="_blank" rel="noopener noreferrer">
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-label="hd-pta logo">
+      <circle cx="14" cy="14" r="13" stroke="currentColor" stroke-width="1.5" opacity="0.3"/>
+      <circle cx="14" cy="14" r="3" fill="currentColor" opacity="0.8"/>
+      <circle cx="6" cy="8" r="1.5" fill="currentColor" opacity="0.5"/>
+      <circle cx="22" cy="8" r="1.5" fill="currentColor" opacity="0.5"/>
+      <circle cx="6" cy="20" r="1.5" fill="currentColor" opacity="0.5"/>
+      <circle cx="22" cy="20" r="1.5" fill="currentColor" opacity="0.5"/>
+      <circle cx="14" cy="4" r="1.5" fill="currentColor" opacity="0.5"/>
+      <line x1="14" y1="14" x2="6" y2="8" stroke="currentColor" stroke-width="0.75" opacity="0.25"/>
+      <line x1="14" y1="14" x2="22" y2="8" stroke="currentColor" stroke-width="0.75" opacity="0.25"/>
+      <line x1="14" y1="14" x2="6" y2="20" stroke="currentColor" stroke-width="0.75" opacity="0.25"/>
+      <line x1="14" y1="14" x2="22" y2="20" stroke="currentColor" stroke-width="0.75" opacity="0.25"/>
+    </svg>
+    hd-pta
+  </a>
+  <div class="nav-right">
+    <a href="#what" class="nav-link">Overview</a>
+    <a href="#pipeline" class="nav-link">Methods</a>
+    <a href="#results" class="nav-link">Results</a>
+    <a href="#run" class="nav-link">Run</a>
+    <button class="theme-toggle" data-theme-toggle aria-label="Switch to light mode">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+      </svg>
+    </button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="starfield" id="starfield"></div>
+  <div class="hero-bg"></div>
+  <div class="hero-inner">
+    <div class="hero-badge">
+      <div class="hero-badge-dot"></div>
+      NANOGrav 15-year Data Set
+    </div>
+    <h1 class="hero-title">The <em>Hellings–Downs</em> Signal in Pulsar Timing Data</h1>
+    <p class="hero-subtitle">
+      Reconstructing the gravitational-wave background detection — the way NANOGrav did it — 
+      watching the quadrupolar correlation curve emerge, pair by pair, from data that shows 
+      nothing in any single pulsar.
+    </p>
+    <div class="hero-ctas">
+      <a href="https://github.com/meamresh/hd-pta" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+        View on GitHub
+      </a>
+      <a href="#pipeline" class="btn btn-ghost">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+        How it Works
+      </a>
+      <a href="#run" class="btn btn-ghost">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Quick Start
+      </a>
+    </div>
+  </div>
+  <div class="hero-scroll">
+    <div class="hero-scroll-line"></div>
+    Scroll to explore
+  </div>
+</section>
+
+<!-- WHAT IS THIS -->
+<section class="section" id="what">
+  <div class="section-inner">
+    <div class="section-label">Overview</div>
+    <h2 class="section-heading">Two Pulsars Know Nothing.<br>Two Thousand Know Everything.</h2>
+    <p class="section-sub">
+      A GW background imprints no signal on any individual pulsar — only on the 
+      <em>correlations</em> between pairs. This project makes that emergence visible.
+    </p>
+
+    <div class="what-grid">
+      <div class="what-text">
+        <p>
+          A pulsar timing array detects a gravitational-wave background not in any 
+          individual pulsar, but in the <strong>correlations between pairs of pulsars</strong>. 
+          A real GW background imprints a specific quadrupolar pattern — the 
+          <strong>Hellings–Downs curve</strong> — on how strongly two pulsars' timing 
+          residuals correlate as a function of the angle between them.
+        </p>
+        <p>
+          No clock error, ephemeris error, or per-pulsar noise process can imitate 
+          that shape. This is what makes the NANOGrav 15-year result a genuine 
+          detection and not a systematic artifact.
+        </p>
+        <p>
+          This repository does two things: first, it <strong>injects</strong> a known 
+          GWB plus NANOGrav-realistic noise into 67 synthetic pulsars and recovers the 
+          HD curve from scratch. Second, it runs the NANOGrav collaboration's own 
+          optimal-statistic code on the <strong>real 15-year data</strong> — the real 
+          white-noise parameters and the real MCMC presampled chain.
+        </p>
+      </div>
+
+      <div>
+        <div class="what-diagram">
+          <div class="diagram-title">67 Pulsars → 2,211 Pairs</div>
+          <div class="pulsar-grid" id="pulsarGrid"></div>
+          <div class="diagram-note">
+            Each dot is a pulsar. Highlighted pairs contribute a single
+            cross-correlation estimate ρ<sub>ab</sub> — the building block of the HD curve.
+            With N = 67 pulsars, you get N(N−1)/2 = 2,211 such estimates.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- PIPELINE -->
+<section class="section" id="pipeline">
+  <div class="section-inner">
+    <div class="section-label">Signal Processing Chain</div>
+    <h2 class="section-heading">From Raw Residuals<br>to Detection</h2>
+    <p class="section-sub">
+      The pipeline follows the genuine NANOGrav methodology, step by step.
+      See <a href="https://github.com/meamresh/hd-pta/blob/main/docs/METHODS.md" 
+      target="_blank" rel="noopener noreferrer" style="color:var(--color-primary);text-decoration:underline;text-underline-offset:3px;">docs/METHODS.md</a>
+      for the full physics and statistics walkthrough.
+    </p>
+
+    <div class="pipeline">
+      <div class="pipeline-step">
+        <div class="step-number">01</div>
+        <div class="step-content">
+          <h3>Timing-Model Projection</h3>
+          <p>Each pulsar's residuals still carry spin, astrometric, and binary parameters. These are removed analytically by projecting onto the null space of the timing-model design matrix — the same linear operation <code style="font-size:0.9em;color:var(--color-primary)">enterprise</code> performs internally.</p>
+        </div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-number">02</div>
+        <div class="step-content">
+          <h3>Frequency-Domain Reduction</h3>
+          <p>Pulsars are observed at different, irregular epochs, so residuals are projected onto a common Fourier basis, inverse-variance weighted by TOA uncertainties.</p>
+          <div class="step-formula">f_k = k / T_span,  k = 1 … 14</div>
+        </div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-number">03</div>
+        <div class="step-content">
+          <h3>Cross-Correlation &amp; Optimal Statistic</h3>
+          <p>For every pulsar pair, the optimal statistic forms a noise-marginalized estimate of the correlation ρ<sub>ab</sub>. This is an estimator of A² · Γ<sub>ab</sub>, where Γ<sub>ab</sub> is the Hellings–Downs value for that pair and A² the GW background amplitude.</p>
+          <div class="step-formula">ρ_ab  ≈  A²GWB · Γ_ab(θ_ab)</div>
+        </div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-number">04</div>
+        <div class="step-content">
+          <h3>Noise Marginalization</h3>
+          <p>The real intrinsic red noise of each pulsar is marginalized over using a presampled MCMC chain (<code style="font-size:0.9em;color:var(--color-primary)">curn_14f_pl_vg.core</code>) from the NANOGrav release. This step separates a genuine detection from an artifact.</p>
+        </div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-number">05</div>
+        <div class="step-content">
+          <h3>FFT Normalization (Simulation)</h3>
+          <p>Converting a power-spectral density to a time-domain realization requires careful FFT normalization. The simulation includes an assertion verifying that the realized RMS matches the integrated PSD — getting the factor of N wrong would silently rescale every noise component.</p>
+          <div class="step-formula">σ = sqrt( N · P(f) / (4 · dt) )</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- RESULTS -->
+<section class="section" id="results">
+  <div class="section-inner section-wide">
+    <div class="section-label">Results</div>
+    <h2 class="section-heading">The Curve Emerges</h2>
+    <p class="section-sub">Simulation and real-data results are consistent with the published NANOGrav 15-year detection.</p>
+
+    <div class="results-grid">
+      <div class="result-card">
+        <div class="result-card-label">Simulation</div>
+        <h3>67 Synthetic Pulsars</h3>
+        <p>Injects a known GWB + NANOGrav-realistic noise, then recovers the Hellings–Downs curve and amplitude posterior. Detection significance is higher than the real ~3.5–4σ because the noise model is known exactly — the idealized upper bound.</p>
+        <div class="result-stat">
+          <span class="result-stat-value">2.6×10⁻¹⁵</span>
+          <span class="result-stat-unit">A<sub>GWB</sub> recovered</span>
+        </div>
+      </div>
+
+      <div class="result-card">
+        <div class="result-card-label">Real NANOGrav Data</div>
+        <h3>Full 67-Pulsar Array</h3>
+        <p>Reproduces the published 2,211-pair Hellings–Downs detection at ~3.5–4σ on the real NANOGrav 15-year data, real white-noise parameters, and real presampled red-noise MCMC chain.</p>
+        <div class="result-stat">
+          <span class="result-stat-value">~3.5–4σ</span>
+          <span class="result-stat-unit">detection significance</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- HD Curve SVG -->
+    <div class="hd-curve-container">
+      <div class="hd-curve-title">Hellings–Downs Correlation Curve — Schematic</div>
+      <svg viewBox="0 0 700 260" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;">
+        <!-- Grid -->
+        <line x1="60" y1="20" x2="60" y2="230" stroke="currentColor" stroke-opacity="0.1" stroke-width="1"/>
+        <line x1="60" y1="230" x2="680" y2="230" stroke="currentColor" stroke-opacity="0.1" stroke-width="1"/>
+        <line x1="60" y1="130" x2="680" y2="130" stroke="currentColor" stroke-opacity="0.07" stroke-width="1" stroke-dasharray="4,6"/>
+        <line x1="220" y1="20" x2="220" y2="230" stroke="currentColor" stroke-opacity="0.07" stroke-width="1" stroke-dasharray="4,6"/>
+        <line x1="370" y1="20" x2="370" y2="230" stroke="currentColor" stroke-opacity="0.07" stroke-width="1" stroke-dasharray="4,6"/>
+        <line x1="530" y1="20" x2="530" y2="230" stroke="currentColor" stroke-opacity="0.07" stroke-width="1" stroke-dasharray="4,6"/>
+        <!-- Axis labels -->
+        <text x="60" y="250" fill="currentColor" opacity="0.4" font-size="10" text-anchor="middle">0°</text>
+        <text x="163" y="250" fill="currentColor" opacity="0.4" font-size="10" text-anchor="middle">30°</text>
+        <text x="267" y="250" fill="currentColor" opacity="0.4" font-size="10" text-anchor="middle">60°</text>
+        <text x="370" y="250" fill="currentColor" opacity="0.4" font-size="10" text-anchor="middle">90°</text>
+        <text x="473" y="250" fill="currentColor" opacity="0.4" font-size="10" text-anchor="middle">120°</text>
+        <text x="577" y="250" fill="currentColor" opacity="0.4" font-size="10" text-anchor="middle">150°</text>
+        <text x="680" y="250" fill="currentColor" opacity="0.4" font-size="10" text-anchor="middle">180°</text>
+        <text x="30" y="169" fill="currentColor" opacity="0.4" font-size="10" text-anchor="middle">0</text>
+        <text x="30" y="40" fill="currentColor" opacity="0.4" font-size="9" text-anchor="middle">+0.5</text>
+        <text x="30" y="207" fill="currentColor" opacity="0.4" font-size="9" text-anchor="middle">−0.15</text>
+        <!-- Axis titles -->
+        <text x="370" y="275" fill="currentColor" opacity="0.5" font-size="10" text-anchor="middle">Angular separation θ</text>
+        <text x="14" y="169" fill="currentColor" opacity="0.5" font-size="10" text-anchor="middle" transform="rotate(-90,14,169)">Correlation Γ(θ)</text>
+        <!-- Scatter points (simulated pair data) - generated to match HD mapping -->
+        <g id="hd-scatter" opacity="0.35" fill="currentColor"></g>
+          <!-- HD Curve (computed) -->
+          <path id="hd-curve-path" stroke="var(--color-primary)" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          <!-- Label -->
+          <text x="100" y="38" fill="var(--color-primary)" font-size="10" opacity="0.9">Hellings–Downs 1983</text>
+          <line id="hd-label-line" x1="165" y1="40" x2="178" y2="52" stroke="var(--color-primary)" stroke-width="1" opacity="0.6"/>
+      </svg>
+    </div>
+
+    <!-- Memory table -->
+    <div style="margin-top: var(--space-8);">
+      <div class="section-label" style="margin-bottom: var(--space-4);">Memory Scaling</div>
+      <p style="font-size: var(--text-sm); color: var(--color-text-muted); margin-bottom: var(--space-4); max-width: 54ch;">
+        S/N grows with the number of pulsar <em>pairs</em> (≈ N²). A subset genuinely yields 
+        a lower-significance curve — that is real physics, not a bug.
+      </p>
+      <table class="memory-table">
+        <thead>
+          <tr>
+            <th>Available RAM</th>
+            <th>Pulsars</th>
+            <th>Pairs</th>
+            <th>Significance</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>≥ 7.5 GB</td>
+            <td>67 (full)</td>
+            <td>2,211</td>
+            <td>~3.5–4σ</td>
+            <td><span class="badge-full">Published result</span></td>
+          </tr>
+          <tr>
+            <td>5–7.5 GB</td>
+            <td>45</td>
+            <td>990</td>
+            <td>reduced</td>
+            <td>Subset</td>
+          </tr>
+          <tr>
+            <td>3.5–5 GB</td>
+            <td>30</td>
+            <td>435</td>
+            <td>reduced</td>
+            <td>Subset</td>
+          </tr>
+          <tr>
+            <td>&lt; 3.5 GB</td>
+            <td>22</td>
+            <td>231</td>
+            <td>reduced</td>
+            <td>Minimum useful</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- HOW TO RUN -->
+<section class="section" id="run">
+  <div class="section-inner">
+    <div class="section-label">Quick Start</div>
+    <h2 class="section-heading">Running the Code</h2>
+    <p class="section-sub">Two paths: a self-contained simulation (~2 minutes, no data needed), and the full real-data pipeline with the NANOGrav 15-year dataset.</p>
+
+    <div class="run-tabs">
+      <button class="tab-btn active" onclick="switchTab('sim', this)">Simulation only</button>
+      <button class="tab-btn" onclick="switchTab('real', this)">Real NANOGrav data</button>
+      <button class="tab-btn" onclick="switchTab('colab', this)">Colab notebook</button>
+    </div>
+
+    <div class="tab-panel active" id="tab-sim">
+      <div class="code-block">
+        <button class="copy-btn" onclick="copyCode('tab-sim')">Copy</button>
+        <span class="code-comment"># No external data required — ~2 minutes</span><br>
+        <span class="code-cmd">git clone </span><span class="code-arg">https://github.com/meamresh/hd-pta.git</span><br>
+        <span class="code-cmd">cd </span><span class="code-arg">hd-pta</span><br>
+        <span class="code-cmd">pip install </span><span class="code-arg">-r requirements.txt</span><br><br>
+        <span class="code-comment"># Run simulation → figures/hd_simulation.png</span><br>
+        <span class="code-cmd">python </span><span class="code-arg">src/simulate_hd.py</span><br><br>
+        <span class="code-comment"># Animate pair-by-pair emergence → figures/hd_emergence_sim.gif</span><br>
+        <span class="code-cmd">python </span><span class="code-arg">src/animate_hd.py --sim</span><br><br>
+        <span class="code-comment"># Animate growing array (6 → 67 pulsars) → figures/hd_growing_array_sim.gif</span><br>
+        <span class="code-cmd">python </span><span class="code-arg">src/animate_npsr.py --sim</span>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="tab-real">
+      <div class="code-block">
+        <button class="copy-btn" onclick="copyCode('tab-real')">Copy</button>
+        <span class="code-comment"># System dependency for scikit-sparse</span><br>
+        <span class="code-cmd">sudo apt-get install </span><span class="code-arg">libsuitesparse-dev</span><span class="code-comment">  # Debian/Ubuntu</span><br>
+        <span class="code-comment"># brew install suite-sparse              # macOS</span><br><br>
+        <span class="code-cmd">pip install </span><span class="code-arg">-r requirements.txt</span><br>
+        <span class="code-cmd">pip install </span><span class="code-arg">pandas pyarrow enterprise-pulsar "enterprise_extensions>=3.0.2" la_forge</span><br><br>
+        <span class="code-comment"># Fetch real NANOGrav 15-year data</span><br>
+        <span class="code-cmd">./setup.sh</span><br><br>
+        <span class="code-comment"># Run optimal statistic → results/ng15_real_os.npz</span><br>
+        <span class="code-cmd">python </span><span class="code-arg">src/ng15_optimal_statistic.py</span><br><br>
+        <span class="code-comment"># Animate real-data emergence</span><br>
+        <span class="code-cmd">python </span><span class="code-arg">src/animate_hd.py --real</span><br>
+        <span class="code-cmd">python </span><span class="code-arg">src/animate_npsr.py --real</span>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="tab-colab">
+      <div class="code-block" style="display:flex;align-items:center;gap:var(--space-4);">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="var(--color-primary)"><path d="M16.942 5.556A8 8 0 1 0 12 20a8 8 0 0 0 8-8h-3a5 5 0 1 1-2.647-4.44l-2.06 2.06a2 2 0 1 0 2.829 2.829l4.95-4.95a7.963 7.963 0 0 0-5.13-1.943z"/></svg>
+        <div>
+          <div style="font-weight:600;margin-bottom:var(--space-1);">Open in Google Colab</div>
+          <div style="font-size:var(--text-sm);color:var(--color-text-muted);margin-bottom:var(--space-3);">
+            Full real-data run, installs everything via conda, sufficient RAM for all 67 pulsars. Run top to bottom (~20–40 min).
+          </div>
+          <a href="https://github.com/meamresh/hd-pta/blob/main/notebooks/run_on_colab.ipynb" target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="font-size:var(--text-xs);">
+            Open notebooks/run_on_colab.ipynb →
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- File tree -->
+    <div style="margin-top: var(--space-10);">
+      <div class="section-label" style="margin-bottom: var(--space-4);">Repository Layout</div>
+      <div class="file-tree">
+        <span class="tree-dir">hd-pta/</span><br>
+        ├── <span class="tree-file">README.md</span><br>
+        ├── <span class="tree-file">requirements.txt</span><br>
+        ├── <span class="tree-file">setup.sh</span>       <span class="tree-comment">← fetch real NANOGrav data</span><br>
+        ├── <span class="tree-dir">src/</span><br>
+        │   ├── <span class="tree-file">simulate_hd.py</span>             <span class="tree-comment">← simulation + summary figure</span><br>
+        │   ├── <span class="tree-file">ng15_optimal_statistic.py</span>  <span class="tree-comment">← real NANOGrav optimal statistic</span><br>
+        │   ├── <span class="tree-file">animate_hd.py</span>              <span class="tree-comment">← pair-by-pair animation</span><br>
+        │   └── <span class="tree-file">animate_npsr.py</span>            <span class="tree-comment">← growing array animation</span><br>
+        ├── <span class="tree-dir">notebooks/</span><br>
+        │   └── <span class="tree-file">run_on_colab.ipynb</span>         <span class="tree-comment">← full real-data run on Colab</span><br>
+        ├── <span class="tree-dir">docs/</span><br>
+        │   ├── <span class="tree-file">METHODS.md</span>                 <span class="tree-comment">← physics + statistics walkthrough</span><br>
+        │   └── <span class="tree-dir">examples/</span>                   <span class="tree-comment">← example output figures</span><br>
+        ├── <span class="tree-dir">figures/</span>                        <span class="tree-comment">← generated figures (gitignored)</span><br>
+        └── <span class="tree-dir">results/</span>                        <span class="tree-comment">← .npz outputs (gitignored)</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- CITATIONS -->
+<section class="section" id="cite">
+  <div class="section-inner">
+    <div class="section-label">Data &amp; Citations</div>
+    <h2 class="section-heading">Attribution</h2>
+    <p class="section-sub">This repository contains no NANOGrav data. <code style="color:var(--color-primary)">setup.sh</code> downloads it from the NANOGrav collaboration's public repository. If you use the data, please cite:</p>
+
+    <ul class="citation-list">
+      <li class="citation-item">
+        <div class="citation-num">1</div>
+        <div>
+          <div>Agazie et al. 2023 — <em>The NANOGrav 15-year Data Set: Evidence for a Gravitational-Wave Background</em></div>
+          <div class="citation-meta"><a href="https://doi.org/10.3847/2041-8213/acdac6" target="_blank" rel="noopener noreferrer">ApJL 951 L8 · doi:10.3847/2041-8213/acdac6</a></div>
+        </div>
+      </li>
+      <li class="citation-item">
+        <div class="citation-num">2</div>
+        <div>
+          <div>Agazie et al. 2023 — <em>The NANOGrav 15-year Data Set: Observations and Timing of 68 Millisecond Pulsars</em></div>
+          <div class="citation-meta"><a href="https://doi.org/10.3847/2041-8213/acda9a" target="_blank" rel="noopener noreferrer">ApJL 951 L9 · doi:10.3847/2041-8213/acda9a</a></div>
+        </div>
+      </li>
+      <li class="citation-item">
+        <div class="citation-num">3</div>
+        <div>
+          <div>NANOGrav 15-year data set — Zenodo</div>
+          <div class="citation-meta"><a href="https://doi.org/10.5281/zenodo.8423265" target="_blank" rel="noopener noreferrer">doi:10.5281/zenodo.8423265</a></div>
+        </div>
+      </li>
+      <li class="citation-item">
+        <div class="citation-num">4</div>
+        <div>
+          <div>Hellings &amp; Downs 1983 — <em>Upper limits on the isotropic gravitational radiation background from pulsar timing analysis</em></div>
+          <div class="citation-meta">ApJL 265 L39</div>
+        </div>
+      </li>
+      <li class="citation-item">
+        <div class="citation-num">5</div>
+        <div>
+          <div>Optimal-statistic code — <code style="color:var(--color-primary)">enterprise_extensions</code></div>
+          <div class="citation-meta"><a href="https://github.com/nanograv/enterprise_extensions" target="_blank" rel="noopener noreferrer">github.com/nanograv/enterprise_extensions</a></div>
+        </div>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-author">Amresh Verma</div>
+    <div class="footer-sub">PhD Researcher in Cosmology · Ariel University</div>
+    <div class="footer-links">
+      <a href="https://meamresh.github.io" target="_blank" rel="noopener noreferrer" class="footer-link">Homepage</a>
+      <a href="https://github.com/meamresh/hd-pta" target="_blank" rel="noopener noreferrer" class="footer-link">GitHub Repo</a>
+      <a href="https://github.com/meamresh/hd-pta/blob/main/docs/METHODS.md" target="_blank" rel="noopener noreferrer" class="footer-link">Methods</a>
+      <a href="#cite" class="footer-link">Citations</a>
+    </div>
+    <div class="footer-copy">MIT License · Code only, not NANOGrav data</div>
+  </div>
+</footer>
+
+<script>
+// Theme toggle
+(function(){
+  const t = document.querySelector('[data-theme-toggle]');
+  const r = document.documentElement;
+  let d = r.getAttribute('data-theme') || (matchMedia('(prefers-color-scheme:dark)').matches ? 'dark' : 'light');
+  r.setAttribute('data-theme', d);
+  function updateIcon() {
+    if (!t) return;
+    t.innerHTML = d === 'dark'
+      ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>'
+      : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+  }
+  updateIcon();
+  t && t.addEventListener('click', () => {
+    d = d === 'dark' ? 'light' : 'dark';
+    r.setAttribute('data-theme', d);
+    updateIcon();
+  });
+})();
+
+// Starfield
+(function() {
+  const sf = document.getElementById('starfield');
+  if (!sf) return;
+  for (let i = 0; i < 80; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    const size = Math.random() < 0.8 ? 1 : Math.random() < 0.9 ? 2 : 3;
+    s.style.cssText = `
+      width:${size}px; height:${size}px;
+      left:${Math.random()*100}%; top:${Math.random()*100}%;
+      --dur:${3 + Math.random()*5}s;
+      --delay:${Math.random()*5}s;
+      --max-op:${0.2 + Math.random()*0.5};
+    `;
+    sf.appendChild(s);
+  }
+})();
+
+// Pulsar grid
+(function() {
+  const grid = document.getElementById('pulsarGrid');
+  if (!grid) return;
+  const activeSet = new Set([2,5,8,9,14,18,22,26,30,33,37,40,41,44,48]);
+  for (let i = 0; i < 49; i++) {
+    const d = document.createElement('div');
+    d.className = 'pulsar-dot' + (activeSet.has(i) ? ' active' : '');
+    grid.appendChild(d);
+  }
+})();
+
+// Tabs
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// Copy code
+function copyCode(panelId) {
+  const panel = document.getElementById(panelId);
+  const lines = panel.querySelectorAll('span:not(.copy-btn *)');
+  let text = '';
+  panel.querySelectorAll('br').forEach(() => {});
+  text = panel.innerText.replace(/^Copy\n/, '').trim();
+  navigator.clipboard && navigator.clipboard.writeText(text);
+  const btn = panel.querySelector('.copy-btn');
+  if (btn) { btn.textContent = 'Copied!'; setTimeout(() => btn.textContent = 'Copy', 2000); }
+}
+
+// Scroll-reveal
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.style.opacity = '1';
+      e.target.style.transform = 'translateY(0)';
+      observer.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.1 });
+document.querySelectorAll('.result-card, .pipeline-step, .citation-item').forEach(el => {
+  el.style.opacity = '0';
+  el.style.transform = 'translateY(16px)';
+  el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+  observer.observe(el);
+});
+
+// Draw accurate Hellings–Downs curve into the SVG
+;(function drawHD() {
+  const svg = document.querySelector('.hd-curve-container svg');
+  if (!svg) return;
+  const pathEl = document.getElementById('hd-curve-path');
+  if (!pathEl) return;
+  // SVG mapping
+  const xMin = 60, xMax = 680; // degrees 0..180
+  const yTop = 40, yBottom = 220; // visual range for values ~ -0.2 .. +0.5
+  const vTop = 0.5, vBottom = -0.2;
+  const m = (yBottom - yTop) / (vBottom - vTop);
+  const c = yTop - m * vTop;
+
+  function mapX(deg) { return xMin + (deg / 180) * (xMax - xMin); }
+  function mapY(val) { return m * val + c; }
+
+  function hd(theta) {
+    let x = (1 - Math.cos(theta)) / 2;
+    x = Math.max(x, 1e-12);
+    return 1.5 * x * Math.log(x) - 0.25 * x + 0.5;
+  }
+
+  const N = 200;
+  let d = '';
+  for (let i = 0; i <= N; i++) {
+    const theta = (i / N) * Math.PI;
+    const deg = theta * 180 / Math.PI;
+    const val = hd(theta);
+    const x = mapX(deg);
+    const y = mapY(val);
+    d += (i === 0 ? 'M ' : ' L ') + x.toFixed(3) + ' ' + y.toFixed(3);
+  }
+  pathEl.setAttribute('d', d);
+})();
+
+// Generate a representative scatter of pairwise points aligned to the
+// same SVG mapping so vertical positions match the HD curve.
+;(function drawScatter() {
+  const g = document.getElementById('hd-scatter');
+  if (!g) return;
+  const xMin = 60, xMax = 680;
+  const yTop = 40, yBottom = 220;
+  const vTop = 0.5, vBottom = -0.2;
+  const m = (yBottom - yTop) / (vBottom - vTop);
+  const c = yTop - m * vTop;
+  function mapX(deg) { return xMin + (deg / 180) * (xMax - xMin); }
+  function mapY(val) { return m * val + c; }
+  function hd(theta) {
+    let x = (1 - Math.cos(theta)) / 2;
+    x = Math.max(x, 1e-12);
+    return 1.5 * x * Math.log(x) - 0.25 * x + 0.5;
+  }
+  // small RNG
+  function gauss(rand) {
+    let u = 0, v = 0;
+    while(u === 0) u = Math.random();
+    while(v === 0) v = Math.random();
+    return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+  }
+  const N = 70;
+  for (let i = 0; i < N; i++) {
+    const deg = Math.random() * 180;
+    const theta = deg * Math.PI / 180;
+    // model scatter: HD(theta) + noise with sigma ~0.12
+    const noise = 0.12 * gauss();
+    const val = hd(theta) + noise;
+    const cx = mapX(deg);
+    const cy = mapY(val);
+    const r = Math.random() < 0.6 ? 2 : 2.5;
+    const circ = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    circ.setAttribute('cx', cx);
+    circ.setAttribute('cy', cy);
+    circ.setAttribute('r', r);
+    g.appendChild(circ);
+  }
+})();
+</script>
+
+</body>
+</html>
