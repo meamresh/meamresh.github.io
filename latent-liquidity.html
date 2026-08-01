@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script>(function(){try{if(localStorage.getItem('ll-theme')==='dark')document.documentElement.setAttribute('data-theme','dark');}catch(e){}})();</script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Latent Liquidity · Crisis Dashboard</title>
@@ -26,6 +27,24 @@
       --accent4:   #6a4fa0;
       --amber:     #a5741b;
     }
+    :root[data-theme="dark"] {
+      --bg:        #04080f;
+      --surface-1: #080f1e;
+      --surface-2: #0c1528;
+      --border:    rgba(100,150,255,0.10);
+      --border-hi: rgba(100,180,255,0.22);
+      --text:      #dce9ff;
+      --text2:     #b8cce8;
+      --muted:     #6a85b0;
+      --dim:       #374b6d;
+      --accent:    #3ec6ff;
+      --accent-d:  #7dd8ff;
+      --accent2:   #ff7c5c;
+      --accent3:   #5cf5b2;
+      --accent4:   #b88dff;
+      --amber:     #f6c344;
+    }
+    [data-theme="dark"] .paper, [data-theme="dark"] .modal-inner { box-shadow: none; }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
     body {
@@ -36,6 +55,7 @@
       line-height: 1.6;
       -webkit-font-smoothing: antialiased;
       padding-bottom: 40px;
+      transition: background-color .2s ease, color .2s ease;
     }
     .shell { max-width: 1160px; margin: 0 auto; padding: 0 32px; }
 
@@ -51,6 +71,8 @@
       height: 62px; display: flex; align-items: center; justify-content: space-between;
     }
     .nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .nav-actions { display: flex; align-items: center; gap: 10px; }
+    .theme-toggle { min-width: 60px; text-align: center; }
     .nav-mark {
       width: 26px; height: 26px; border-radius: 6px; background: var(--accent);
       display: flex; align-items: center; justify-content: center;
@@ -271,9 +293,12 @@
         <a href="#signal">Signal</a>
         <a href="#stress">Stress</a>
         <a href="#gallery">Gallery</a>
-        <a href="#reproduce">Reproduce</a>
+        <a href="strategy.html">Strategy</a>
       </div>
-      <a class="btn" href="https://github.com/meamresh/latent_liquidity_quant" target="_blank" rel="noreferrer">View source ↗</a>
+      <div class="nav-actions">
+        <button class="btn theme-toggle" id="themeToggle" type="button">Dark</button>
+        <a class="btn" href="https://github.com/meamresh/latent_liquidity_quant" target="_blank" rel="noreferrer">View source ↗</a>
+      </div>
     </div>
   </nav>
 
@@ -291,6 +316,7 @@
       </p>
       <div class="hero-actions">
         <a class="btn primary" href="https://github.com/meamresh/latent_liquidity_quant/blob/main/paper/latent_liquidity_quant.pdf" target="_blank" rel="noreferrer">Read the paper →</a>
+        <a class="btn" href="strategy.html">Strategy &amp; PnL →</a>
         <a class="btn" href="results.html">DPF vs BPF Results →</a>
         <a class="btn" href="theory-methods.html">Theory &amp; Methods →</a>
       </div>
@@ -577,7 +603,8 @@
       </div>
       <div>
         <a href="theory-methods.html">Theory →</a> &nbsp;·&nbsp;
-        <a href="results.html">Results →</a>
+        <a href="results.html">Results →</a> &nbsp;·&nbsp;
+        <a href="strategy.html">Strategy →</a>
       </div>
     </footer>
   </div>
@@ -597,18 +624,31 @@ document.addEventListener("DOMContentLoaded", () => {
   let dpfRaw = null, bpfRaw = null;
   let mode = 'dpf';
 
-  const layout = (extra={}) => ({
-    margin: { t:10, r:55, l:55, b:40 },
-    hovermode: 'x unified',
-    paper_bgcolor: 'rgba(0,0,0,0)',
-    plot_bgcolor:  'rgba(0,0,0,0)',
-    font: { family:"'IBM Plex Mono',monospace", color:'#5e636b', size:11 },
-    xaxis: { gridcolor:'rgba(26,28,32,0.08)', linecolor:'rgba(26,28,32,0.16)', tickcolor:'rgba(26,28,32,0.16)' },
-    yaxis: { gridcolor:'rgba(26,28,32,0.08)', linecolor:'rgba(26,28,32,0.16)', tickcolor:'rgba(26,28,32,0.16)' },
-    legend: { bgcolor:'rgba(0,0,0,0)', font:{ color:'#33363c' } },
-    hoverlabel: { bgcolor:'#ffffff', bordercolor:'rgba(31,95,168,0.3)', font:{ family:"'IBM Plex Mono',monospace", color:'#1a1c20', size:11 } },
-    ...extra
-  });
+  const PALETTE = {
+    light: { muted:'#5e636b', text2:'#33363c', ink:'#1a1c20', gridA:'rgba(26,28,32,0.08)', gridB:'rgba(26,28,32,0.16)', hoverBg:'#ffffff', hoverBorder:'rgba(31,95,168,0.3)',
+      dpf:'#1f5fa8', dpfFillProb:'rgba(31,95,168,0.08)', dpfFillCI:'rgba(31,95,168,0.10)', bpf:'#a5741b', bpfFillProb:'rgba(165,116,27,0.06)',
+      threshold:'rgba(187,59,53,0.45)', tailBar:'rgba(187,59,53,0.25)', stressThreshold:'rgba(26,127,90,0.5)', violet:'#6a4fa0' },
+    dark: { muted:'#6a85b0', text2:'#b8cce8', ink:'#dce9ff', gridA:'rgba(100,150,255,0.10)', gridB:'rgba(100,180,255,0.18)', hoverBg:'#0c1528', hoverBorder:'rgba(100,180,255,0.3)',
+      dpf:'#3ec6ff', dpfFillProb:'rgba(62,198,255,0.08)', dpfFillCI:'rgba(62,198,255,0.10)', bpf:'#f6c344', bpfFillProb:'rgba(246,195,68,0.06)',
+      threshold:'rgba(255,124,92,0.4)', tailBar:'rgba(255,124,92,0.25)', stressThreshold:'rgba(92,245,178,0.45)', violet:'#b88dff' }
+  };
+  const pal = () => document.documentElement.getAttribute('data-theme') === 'dark' ? PALETTE.dark : PALETTE.light;
+
+  const layout = (extra={}) => {
+    const p = pal();
+    return {
+      margin: { t:10, r:55, l:55, b:40 },
+      hovermode: 'x unified',
+      paper_bgcolor: 'rgba(0,0,0,0)',
+      plot_bgcolor:  'rgba(0,0,0,0)',
+      font: { family:"'IBM Plex Mono',monospace", color:p.muted, size:11 },
+      xaxis: { gridcolor:p.gridA, linecolor:p.gridB, tickcolor:p.gridB },
+      yaxis: { gridcolor:p.gridA, linecolor:p.gridB, tickcolor:p.gridB },
+      legend: { bgcolor:'rgba(0,0,0,0)', font:{ color:p.text2 } },
+      hoverlabel: { bgcolor:p.hoverBg, bordercolor:p.hoverBorder, font:{ family:"'IBM Plex Mono',monospace", color:p.ink, size:11 } },
+      ...extra
+    };
+  };
 
   function slice(raw, s, e) {
     const sm = s ? new Date(s).getTime() : -Infinity;
@@ -618,7 +658,11 @@ document.addEventListener("DOMContentLoaded", () => {
     return { dates:p(raw.dates), crisis:p(raw.crisis_prob), L:p(raw.L_mean), L05:p(raw.L_q05), L95:p(raw.L_q95), tail:p(raw.P_L_gt_2), h:p(raw.h_mean), z:p(raw.z_mean) };
   }
 
+  let lastStart = '', lastEnd = '';
+
   function plotAll(start, end) {
+    lastStart = start; lastEnd = end;
+    const p = pal();
     const dpf = dpfRaw ? slice(dpfRaw, start, end) : null;
     const bpf = bpfRaw ? slice(bpfRaw, start, end) : null;
     const d = mode==='bpf' ? bpf : dpf;
@@ -635,39 +679,41 @@ document.addEventListener("DOMContentLoaded", () => {
     // Crisis prob
     const probTraces = [];
     if ((mode==='dpf'||mode==='both') && dpf) {
-      probTraces.push({ x:dpf.dates, y:dpf.crisis, type:'scatter', mode:'lines', fill:'tozeroy', fillcolor:'rgba(31,95,168,0.08)', line:{color:'#1f5fa8',width:2}, name:'DPF crisis prob', hovertemplate:'<b>%{x}</b><br>DPF: %{y:.3f}<extra></extra>' });
+      probTraces.push({ x:dpf.dates, y:dpf.crisis, type:'scatter', mode:'lines', fill:'tozeroy', fillcolor:p.dpfFillProb, line:{color:p.dpf,width:2}, name:'DPF crisis prob', hovertemplate:'<b>%{x}</b><br>DPF: %{y:.3f}<extra></extra>' });
     }
     if ((mode==='bpf'||mode==='both') && bpf) {
-      probTraces.push({ x:bpf.dates, y:bpf.crisis, type:'scatter', mode:'lines', fill:'tozeroy', fillcolor:'rgba(165,116,27,0.06)', line:{color:'#a5741b',width:2,dash:mode==='both'?'dot':'solid'}, name:'BPF crisis prob', hovertemplate:'BPF: %{y:.3f}<extra></extra>' });
+      probTraces.push({ x:bpf.dates, y:bpf.crisis, type:'scatter', mode:'lines', fill:'tozeroy', fillcolor:p.bpfFillProb, line:{color:p.bpf,width:2,dash:mode==='both'?'dot':'solid'}, name:'BPF crisis prob', hovertemplate:'BPF: %{y:.3f}<extra></extra>' });
     }
-    Plotly.newPlot('probPlot', probTraces, layout({ yaxis:{title:'Probability',range:[0,1.05]}, shapes:[{ type:'line', x0:d.dates[0], x1:d.dates[d.dates.length-1], y0:0.5, y1:0.5, line:{dash:'dot',color:'rgba(187,59,53,0.45)',width:1.5} }] }), {responsive:true});
+    Plotly.newPlot('probPlot', probTraces, layout({ yaxis:{title:'Probability',range:[0,1.05]}, shapes:[{ type:'line', x0:d.dates[0], x1:d.dates[d.dates.length-1], y0:0.5, y1:0.5, line:{dash:'dot',color:p.threshold,width:1.5} }] }), {responsive:true});
 
     // Stress
     const stressTraces = [];
     if ((mode==='dpf'||mode==='both') && dpf) {
       stressTraces.push(
-        { x:dpf.dates, y:dpf.L95, type:'scatter', mode:'lines', line:{color:'rgba(31,95,168,0)'}, showlegend:false, hoverinfo:'skip' },
-        { x:dpf.dates, y:dpf.L05, type:'scatter', mode:'lines', fill:'tonexty', fillcolor:'rgba(31,95,168,0.10)', line:{color:'rgba(31,95,168,0)'}, showlegend:false, hoverinfo:'skip' },
-        { x:dpf.dates, y:dpf.L, type:'scatter', mode:'lines', line:{color:'#1f5fa8',width:2}, name:'DPF L_t', hovertemplate:'<b>%{x}</b><br>L_t: %{y:.3f}<extra></extra>' }
+        { x:dpf.dates, y:dpf.L95, type:'scatter', mode:'lines', line:{color:'rgba(0,0,0,0)'}, showlegend:false, hoverinfo:'skip' },
+        { x:dpf.dates, y:dpf.L05, type:'scatter', mode:'lines', fill:'tonexty', fillcolor:p.dpfFillCI, line:{color:'rgba(0,0,0,0)'}, showlegend:false, hoverinfo:'skip' },
+        { x:dpf.dates, y:dpf.L, type:'scatter', mode:'lines', line:{color:p.dpf,width:2}, name:'DPF L_t', hovertemplate:'<b>%{x}</b><br>L_t: %{y:.3f}<extra></extra>' }
       );
     }
     if ((mode==='bpf'||mode==='both') && bpf) {
       stressTraces.push(
-        { x:bpf.dates, y:bpf.L, type:'scatter', mode:'lines', line:{color:'#a5741b',width:2,dash:mode==='both'?'dot':'solid'}, name:'BPF L_t', hovertemplate:'BPF L_t: %{y:.3f}<extra></extra>' }
+        { x:bpf.dates, y:bpf.L, type:'scatter', mode:'lines', line:{color:p.bpf,width:2,dash:mode==='both'?'dot':'solid'}, name:'BPF L_t', hovertemplate:'BPF L_t: %{y:.3f}<extra></extra>' }
       );
     }
     if (d.tail) {
-      stressTraces.push({ x:d.dates, y:d.tail, type:'bar', marker:{color:'rgba(187,59,53,0.25)',line:{width:0}}, name:'P(L>2)', yaxis:'y2', hovertemplate:'P(L>2): %{y:.3f}<extra></extra>' });
+      stressTraces.push({ x:d.dates, y:d.tail, type:'bar', marker:{color:p.tailBar,line:{width:0}}, name:'P(L>2)', yaxis:'y2', hovertemplate:'P(L>2): %{y:.3f}<extra></extra>' });
     }
-    Plotly.newPlot('stressPlot', stressTraces, layout({ yaxis:{title:'L_t'}, yaxis2:{title:'Tail prob',overlaying:'y',side:'right',range:[0,1.05],gridcolor:'rgba(0,0,0,0)'}, shapes:[{ type:'line', x0:d.dates[0], x1:d.dates[d.dates.length-1], y0:2, y1:2, line:{dash:'dot',color:'rgba(26,127,90,0.5)',width:1.5} }], bargap:0 }), {responsive:true});
+    Plotly.newPlot('stressPlot', stressTraces, layout({ yaxis:{title:'L_t'}, yaxis2:{title:'Tail prob',overlaying:'y',side:'right',range:[0,1.05],gridcolor:'rgba(0,0,0,0)'}, shapes:[{ type:'line', x0:d.dates[0], x1:d.dates[d.dates.length-1], y0:2, y1:2, line:{dash:'dot',color:p.stressThreshold,width:1.5} }], bargap:0 }), {responsive:true});
 
     // Latent (always DPF if available)
     const src = dpf || bpf;
     Plotly.newPlot('latentPlot', [
-      { x:src.dates, y:src.h, type:'scatter', mode:'lines', line:{color:'#6a4fa0',width:2}, name:'h_t (log-vol)', hovertemplate:'<b>%{x}</b><br>h: %{y:.3f}<extra></extra>' },
-      { x:src.dates, y:src.z, type:'scatter', mode:'lines', line:{color:'#a5741b',width:2}, name:'z_t (corr. driver)', hovertemplate:'z: %{y:.3f}<extra></extra>' }
+      { x:src.dates, y:src.h, type:'scatter', mode:'lines', line:{color:p.violet,width:2}, name:'h_t (log-vol)', hovertemplate:'<b>%{x}</b><br>h: %{y:.3f}<extra></extra>' },
+      { x:src.dates, y:src.z, type:'scatter', mode:'lines', line:{color:p.bpf,width:2}, name:'z_t (corr. driver)', hovertemplate:'z: %{y:.3f}<extra></extra>' }
     ], layout(), {responsive:true});
   }
+
+  window.llRefreshTheme = () => plotAll(lastStart, lastEnd);
 
   async function init() {
     try {
@@ -721,6 +767,22 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById('modal').addEventListener('click', e => { if(e.target.id==='modal') hide(); });
   window.addEventListener('keydown', e => { if(e.key==='Escape') hide(); });
 });
+
+(function() {
+  const KEY = 'll-theme';
+  const btn = document.getElementById('themeToggle');
+  function apply(theme) {
+    if (theme === 'dark') { document.documentElement.setAttribute('data-theme', 'dark'); btn.textContent = 'Light'; }
+    else { document.documentElement.removeAttribute('data-theme'); btn.textContent = 'Dark'; }
+    if (window.llRefreshTheme) window.llRefreshTheme();
+  }
+  apply(localStorage.getItem(KEY) === 'dark' ? 'dark' : 'light');
+  btn.addEventListener('click', () => {
+    const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    localStorage.setItem(KEY, next);
+    apply(next);
+  });
+})();
 </script>
 </body>
 </html>

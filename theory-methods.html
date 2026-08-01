@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script>(function(){try{if(localStorage.getItem('ll-theme')==='dark')document.documentElement.setAttribute('data-theme','dark');}catch(e){}})();</script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Theory &amp; Methods · Latent Liquidity</title>
@@ -11,15 +12,19 @@
   <link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     :root{--bg:#f6f5f1;--surface-1:#ffffff;--surface-2:#fbfaf7;--border:#e7e4db;--border-hi:#d6d2c6;--text:#1a1c20;--text2:#33363c;--muted:#5e636b;--dim:#9a9d9f;--accent:#1f5fa8;--accent-d:#173f6e;--accent2:#bb3b35;--accent3:#1a7f5a;--accent4:#6a4fa0;--amber:#a5741b;}
+    :root[data-theme="dark"]{--bg:#04080f;--surface-1:#080f1e;--surface-2:#0c1528;--border:rgba(100,150,255,0.10);--border-hi:rgba(100,180,255,0.22);--text:#dce9ff;--text2:#b8cce8;--muted:#6a85b0;--dim:#374b6d;--accent:#3ec6ff;--accent-d:#7dd8ff;--accent2:#ff7c5c;--accent3:#5cf5b2;--accent4:#b88dff;--amber:#f6c344;}
+    [data-theme="dark"] .paper{box-shadow:none;}
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
     html{scroll-behavior:smooth;}
-    body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.7;-webkit-font-smoothing:antialiased;padding-bottom:40px;}
+    body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.7;-webkit-font-smoothing:antialiased;padding-bottom:40px;transition:background-color .2s ease,color .2s ease;}
     .shell{max-width:860px;margin:0 auto;padding:0 32px;}
 
     /* NAV */
     .nav{position:sticky;top:0;z-index:30;background:rgba(246,245,241,.88);backdrop-filter:blur(8px);border-bottom:1px solid var(--border);}
     .nav-in{max-width:1160px;margin:0 auto;padding:0 32px;height:62px;display:flex;align-items:center;justify-content:space-between;}
     .nav-brand{display:flex;align-items:center;gap:10px;text-decoration:none;}
+    .nav-actions{display:flex;align-items:center;gap:10px;}
+    .theme-toggle{min-width:60px;text-align:center;}
     .nav-mark{width:26px;height:26px;border-radius:6px;background:var(--accent);display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Newsreader',serif;font-weight:600;font-size:13px;}
     .nav-word{font-family:'Newsreader',Georgia,serif;font-weight:600;font-size:1.05rem;color:var(--text);}
     .nav-links{display:flex;align-items:center;gap:26px;}
@@ -125,10 +130,13 @@
       <div class="nav-links">
         <a href="latent-liquidity.html">Dashboard</a>
         <a href="results.html">Results</a>
-        <a href="#sec-filters">Filters</a>
+        <a href="strategy.html">Strategy</a>
         <a href="#sec-params">Parameters</a>
       </div>
-      <a class="btn" href="https://github.com/meamresh/latent_liquidity_quant/tree/main/src/models/" target="_blank" rel="noreferrer">View source ↗</a>
+      <div class="nav-actions">
+        <button class="btn theme-toggle" id="themeToggle" type="button">Dark</button>
+        <a class="btn" href="https://github.com/meamresh/latent_liquidity_quant/tree/main/src/models/" target="_blank" rel="noreferrer">View source ↗</a>
+      </div>
     </div>
   </nav>
 
@@ -146,6 +154,7 @@
         <a class="btn primary" href="https://github.com/meamresh/latent_liquidity_quant/blob/main/paper/latent_liquidity_quant.pdf" target="_blank" rel="noreferrer">Read the paper →</a>
         <a class="btn" href="latent-liquidity.html">← Dashboard</a>
         <a class="btn" href="results.html">Results →</a>
+        <a class="btn" href="strategy.html">Strategy →</a>
       </div>
     </div>
 
@@ -243,13 +252,13 @@
       <h3>Bootstrap Particle Filter (BPF)</h3>
       <p>$N=1000$, fixed hand-calibrated parameters, <strong>multinomial resampling</strong> when $\text{ESS}_t < N/2$. Stable and stationary — easier to calibrate, but cannot adapt to structural shifts.</p>
       <h3>Differentiable Particle Filter (DPF)</h3>
-      <p>$N=500$, <strong>Sinkhorn OT resampling</strong>, online gradient-based parameter learning. Makes the filter differentiable with respect to $\bm\theta$.</p>
+      <p>$N=500$, <strong>Sinkhorn OT resampling</strong>, online gradient-based parameter learning. Makes the filter differentiable with respect to $\boldsymbol{\theta}$.</p>
       <div class="eq-block">
         <div class="eq-label">Sinkhorn regularised OT ($\varepsilon=0.5$, 20 iterations)</div>
         $$\min_{P\in\Pi(\mathbf{w},\mathbf{u})}\langle P,C\rangle_F - \varepsilon H(P), \quad C_{ij}=\|\mathbf{x}^{(i)}-\mathbf{x}^{(j)}\|^2$$
         $$K_{ij}=\exp(-C_{ij}/\varepsilon): \quad \mathbf{u}^{(k+1)}=\mathbf{w}\oslash(K\mathbf{v}^{(k)}), \quad \mathbf{v}^{(k+1)}=\mathbf{1}/N\oslash(K^\top\mathbf{u}^{(k+1)})$$
       </div>
-      <p>$P^\star(\mathbf{w})$ is smooth, so gradients $\partial\log p/\partial\bm\theta$ flow through resampling via TensorFlow autodiff.</p>
+      <p>$P^\star(\mathbf{w})$ is smooth, so gradients $\partial\log p/\partial\boldsymbol{\theta}$ flow through resampling via TensorFlow autodiff.</p>
       <div class="step-row">
         <div class="step-card bpf">
           <div class="step-num">BPF wins</div>
@@ -274,14 +283,14 @@
       <h2>DPF Online Parameter Training</h2>
       <div class="eq-block">
         <div class="eq-label">Training objective</div>
-        $$\mathcal{L}(\bm\theta)=-\log p(\mathbf{y}_{t-W:t}\mid\bm\theta)\approx-\sum_{s=t-W}^{t}\log\!\left(\tfrac{1}{N}\sum_i p(\mathbf{y}_s\mid\mathbf{x}_s^{(i)},\bm\theta)\right)$$
+        $$\mathcal{L}(\boldsymbol{\theta})=-\log p(\mathbf{y}_{t-W:t}\mid\boldsymbol{\theta})\approx-\sum_{s=t-W}^{t}\log\!\left(\tfrac{1}{N}\sum_i p(\mathbf{y}_s\mid\mathbf{x}_s^{(i)},\boldsymbol{\theta})\right)$$
       </div>
       <div class="pipeline-steps">
         <div class="pipe-step"><div class="pipe-num">1</div><div class="pipe-body"><div class="pipe-title">Rolling window</div><div class="pipe-desc">$W=120$ days, stride $U=60$. At each update point $t$, extract $\mathbf{y}_{t-120:t}$. For $t < W$: use hand-tuned defaults (burn-in).</div></div></div>
-        <div class="pipe-step"><div class="pipe-num">2</div><div class="pipe-body"><div class="pipe-title">DPF forward pass</div><div class="pipe-desc">Run Sinkhorn-resampled filter on window. Compute $\mathcal{L}$ and $\nabla_{\bm\theta}\mathcal{L}$ via TF auto-differentiation.</div></div></div>
+        <div class="pipe-step"><div class="pipe-num">2</div><div class="pipe-body"><div class="pipe-title">DPF forward pass</div><div class="pipe-desc">Run Sinkhorn-resampled filter on window. Compute $\mathcal{L}$ and $\nabla_{\boldsymbol{\theta}}\mathcal{L}$ via TF auto-differentiation.</div></div></div>
         <div class="pipe-step"><div class="pipe-num">3</div><div class="pipe-body"><div class="pipe-title">Persistent Adam</div><div class="pipe-desc">$\eta=5\times10^{-4}$, gradient clip norm 5.0, max 50 epochs/window. Persistent across windows — preserves momentum.</div></div></div>
         <div class="pipe-step"><div class="pipe-num">4</div><div class="pipe-body"><div class="pipe-title">NaN/spike safety</div><div class="pipe-desc">Loss spike (3× recent median) or NaN triggers rollback to last valid checkpoint. &lt;5% of windows affected.</div></div></div>
-        <div class="pipe-step"><div class="pipe-num">5</div><div class="pipe-body"><div class="pipe-title">Causal store</div><div class="pipe-desc">$\bm\theta_t$ only used for inference at $s\geq t$ — strict no-lookahead guarantee.</div><div class="pipe-code">results/trained_params/dpf_learned_params.npz</div></div></div>
+        <div class="pipe-step"><div class="pipe-num">5</div><div class="pipe-body"><div class="pipe-title">Causal store</div><div class="pipe-desc">$\boldsymbol{\theta}_t$ only used for inference at $s\geq t$ — strict no-lookahead guarantee.</div><div class="pipe-code">results/trained_params/dpf_learned_params.npz</div></div></div>
       </div>
       <p>10 learnable parameters. Constrained via: sigmoid ($\phi_\cdot$), softplus ($\beta,\gamma,\sigma$), negative sigmoid ($\rho_\text{lev}$).</p>
     </section>
@@ -301,7 +310,7 @@
         </div>
         <div class="step-card">
           <div class="step-num">Step 03</div><div class="step-title">Score</div>
-          <div class="step-desc">Apply calibrated logistic model $f_{\bm\beta}(\hat{L},\Delta\hat{L},D)$ each step.</div>
+          <div class="step-desc">Apply calibrated logistic model $f_{\boldsymbol{\beta}}(\hat{L},\Delta\hat{L},D)$ each step.</div>
         </div>
         <div class="step-card">
           <div class="step-num">Step 04</div><div class="step-title">Rescale</div>
@@ -310,7 +319,7 @@
       </div>
       <div class="eq-block">
         <div class="eq-label">Neutral-baseline rescaling</div>
-        $$P_\text{raw}(t)=\frac{1}{N_\text{sim} H}\sum_{i,h}p_{\bm\beta}^{(i,h)},\qquad P_\text{crisis}(t)=\mathrm{clip}\!\left(\frac{P_\text{raw}-p_0}{1-p_0},\,0,\,1\right)$$
+        $$P_\text{raw}(t)=\frac{1}{N_\text{sim} H}\sum_{i,h}p_{\boldsymbol{\beta}}^{(i,h)},\qquad P_\text{crisis}(t)=\mathrm{clip}\!\left(\frac{P_\text{raw}-p_0}{1-p_0},\,0,\,1\right)$$
       </div>
       <p>Results: DPF 340× (GFC 0.784, calm 0.002), BPF 54× (GFC 0.788, calm 0.014). Smoothed with 10-day rolling average post hoc.</p>
     </section>
@@ -385,9 +394,26 @@
       </div>
       <div>
         <a href="latent-liquidity.html">Dashboard →</a> &nbsp;·&nbsp;
-        <a href="results.html">Results →</a>
+        <a href="results.html">Results →</a> &nbsp;·&nbsp;
+        <a href="strategy.html">Strategy →</a>
       </div>
     </footer>
   </div>
+<script>
+(function() {
+  const KEY = 'll-theme';
+  const btn = document.getElementById('themeToggle');
+  function apply(theme) {
+    if (theme === 'dark') { document.documentElement.setAttribute('data-theme', 'dark'); btn.textContent = 'Light'; }
+    else { document.documentElement.removeAttribute('data-theme'); btn.textContent = 'Dark'; }
+  }
+  apply(localStorage.getItem(KEY) === 'dark' ? 'dark' : 'light');
+  btn.addEventListener('click', () => {
+    const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    localStorage.setItem(KEY, next);
+    apply(next);
+  });
+})();
+</script>
 </body>
 </html>

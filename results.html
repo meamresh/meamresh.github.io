@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script>(function(){try{if(localStorage.getItem('ll-theme')==='dark')document.documentElement.setAttribute('data-theme','dark');}catch(e){}})();</script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DPF vs BPF Results · Latent Liquidity</title>
@@ -9,15 +10,19 @@
   <link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     :root{--bg:#f6f5f1;--surface-1:#ffffff;--surface-2:#fbfaf7;--border:#e7e4db;--border-hi:#d6d2c6;--text:#1a1c20;--text2:#33363c;--muted:#5e636b;--dim:#9a9d9f;--accent:#1f5fa8;--accent-d:#173f6e;--accent2:#bb3b35;--accent3:#1a7f5a;--accent4:#6a4fa0;--amber:#a5741b;}
+    :root[data-theme="dark"]{--bg:#04080f;--surface-1:#080f1e;--surface-2:#0c1528;--border:rgba(100,150,255,0.10);--border-hi:rgba(100,180,255,0.22);--text:#dce9ff;--text2:#b8cce8;--muted:#6a85b0;--dim:#374b6d;--accent:#3ec6ff;--accent-d:#7dd8ff;--accent2:#ff7c5c;--accent3:#5cf5b2;--accent4:#b88dff;--amber:#f6c344;}
+    [data-theme="dark"] .paper,[data-theme="dark"] .finding-card,[data-theme="dark"] .modal-inner{box-shadow:none;}
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
     html{scroll-behavior:smooth;}
-    body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6;-webkit-font-smoothing:antialiased;padding-bottom:40px;}
+    body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6;-webkit-font-smoothing:antialiased;padding-bottom:40px;transition:background-color .2s ease,color .2s ease;}
     .shell{max-width:1160px;margin:0 auto;padding:0 32px;}
 
     /* NAV */
     .nav{position:sticky;top:0;z-index:30;background:rgba(246,245,241,.88);backdrop-filter:blur(8px);border-bottom:1px solid var(--border);}
     .nav-in{max-width:1160px;margin:0 auto;padding:0 32px;height:62px;display:flex;align-items:center;justify-content:space-between;}
     .nav-brand{display:flex;align-items:center;gap:10px;text-decoration:none;}
+    .nav-actions{display:flex;align-items:center;gap:10px;}
+    .theme-toggle{min-width:60px;text-align:center;}
     .nav-mark{width:26px;height:26px;border-radius:6px;background:var(--accent);display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Newsreader',serif;font-weight:600;font-size:13px;}
     .nav-word{font-family:'Newsreader',Georgia,serif;font-weight:600;font-size:1.05rem;color:var(--text);}
     .nav-links{display:flex;align-items:center;gap:26px;}
@@ -149,10 +154,13 @@
       <div class="nav-links">
         <a href="latent-liquidity.html">Dashboard</a>
         <a href="theory-methods.html">Theory</a>
-        <a href="#metrics">Metrics</a>
+        <a href="strategy.html">Strategy</a>
         <a href="#gallery">Gallery</a>
       </div>
-      <a class="btn" href="https://github.com/meamresh/latent_liquidity_quant" target="_blank" rel="noreferrer">View source ↗</a>
+      <div class="nav-actions">
+        <button class="btn theme-toggle" id="themeToggle" type="button">Dark</button>
+        <a class="btn" href="https://github.com/meamresh/latent_liquidity_quant" target="_blank" rel="noreferrer">View source ↗</a>
+      </div>
     </div>
   </nav>
 
@@ -169,6 +177,7 @@
         <a class="btn primary" href="https://github.com/meamresh/latent_liquidity_quant/blob/main/paper/latent_liquidity_quant.pdf" target="_blank" rel="noreferrer">Read the paper →</a>
         <a class="btn" href="latent-liquidity.html">← Dashboard</a>
         <a class="btn" href="theory-methods.html">Theory &amp; Methods →</a>
+        <a class="btn" href="strategy.html">Strategy &amp; PnL →</a>
       </div>
     </div>
 
@@ -415,7 +424,8 @@
       </div>
       <div>
         <a href="latent-liquidity.html">Dashboard →</a> &nbsp;·&nbsp;
-        <a href="theory-methods.html">Theory →</a>
+        <a href="theory-methods.html">Theory →</a> &nbsp;·&nbsp;
+        <a href="strategy.html">Strategy →</a>
       </div>
     </footer>
   </div>
@@ -439,6 +449,21 @@ const hide = () => { document.getElementById('modal').style.display = 'none'; };
 document.getElementById('modalClose').onclick = e => { e.stopPropagation(); hide(); };
 document.getElementById('modal').addEventListener('click', e => { if(e.target.id==='modal') hide(); });
 window.addEventListener('keydown', e => { if(e.key==='Escape') hide(); });
+
+(function() {
+  const KEY = 'll-theme';
+  const btn = document.getElementById('themeToggle');
+  function apply(theme) {
+    if (theme === 'dark') { document.documentElement.setAttribute('data-theme', 'dark'); btn.textContent = 'Light'; }
+    else { document.documentElement.removeAttribute('data-theme'); btn.textContent = 'Dark'; }
+  }
+  apply(localStorage.getItem(KEY) === 'dark' ? 'dark' : 'light');
+  btn.addEventListener('click', () => {
+    const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    localStorage.setItem(KEY, next);
+    apply(next);
+  });
+})();
 </script>
 </body>
 </html>
