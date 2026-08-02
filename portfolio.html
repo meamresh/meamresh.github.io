@@ -1,59 +1,162 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script>(function(){try{if(localStorage.getItem('pf-theme')==='dark')document.documentElement.setAttribute('data-theme','dark');}catch(e){}})();</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Quant/ML Portfolio | Amresh Verma</title>
-  <link rel="stylesheet" href="portfolio.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root{--bg:#f6f5f1;--surface-1:#ffffff;--surface-2:#fbfaf7;--border:#e7e4db;--border-hi:#d6d2c6;--text:#1a1c20;--text2:#33363c;--muted:#5e636b;--dim:#9a9d9f;--accent:#1f5fa8;--accent-d:#173f6e;--accent2:#bb3b35;--accent3:#1a7f5a;--accent4:#6a4fa0;--amber:#a5741b;}
+    :root[data-theme="dark"]{--bg:#04080f;--surface-1:#080f1e;--surface-2:#0c1528;--border:rgba(100,150,255,0.10);--border-hi:rgba(100,180,255,0.22);--text:#dce9ff;--text2:#b8cce8;--muted:#6a85b0;--dim:#374b6d;--accent:#3ec6ff;--accent-d:#7dd8ff;--accent2:#ff7c5c;--accent3:#5cf5b2;--accent4:#b88dff;--amber:#f6c344;}
+    [data-theme="dark"] .paper{box-shadow:none;}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html{scroll-behavior:smooth;}
+    body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6;-webkit-font-smoothing:antialiased;padding-bottom:40px;transition:background-color .2s ease,color .2s ease;}
+    .shell{max-width:1160px;margin:0 auto;padding:0 32px;}
+
+    /* NAV */
+    .nav{position:sticky;top:0;z-index:30;background:rgba(246,245,241,.88);backdrop-filter:blur(8px);border-bottom:1px solid var(--border);}
+    .nav-in{max-width:1160px;margin:0 auto;padding:0 32px;height:62px;display:flex;align-items:center;justify-content:space-between;}
+    .nav-brand{display:flex;align-items:center;gap:10px;text-decoration:none;}
+    .nav-mark{width:26px;height:26px;border-radius:6px;background:var(--accent);display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Newsreader',serif;font-weight:600;font-size:13px;}
+    .nav-word{font-family:'Newsreader',Georgia,serif;font-weight:600;font-size:1.05rem;color:var(--text);}
+    .nav-links{display:flex;align-items:center;gap:26px;}
+    .nav-links a{color:var(--muted);text-decoration:none;font-size:.86rem;}
+    .nav-links a:hover{color:var(--text);}
+    .nav-actions{display:flex;align-items:center;gap:10px;}
+    .theme-toggle{min-width:60px;text-align:center;}
+    @media(max-width:820px){.nav-links{display:none;}}
+
+    /* HERO */
+    .hero{padding:52px 0 36px;}
+    .kick{font-family:'IBM Plex Mono',monospace;font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);font-weight:600;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+    .kick::before{content:'';width:18px;height:2px;background:var(--accent);}
+    h1{font-family:'Newsreader',Georgia,serif;font-weight:500;font-size:2.6rem;line-height:1.12;letter-spacing:-.015em;color:var(--text);max-width:20ch;}
+    .lead{font-size:1.02rem;line-height:1.65;color:var(--muted);max-width:640px;margin-top:20px;}
+    .hero-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:28px;}
+
+    /* BUTTONS */
+    .btn{display:inline-flex;align-items:center;gap:7px;padding:10px 16px;border-radius:6px;border:1px solid var(--border-hi);text-decoration:none;color:var(--text);background:var(--surface-1);font-family:'IBM Plex Sans',sans-serif;font-weight:500;font-size:.87rem;cursor:pointer;transition:all .15s ease;white-space:nowrap;}
+    .btn:hover{border-color:var(--accent);color:var(--accent);}
+    .btn.primary{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600;}
+    .btn.primary:hover{background:var(--accent-d);border-color:var(--accent-d);}
+
+    .divider{border-top:1px solid var(--border);}
+
+    /* SECTIONS */
+    .section{padding:36px 0;border-top:1px solid var(--border);}
+    .klabel{font-family:'IBM Plex Mono',monospace;font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:600;}
+    h2{font-family:'IBM Plex Sans',sans-serif;font-size:1.3rem;font-weight:600;color:var(--text);margin-top:6px;}
+    .section-intro{color:var(--muted);max-width:680px;margin-top:12px;font-size:.95rem;}
+
+    .paper{background:var(--surface-1);border:1px solid var(--border);border-radius:6px;box-shadow:0 1px 2px rgba(26,28,32,.04),0 8px 24px -16px rgba(26,28,32,.18);}
+
+    /* PROJECT GRID */
+    .project-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:22px;}
+    @media(max-width:760px){.project-grid{grid-template-columns:1fr;}}
+    .project-card{display:block;padding:24px 26px;text-decoration:none;color:inherit;transition:border-color .15s ease,transform .15s ease;}
+    .project-card:hover{border-color:var(--accent);transform:translateY(-2px);}
+    .project-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
+    .project-head h3{font-family:'IBM Plex Sans',sans-serif;font-size:1.05rem;font-weight:600;color:var(--text);}
+    .badge{font-family:'IBM Plex Mono',monospace;font-size:.65rem;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:4px;white-space:nowrap;font-weight:600;}
+    .badge.live{color:var(--accent3);border:1px solid rgba(26,127,90,.3);background:rgba(26,127,90,.07);}
+    .project-card p{color:var(--muted);font-size:.88rem;margin-top:10px;line-height:1.6;}
+    .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px;}
+    .tags span{font-family:'IBM Plex Mono',monospace;font-size:.68rem;padding:4px 9px;border-radius:4px;border:1px solid var(--border-hi);color:var(--muted);background:var(--surface-2);}
+    .project-link{display:inline-block;margin-top:16px;font-family:'IBM Plex Mono',monospace;font-size:.8rem;font-weight:500;color:var(--accent);}
+    .project-card:hover .project-link{text-decoration:underline;}
+
+    footer{padding:28px 0 0;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;font-family:'IBM Plex Mono',monospace;font-size:.78rem;color:var(--dim);}
+    footer a{color:var(--accent);text-decoration:none;}
+    footer a:hover{text-decoration:underline;}
+
+    @media(max-width:600px){h1{font-size:1.9rem;}.shell{padding:0 18px;}.nav-in{padding:0 18px;}}
+  </style>
 </head>
 <body>
-  <header class="site-header">
-    <a class="brand" href="index.html">Amresh Verma</a>
-    <nav>
-      <a href="index.html#about">Research</a>
-      <a href="index.html#publications">Publications</a>
-      <a href="index.html#contact">Contact</a>
-    </nav>
-  </header>
 
-  <main>
-    <section class="hero">
-      <h1>Quant/ML Portfolio</h1>
-      <p>
-        A curated collection of technical projects focused on probabilistic
-        modeling, calibration diagnostics, and systems-aware machine learning.
+  <nav class="nav">
+    <div class="nav-in">
+      <a class="nav-brand" href="index.html">
+        <span class="nav-mark">A</span>
+        <span class="nav-word">Amresh Verma</span>
+      </a>
+      <div class="nav-links">
+        <a href="index.html#about">Research</a>
+        <a href="index.html#publications">Publications</a>
+        <a href="index.html#contact">Contact</a>
+      </div>
+      <div class="nav-actions">
+        <button class="btn theme-toggle" id="themeToggle" type="button">Dark</button>
+        <a class="btn" href="index.html">← Homepage</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="shell">
+
+    <div class="hero">
+      <div class="kick">Quantitative Research · Portfolio</div>
+      <h1>Quant / ML Portfolio</h1>
+      <p class="lead">
+        A curated collection of technical projects focused on probabilistic modeling, calibration
+        diagnostics, and systems-aware machine learning.
       </p>
       <div class="hero-actions">
-        <a class="btn primary" href="latent-liquidity.html">Open Crisis Prediction Project</a>
+        <a class="btn primary" href="latent-liquidity.html">Open Crisis Prediction Project →</a>
         <a class="btn" href="index.html">Back to Homepage</a>
       </div>
-    </section>
+    </div>
 
-    <section class="section">
-      <h2>Projects</h2>
+    <div class="divider"></div>
+
+    <div class="section">
+      <div class="klabel">Projects</div>
+      <h2>Selected Work</h2>
       <p class="section-intro">
-        I plan to add new projects to this portfolio as they are completed and validated.
+        New projects are added to this portfolio as they are completed and validated.
       </p>
 
       <div class="project-grid">
-        <a class="project-card" href="latent-liquidity.html">
+        <a class="project-card paper" href="latent-liquidity.html">
           <div class="project-head">
-            <h3>Latent Liquidity & Crisis</h3>
+            <h3>Latent Liquidity &amp; Crisis</h3>
             <span class="badge live">Live</span>
           </div>
           <p>
-            Interactive crisis probability and latent-factor dashboard built
-            from <code>latent_liquidity_quant</code> outputs with Plotly.
+            Interactive crisis probability and latent-factor dashboard built from
+            <code>latent_liquidity_quant</code> outputs with Plotly, plus a full DPF/BPF strategy
+            backtest.
           </p>
           <div class="tags">
             <span>Crisis Probabilities</span>
             <span>Latent Factors L/h/z</span>
             <span>Interactive Plots</span>
           </div>
-          <span class="project-link">Open project page</span>
+          <span class="project-link">Open project page →</span>
         </a>
-        <a class="project-card" href="hidden_markov_model/">
+
+        <a class="project-card paper" href="banknifty-strangle.html">
+          <div class="project-head">
+            <h3>09:20 Short Strangle</h3>
+            <span class="badge live">Live</span>
+          </div>
+          <p>
+            Vectorized intraday options backtest — 9.4M minute bars processed in ~18s — reaching an
+            honest gross-positive-but-costs-likely-erase-it verdict on a BankNifty short strangle.
+          </p>
+          <div class="tags">
+            <span>Intraday Options</span>
+            <span>Vectorized Backtest</span>
+            <span>Bias Audit</span>
+          </div>
+          <span class="project-link">Open project page →</span>
+        </a>
+
+        <a class="project-card paper" href="hidden_markov_model/">
           <div class="project-head">
             <h3>Hidden Markov Model</h3>
             <span class="badge live">Live</span>
@@ -67,9 +170,10 @@
             <span>Bayesian Filtering</span>
             <span>Calibration</span>
           </div>
-          <span class="project-link">Open project page</span>
+          <span class="project-link">Open project page →</span>
         </a>
-        <a class="project-card" href="finance.html">
+
+        <a class="project-card paper" href="finance.html">
           <div class="project-head">
             <h3>Finance</h3>
             <span class="badge live">Live</span>
@@ -83,13 +187,32 @@
             <span>Risk Modeling</span>
             <span>Signal Inference</span>
           </div>
-          <span class="project-link">Open project page</span>
+          <span class="project-link">Open project page →</span>
         </a>
+      </div>
+    </div>
 
-      <p class="footer-note">
-        Repository home: <a href="https://github.com/meamresh">github.com/meamresh</a>
-      </p>
-    </section>
-  </main>
+    <footer>
+      <div>Repository home: <a href="https://github.com/meamresh" target="_blank">github.com/meamresh</a></div>
+      <div><a href="index.html">← Back to homepage</a></div>
+    </footer>
+  </div>
+
+<script>
+(function() {
+  const KEY = 'pf-theme';
+  const btn = document.getElementById('themeToggle');
+  function apply(theme) {
+    if (theme === 'dark') { document.documentElement.setAttribute('data-theme', 'dark'); btn.textContent = 'Light'; }
+    else { document.documentElement.removeAttribute('data-theme'); btn.textContent = 'Dark'; }
+  }
+  apply(localStorage.getItem(KEY) === 'dark' ? 'dark' : 'light');
+  btn.addEventListener('click', () => {
+    const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    localStorage.setItem(KEY, next);
+    apply(next);
+  });
+})();
+</script>
 </body>
 </html>

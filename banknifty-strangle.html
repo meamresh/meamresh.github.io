@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>(function(){try{if(localStorage.getItem('ss-theme')==='dark')document.documentElement.setAttribute('data-theme','dark');}catch(e){}})();</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>09:20 Short Strangle · Intraday Options Backtest</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f4f2ec; --surface:#fffdf8; --surface2:#faf7f0;
+  --border:#e4e0d5; --border-hi:#d3cdbd;
+  --ink:#1b1a17; --ink2:#3a382f; --muted:#6b6858; --dim:#9a9788;
+  --amber:#c07d18; --amber-d:#9a6210;
+  --stop:#b8402f; --green:#3f7d4e;
+  --grid:rgba(27,26,23,0.07);
+}
+:root[data-theme="dark"]{
+  --bg:#0b0d10; --surface:#12151a; --surface2:#161a20;
+  --border:rgba(220,180,90,0.12); --border-hi:rgba(230,180,90,0.26);
+  --ink:#f0ead9; --ink2:#d3cbb5; --muted:#938c76; --dim:#5c5646;
+  --amber:#e6a52e; --amber-d:#f3ba50;
+  --stop:#ef6a52; --green:#5fc37e;
+  --grid:rgba(230,190,110,0.10);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);
+  line-height:1.6;-webkit-font-smoothing:antialiased;padding-bottom:56px;
+  transition:background-color .25s ease,color .25s ease;
+}
+.shell{max-width:1080px;margin:0 auto;padding:0 30px;}
+
+/* NAV */
+.nav{position:sticky;top:0;z-index:40;background:color-mix(in srgb,var(--bg) 88%,transparent);
+  backdrop-filter:blur(9px);border-bottom:1px solid var(--border);}
+.nav-in{max-width:1080px;margin:0 auto;padding:0 30px;height:60px;
+  display:flex;align-items:center;justify-content:space-between;}
+.brand{display:flex;align-items:center;gap:11px;text-decoration:none;}
+.brand-mark{font-family:'JetBrains Mono',monospace;font-weight:600;font-size:.82rem;
+  color:var(--amber);border:1px solid var(--border-hi);border-radius:5px;
+  padding:4px 8px;letter-spacing:.02em;}
+.brand-word{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:1rem;
+  color:var(--ink);letter-spacing:-.01em;}
+.nav-actions{display:flex;align-items:center;gap:9px;}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:9px 15px;border-radius:6px;
+  border:1px solid var(--border-hi);text-decoration:none;color:var(--ink);
+  background:var(--surface);font-family:'Inter',sans-serif;font-weight:500;font-size:.85rem;
+  cursor:pointer;transition:all .15s ease;white-space:nowrap;}
+.btn:hover{border-color:var(--amber);color:var(--amber);}
+.btn.primary{background:var(--amber);color:#fff;border-color:var(--amber);font-weight:600;}
+.btn.primary:hover{background:var(--amber-d);border-color:var(--amber-d);color:#fff;}
+[data-theme="dark"] .btn.primary{color:#12151a;}
+.theme-toggle{min-width:58px;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:.78rem;}
+
+/* HERO */
+.hero{padding:56px 0 30px;}
+.kick{font-family:'JetBrains Mono',monospace;font-size:.72rem;letter-spacing:.15em;
+  text-transform:uppercase;color:var(--amber);font-weight:600;margin-bottom:18px;
+  display:flex;align-items:center;gap:9px;}
+.kick::before{content:'';width:20px;height:2px;background:var(--amber);}
+h1{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:2.7rem;line-height:1.08;
+  letter-spacing:-.02em;color:var(--ink);max-width:19ch;}
+.lead{font-size:1.03rem;line-height:1.62;color:var(--muted);max-width:660px;margin-top:20px;}
+.lead strong{color:var(--ink2);font-weight:600;}
+.hero-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:28px;}
+.tag-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px;}
+.tag{font-family:'JetBrains Mono',monospace;font-size:.7rem;letter-spacing:.02em;
+  padding:5px 10px;border-radius:4px;border:1px solid var(--border-hi);
+  color:var(--muted);background:var(--surface);}
+
+/* SIGNATURE: intraday timeline */
+.timeline-wrap{margin:38px 0 6px;padding:26px 26px 20px;background:var(--surface);
+  border:1px solid var(--border);border-radius:8px;position:relative;overflow:hidden;}
+.tl-label{font-family:'JetBrains Mono',monospace;font-size:.66rem;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--dim);margin-bottom:20px;}
+.tl-svg{width:100%;height:96px;display:block;}
+.tl-cap{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--muted);
+  margin-top:14px;line-height:1.6;}
+.tl-cap .amber{color:var(--amber);}
+.tl-cap .stop{color:var(--stop);}
+
+/* STAT STRIP */
+.mstrip{display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);margin-top:34px;}
+.mcell{padding:26px 20px;border-left:1px solid var(--border);}
+.mcell:first-child{border-left:none;padding-left:0;}
+.mnum{font-family:'Space Grotesk',sans-serif;font-size:1.85rem;font-weight:600;
+  letter-spacing:-.02em;color:var(--ink);line-height:1;}
+.mnum.amber{color:var(--amber);}
+.mlab{font-family:'JetBrains Mono',monospace;font-size:.64rem;letter-spacing:.05em;
+  text-transform:uppercase;color:var(--muted);margin-top:11px;}
+.msub{font-size:.72rem;color:var(--dim);margin-top:4px;font-family:'JetBrains Mono',monospace;}
+@media(max-width:860px){.mstrip{grid-template-columns:repeat(3,1fr);}
+  .mcell:nth-child(3n+1){border-left:none;padding-left:0;}
+  .mcell:nth-child(n+4){border-top:1px solid var(--border);}}
+@media(max-width:520px){.mstrip{grid-template-columns:repeat(2,1fr);}
+  .mcell:nth-child(odd){border-left:none;padding-left:0;}
+  .mcell:nth-child(n+3){border-top:1px solid var(--border);}}
+
+/* SECTIONS */
+.section{padding:40px 0 6px;border-top:1px solid var(--border);margin-top:40px;}
+.section:first-of-type{border-top:none;}
+.klabel{font-family:'JetBrains Mono',monospace;font-size:.68rem;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--amber);font-weight:600;}
+h2{font-family:'Space Grotesk',sans-serif;font-size:1.5rem;font-weight:600;color:var(--ink);
+  margin-top:8px;letter-spacing:-.01em;}
+.section-intro{color:var(--muted);max-width:680px;margin-top:12px;font-size:.97rem;}
+h3{font-family:'Space Grotesk',sans-serif;font-size:1.05rem;font-weight:600;color:var(--ink2);
+  margin:26px 0 10px;}
+p.body{color:var(--ink2);max-width:700px;margin-top:12px;}
+p.body a{color:var(--amber);text-decoration:none;border-bottom:1px solid transparent;}
+p.body a:hover{border-bottom-color:var(--amber);}
+
+/* CARD */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:24px 26px;margin-top:20px;}
+
+/* RESULTS TABLE */
+.rtable{width:100%;border-collapse:collapse;margin-top:18px;font-size:.9rem;}
+.rtable th,.rtable td{text-align:left;padding:11px 14px;border-bottom:1px solid var(--border);}
+.rtable th{font-family:'JetBrains Mono',monospace;font-size:.66rem;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--muted);font-weight:500;}
+.rtable td{color:var(--ink2);}
+.rtable td.num{font-family:'JetBrains Mono',monospace;color:var(--ink);text-align:right;}
+.rtable td.num.pos{color:var(--green);}
+.rtable td.num.neg{color:var(--stop);}
+.rtable tr:last-child td{border-bottom:none;}
+.rtable .divide td{border-bottom:2px solid var(--border-hi);}
+
+/* VERDICT CALLOUT */
+.verdict{background:var(--surface2);border:1px solid var(--border-hi);border-left:3px solid var(--amber);
+  border-radius:6px;padding:22px 26px;margin-top:24px;}
+.verdict .vk{font-family:'JetBrains Mono',monospace;font-size:.66rem;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--amber);font-weight:600;margin-bottom:10px;}
+.verdict p{color:var(--ink2);font-size:.98rem;line-height:1.66;}
+.verdict p+p{margin-top:12px;}
+.verdict strong{color:var(--ink);}
+
+/* CONCENTRATION BAR */
+.conc{display:flex;flex-direction:column;gap:16px;margin-top:22px;}
+.conc-row{display:flex;flex-direction:column;gap:7px;}
+.conc-head{display:flex;justify-content:space-between;align-items:baseline;
+  font-family:'JetBrains Mono',monospace;font-size:.78rem;}
+.conc-head .lbl{color:var(--ink2);}
+.conc-head .val{color:var(--amber);font-weight:600;}
+.conc-track{height:12px;background:var(--surface2);border:1px solid var(--border);
+  border-radius:6px;overflow:hidden;}
+.conc-fill{height:100%;background:var(--amber);border-radius:5px 0 0 5px;}
+.conc-note{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--dim);margin-top:4px;}
+
+/* METHOD GRID */
+.mgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:20px;}
+@media(max-width:640px){.mgrid{grid-template-columns:1fr;}}
+.mitem{background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:20px 22px;}
+.mitem .mt{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:.98rem;color:var(--ink);
+  display:flex;align-items:center;gap:9px;}
+.mitem .mt .dot{width:7px;height:7px;border-radius:50%;background:var(--amber);flex-shrink:0;}
+.mitem p{color:var(--muted);font-size:.87rem;margin-top:9px;line-height:1.6;}
+.mitem code{font-family:'JetBrains Mono',monospace;font-size:.82rem;color:var(--amber);
+  background:var(--surface2);padding:1px 5px;border-radius:3px;}
+
+/* BIAS TABLE */
+.bias{width:100%;border-collapse:collapse;margin-top:20px;font-size:.88rem;}
+.bias th,.bias td{text-align:left;padding:12px 14px;border-bottom:1px solid var(--border);vertical-align:top;}
+.bias th{font-family:'JetBrains Mono',monospace;font-size:.66rem;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--muted);font-weight:500;}
+.bias td.status{font-family:'JetBrains Mono',monospace;font-size:.8rem;white-space:nowrap;}
+.bias .yes{color:var(--green);}
+.bias .no{color:var(--stop);}
+.bias .na{color:var(--dim);}
+.bias td.desc{color:var(--muted);}
+.bias tr:last-child td{border-bottom:none;}
+
+/* TERMINAL */
+.terminal{background:#14161b;border:1px solid var(--border-hi);border-radius:7px;overflow:hidden;margin-top:20px;}
+.terminal-title{padding:10px 16px;font-family:'JetBrains Mono',monospace;font-size:.68rem;
+  letter-spacing:.08em;text-transform:uppercase;color:#8a8574;border-bottom:1px solid rgba(255,255,255,.06);}
+.terminal-body{padding:16px 20px;display:flex;flex-direction:column;gap:8px;}
+.cmd{display:flex;gap:10px;font-family:'JetBrains Mono',monospace;font-size:.82rem;line-height:1.5;}
+.cmd .prompt{color:var(--amber);user-select:none;flex-shrink:0;}
+.cmd .command{color:#e8e2d0;}
+.cmd .comment{color:#8a8574;}
+
+/* FOOTER */
+footer{padding:30px 0 0;border-top:1px solid var(--border);margin-top:44px;
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;
+  font-family:'JetBrains Mono',monospace;font-size:.76rem;color:var(--dim);}
+footer a{color:var(--amber);text-decoration:none;}
+footer a:hover{text-decoration:underline;}
+
+/* motion */
+@keyframes rise{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+.hero>*,.section>*{animation:rise .45s ease both;}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
+@media(max-width:600px){h1{font-size:2rem;}.shell,.nav-in{padding:0 18px;}h2{font-size:1.3rem;}}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-in">
+    <a class="brand" href="#top">
+      <span class="brand-mark">09:20</span>
+      <span class="brand-word">Short Strangle</span>
+    </a>
+    <div class="nav-actions">
+      <button class="btn theme-toggle" id="themeToggle" type="button">Dark</button>
+      <a class="btn" href="portfolio.html">← Portfolio</a>
+      <a class="btn" href="https://github.com/meamresh/banknifty-strangle" target="_blank" rel="noreferrer">View source ↗</a>
+    </div>
+  </div>
+</nav>
+
+<div class="shell" id="top">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="kick">Quantitative Research · Intraday Options</div>
+    <h1>A disciplined backtest that reaches an honest conclusion</h1>
+    <p class="lead">
+      A fully vectorized backtest of a daily <strong>09:20 BankNifty short-strangle</strong> strategy
+      over one year of minute-level option data — ~9.4M bars processed in ~18 seconds with no
+      per-row loops. It is gross-positive, but the edge lives almost entirely on expiry day, and
+      realistic costs likely erase it at one-lot scale. The point of the project is the
+      <strong>method and the verdict</strong>, not a headline return.
+    </p>
+    <div class="hero-actions">
+      <a class="btn primary" href="https://github.com/meamresh/banknifty-strangle" target="_blank" rel="noreferrer">View source →</a>
+      <a class="btn" href="#results">Results →</a>
+      <a class="btn" href="#method">Method →</a>
+      <a class="btn" href="#bias">Bias audit →</a>
+    </div>
+    <div class="tag-row">
+      <span class="tag">Vectorized pandas</span>
+      <span class="tag">First-passage stop-loss</span>
+      <span class="tag">Look-ahead safe</span>
+      <span class="tag">Hand-verified tests</span>
+      <span class="tag">Cost-honest</span>
+    </div>
+
+    <!-- SIGNATURE TIMELINE -->
+    <div class="timeline-wrap">
+      <div class="tl-label">One trading day · 09:15 → 15:30 IST</div>
+      <svg class="tl-svg" viewBox="0 0 900 96" preserveAspectRatio="none" role="img" aria-label="Intraday strategy timeline">
+        <!-- baseline -->
+        <line x1="30" y1="60" x2="870" y2="60" stroke="var(--border-hi)" stroke-width="1.5"/>
+        <!-- stop-scan window shading 09:21-15:20 -->
+        <rect x="110" y="46" width="700" height="28" fill="var(--amber)" opacity="0.08"/>
+        <!-- ticks -->
+        <g font-family="'JetBrains Mono',monospace" font-size="12" fill="var(--muted)">
+          <line x1="30" y1="55" x2="30" y2="65" stroke="var(--border-hi)"/>
+          <text x="30" y="84" text-anchor="middle">09:15</text>
+          <line x1="110" y1="50" x2="110" y2="70" stroke="var(--amber)" stroke-width="2"/>
+          <text x="110" y="38" text-anchor="middle" fill="var(--amber)" font-weight="600">09:20</text>
+          <text x="110" y="84" text-anchor="middle">entry</text>
+          <line x1="810" y1="50" x2="810" y2="70" stroke="var(--stop)" stroke-width="2"/>
+          <text x="810" y="38" text-anchor="middle" fill="var(--stop)" font-weight="600">15:20</text>
+          <text x="810" y="84" text-anchor="middle">exit</text>
+          <line x1="870" y1="55" x2="870" y2="65" stroke="var(--border-hi)"/>
+          <text x="870" y="84" text-anchor="middle">15:30</text>
+        </g>
+        <!-- entry marker: sell CE + PE -->
+        <circle cx="110" cy="60" r="5" fill="var(--amber)"/>
+        <!-- stop-scan label -->
+        <text x="460" y="60" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="11"
+          fill="var(--muted)" dy="4">stop-loss scan · High ≥ 1.5 × entry, each minute</text>
+        <!-- exit marker -->
+        <circle cx="810" cy="60" r="5" fill="var(--stop)"/>
+      </svg>
+      <div class="tl-cap">
+        <span class="amber">●</span> 09:20 — short the CE &amp; PE nearest ₹50 &nbsp;·&nbsp;
+        scan every minute for a 50% stop &nbsp;·&nbsp;
+        <span class="stop">●</span> 15:20 — close whatever survives
+      </div>
+    </div>
+  </div>
+
+  <!-- STAT STRIP -->
+  <div class="mstrip">
+    <div class="mcell">
+      <div class="mnum amber">~18s</div>
+      <div class="mlab">Full-year runtime</div>
+      <div class="msub">9.4M bars · no loops</div>
+    </div>
+    <div class="mcell">
+      <div class="mnum">494</div>
+      <div class="mlab">Legs traded</div>
+      <div class="msub">247 sessions · 2/day</div>
+    </div>
+    <div class="mcell">
+      <div class="mnum">56%</div>
+      <div class="mlab">P&amp;L from expiry</div>
+      <div class="msub">from 21% of days</div>
+    </div>
+    <div class="mcell">
+      <div class="mnum">−3.11%</div>
+      <div class="mlab">Max drawdown</div>
+      <div class="msub">stop-capped losses</div>
+    </div>
+    <div class="mcell">
+      <div class="mnum">5/5</div>
+      <div class="mlab">Unit tests pass</div>
+      <div class="msub">hand-computed</div>
+    </div>
+  </div>
+
+  <!-- STRATEGY -->
+  <div class="section" id="strategy">
+    <div class="klabel">The Strategy</div>
+    <h2>Sell time, cap the tail, go home flat</h2>
+    <p class="section-intro">
+      A short strangle sells a call and a put at once, collecting two premiums and profiting when
+      the index stays range-bound and the options decay. The whole rulebook fits in three lines.
+    </p>
+    <div class="mgrid">
+      <div class="mitem">
+        <div class="mt"><span class="dot"></span>Entry — 09:20</div>
+        <p>Among all calls, pick the one whose 09:20 one-minute close is nearest ₹50; do the same for puts. Short one lot (15) of each. The ₹50 target is a model-free proxy for constant moneyness-in-vol-units.</p>
+      </div>
+      <div class="mitem">
+        <div class="mt"><span class="dot"></span>Risk — per leg</div>
+        <p>Buy a leg back if its price hits <code>1.5 × entry</code> (a 50% loss on a short), watched on each bar's <strong style="color:var(--ink2)">High</strong> — the only in-bar evidence of the intrabar maximum.</p>
+      </div>
+      <div class="mitem">
+        <div class="mt"><span class="dot"></span>Exit — 15:20</div>
+        <p>Any leg not stopped out is bought back at the 15:20 close. On expiry day this is usually pennies; the position is always flat overnight.</p>
+      </div>
+      <div class="mitem">
+        <div class="mt"><span class="dot"></span>Why sub-50% wins profit</div>
+        <p>Losses cap at half the premium; expiry-day winners decay toward the full premium. Breakeven win rate is <code>ℓ/(w+ℓ) ≈ 1/3</code> — the strategy can lose more often than it wins and still make money.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div class="section" id="results">
+    <div class="klabel">Results</div>
+    <h2>One year, 247 sessions, gross of costs</h2>
+    <p class="section-intro">
+      Headline figures on a fixed one-lot book with a ₹100,000 accounting base. Every number below
+      is reproducible from the source; nothing is tuned after the fact.
+    </p>
+    <div class="card">
+      <table class="rtable">
+        <thead><tr><th>Metric</th><th style="text-align:right">Value</th><th>Reading</th></tr></thead>
+        <tbody>
+          <tr><td>Gross P&amp;L</td><td class="num pos">₹8,259</td><td>on 1 lot (15 qty), no compounding</td></tr>
+          <tr><td>CAGR</td><td class="num">8.27%</td><td>on the accounting base — a convention, not return-on-margin</td></tr>
+          <tr><td>Max drawdown</td><td class="num neg">−3.11%</td><td>shallow: per-leg losses are stop-capped</td></tr>
+          <tr class="divide"><td>Sharpe (gross)</td><td class="num">≈1.21</td><td>daily mean ₹33.4 / sd ₹433.4</td></tr>
+          <tr><td>Win rate</td><td class="num">49.6%</td><td>245 winners / 249 losers</td></tr>
+          <tr><td>Exit mix</td><td class="num">244 / 250</td><td>stop-loss / time exits</td></tr>
+          <tr><td>Est. annual costs</td><td class="num neg">₹12–25k</td><td>brokerage + STT + exchange/SEBI/stamp</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Where the money actually comes from</h3>
+    <div class="conc">
+      <div class="conc-row">
+        <div class="conc-head"><span class="lbl">Expiry Wednesdays</span><span class="val">56% of gross P&amp;L</span></div>
+        <div class="conc-track"><div class="conc-fill" style="width:56%"></div></div>
+        <div class="conc-note">from just 21% of trading days · ₹89/day</div>
+      </div>
+      <div class="conc-row">
+        <div class="conc-head"><span class="lbl">All other days</span><span class="val">44% of gross P&amp;L</span></div>
+        <div class="conc-track"><div class="conc-fill" style="width:44%"></div></div>
+        <div class="conc-note">from 79% of trading days · ₹18.6/day</div>
+      </div>
+    </div>
+    <p class="body">
+      The asymmetry is exactly what theory predicts: theta decay accelerates as time-to-expiry
+      → 0 (<code style="font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--amber)">Θ ∝ τ<sup>−1/2</sup></code>),
+      so the edge concentrates on the day the options expire.
+    </p>
+
+    <div class="verdict">
+      <div class="vk">The honest verdict</div>
+      <p>
+        <strong>Gross-positive, almost certainly net-negative at one-lot scale.</strong> Estimated
+        annual costs (₹12–25k) exceed the ₹8,259 gross profit, and the entire surviving economic
+        core is expiry-day theta. So as specified, this is an <strong>existence proof of an
+        expiry-day variance premium</strong> — not a deployable system.
+      </p>
+      <p>
+        The disciplined thing to do next is not to deploy it but to test it: a cost-inclusive
+        re-run, a parameter-sensitivity sweep to confirm the result is a plateau rather than a
+        lucky point, and an out-of-sample year in a different volatility regime.
+      </p>
+    </div>
+  </div>
+
+  <!-- METHOD -->
+  <div class="section" id="method">
+    <div class="klabel">Engineering</div>
+    <h2>Vectorized, fast, and paranoid about the data</h2>
+    <p class="section-intro">
+      Nine-plus million rows means per-row Python loops are off the table. Every stage is a
+      whole-table operation that runs in compiled C.
+    </p>
+    <div class="mgrid">
+      <div class="mitem">
+        <div class="mt"><span class="dot"></span>Strike selection</div>
+        <p>A single <code>groupby(["Date","Type"]).idxmin()</code> on premium-distance picks the nearest-₹50 option per day and side.</p>
+      </div>
+      <div class="mitem">
+        <div class="mt"><span class="dot"></span>Stop as first-passage</div>
+        <p>Mask <code>High ≥ 1.5·entry</code>, sort, <code>groupby.first()</code> — the earliest in-window touch, <code>τ* = inf{t &gt; t₀ : Hₜ ≥ 1.5Pₑ}</code>.</p>
+      </div>
+      <div class="mitem">
+        <div class="mt"><span class="dot"></span>Fast parsing</div>
+        <p>Dates and tickers are parsed on <em>unique</em> values and broadcast back; pyarrow CSV engine with a pandas fallback.</p>
+      </div>
+      <div class="mitem">
+        <div class="mt"><span class="dot"></span>Defensive loading</div>
+        <p>Auto-detects two spot schemas; drops <em>exact</em> duplicate rows but treats price-<em>conflicting</em> keys as a fatal error, never a silent keep-first.</p>
+      </div>
+    </div>
+
+    <h3>Reproduce it</h3>
+    <div class="terminal">
+      <div class="terminal-title">bash</div>
+      <div class="terminal-body">
+        <div class="cmd"><span class="prompt">$</span><span class="command">pip install -r requirements.txt</span></div>
+        <div class="cmd"><span class="prompt">$</span><span><span class="command">python src/backtest.py</span> <span class="comment"># → 3-sheet workbook + equity/drawdown chart</span></span></div>
+        <div class="cmd"><span class="prompt">$</span><span><span class="command">pytest -q</span> <span class="comment"># 5 hand-computed tests · no market data needed</span></span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BIAS AUDIT -->
+  <div class="section" id="bias">
+    <div class="klabel">Bias Audit</div>
+    <h2>What the backtest controls for — and what it doesn't</h2>
+    <p class="section-intro">
+      The interesting part of any backtest is what it admits it isn't handling. Stated plainly.
+    </p>
+    <div class="card" style="padding:8px 26px;">
+      <table class="bias">
+        <thead><tr><th>Concern</th><th>Status</th><th>How, or why not</th></tr></thead>
+        <tbody>
+          <tr><td>Look-ahead bias</td><td class="status yes">✓ handled</td><td class="desc">Selection uses only the 09:20 close; the stop scan starts the bar <em>after</em> entry (that bar's own High is pre-entry information).</td></tr>
+          <tr><td>Data leakage</td><td class="status yes">✓ handled</td><td class="desc">No future bar informs any decision; the breach is the earliest in-window touch only.</td></tr>
+          <tr><td>Survivorship</td><td class="status yes">✓ mostly</td><td class="desc">Daily universe is whatever was quoted at 09:20; no hindsight liquidity filter; last-bar fallback avoids dropping thin legs.</td></tr>
+          <tr><td>Transaction costs</td><td class="status no">✗ excluded</td><td class="desc">Per spec — but quantified (₹12–25k/yr) and shown likely to exceed gross P&amp;L.</td></tr>
+          <tr><td>Slippage</td><td class="status no">✗ excluded</td><td class="desc">Stops fill at the exact level; the direction of the bias (optimistic) is documented.</td></tr>
+          <tr><td>Rebalancing</td><td class="status na">— n/a</td><td class="desc">Intraday, flat overnight, fixed daily size — nothing to rebalance.</td></tr>
+          <tr><td>Corporate actions</td><td class="status na">— n/a</td><td class="desc">Cash-settled index options; no splits or dividends on the index level.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="body">
+      One more caveat worth stating: the specification fixes Wednesday as expiry day, but real
+      BankNifty weeklies expired on Thursdays until September 2023 — so the expiry flag is
+      mislabelled for part of the year. A production version needs a date-keyed expiry calendar.
+      Full treatment, including the derivations and a production-upgrade path, is in the
+      <a href="https://github.com/meamresh/banknifty-strangle" style="color:var(--amber);text-decoration:none;border-bottom:1px solid transparent;">methodology write-up</a>.
+    </p>
+  </div>
+
+  <footer>
+    <div>Standalone research project · <a href="https://github.com/meamresh/banknifty-strangle" target="_blank">github.com/meamresh/banknifty-strangle</a></div>
+    <div><a href="portfolio.html">← Portfolio</a> &nbsp;·&nbsp; <a href="#top">Back to top ↑</a></div>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  const KEY='ss-theme';
+  const btn=document.getElementById('themeToggle');
+  function apply(t){
+    if(t==='dark'){document.documentElement.setAttribute('data-theme','dark');btn.textContent='Light';}
+    else{document.documentElement.removeAttribute('data-theme');btn.textContent='Dark';}
+  }
+  apply(localStorage.getItem(KEY)==='dark'?'dark':'light');
+  btn.addEventListener('click',()=>{
+    const next=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
+    localStorage.setItem(KEY,next);apply(next);
+  });
+})();
+</script>
+</body>
+</html>
