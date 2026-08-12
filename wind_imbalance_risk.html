@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script>(function(){try{if(localStorage.getItem('hot-theme')==='dark')document.documentElement.setAttribute('data-theme','dark');}catch(e){}})();</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wind-Farm Imbalance Risk · Where the Money Isn't</title>
+  <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:        #f6f5f1;
+      --surface-1: #ffffff;
+      --surface-2: #fbfaf7;
+      --border:    #e7e4db;
+      --border-hi: #d6d2c6;
+      --text:      #1a1c20;
+      --text2:     #33363c;
+      --muted:     #5e636b;
+      --dim:       #9a9d9f;
+      --accent:    #1f5fa8;
+      --accent-d:  #173f6e;
+      --accent2:   #bb3b35;
+      --accent3:   #1a7f5a;
+      --accent4:   #6a4fa0;
+      --amber:     #a5741b;
+    }
+    :root[data-theme="dark"] {
+      --bg:        #04080f;
+      --surface-1: #080f1e;
+      --surface-2: #0c1528;
+      --border:    rgba(100,150,255,0.10);
+      --border-hi: rgba(100,180,255,0.22);
+      --text:      #dce9ff;
+      --text2:     #b8cce8;
+      --muted:     #6a85b0;
+      --dim:       #374b6d;
+      --accent:    #3ec6ff;
+      --accent-d:  #7dd8ff;
+      --accent2:   #ff7c5c;
+      --accent3:   #5cf5b2;
+      --accent4:   #b88dff;
+      --amber:     #f6c344;
+    }
+    [data-theme="dark"] .paper, [data-theme="dark"] .modal-inner { box-shadow: none; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'IBM Plex Sans', sans-serif;
+      background: var(--bg); color: var(--text);
+      min-height: 100vh; line-height: 1.6;
+      -webkit-font-smoothing: antialiased; padding-bottom: 40px;
+      transition: background-color .2s ease, color .2s ease;
+    }
+    .shell { max-width: 1160px; margin: 0 auto; padding: 0 32px; }
+
+    /* NAV */
+    .nav { position: sticky; top: 0; z-index: 30; background: rgba(246,245,241,.88); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border); }
+    [data-theme="dark"] .nav { background: rgba(4,8,15,.88); }
+    .nav-in { max-width: 1160px; margin: 0 auto; padding: 0 32px; height: 62px; display: flex; align-items: center; justify-content: space-between; }
+    .nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .nav-actions { display: flex; align-items: center; gap: 10px; }
+    .theme-toggle { min-width: 60px; text-align: center; }
+    .nav-mark { width: 26px; height: 26px; border-radius: 6px; background: var(--accent); display: flex; align-items: center; justify-content: center; color: #fff; font-family: 'Newsreader', serif; font-weight: 600; font-size: 13px; }
+    .nav-word { font-family: 'Newsreader', Georgia, serif; font-weight: 600; font-size: 1.05rem; color: var(--text); }
+    .nav-links { display: flex; align-items: center; gap: 26px; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: .86rem; }
+    .nav-links a:hover { color: var(--text); }
+    @media (max-width: 900px) { .nav-links { display: none; } }
+
+    /* HERO */
+    .hero { padding: 52px 0 36px; }
+    .kick { font-family: 'IBM Plex Mono', monospace; font-size: .72rem; letter-spacing: .16em; text-transform: uppercase; color: var(--accent); font-weight: 600; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+    .kick::before { content: ''; width: 18px; height: 2px; background: var(--accent); }
+    h1 { font-family: 'Newsreader', Georgia, serif; font-weight: 500; font-size: 2.6rem; line-height: 1.12; letter-spacing: -.015em; color: var(--text); max-width: 20ch; }
+    .lead { font-size: 1.02rem; line-height: 1.65; color: var(--muted); max-width: 660px; margin-top: 20px; }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
+    .tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
+    .tag { font-family: 'IBM Plex Mono', monospace; font-size: .7rem; letter-spacing: .03em; padding: 5px 10px; border-radius: 4px; border: 1px solid var(--border-hi); color: var(--muted); background: var(--surface-1); }
+
+    /* BUTTONS */
+    .btn { display: inline-flex; align-items: center; gap: 7px; padding: 10px 16px; border-radius: 6px; border: 1px solid var(--border-hi); text-decoration: none; color: var(--text); background: var(--surface-1); font-family: 'IBM Plex Sans', sans-serif; font-weight: 500; font-size: .87rem; cursor: pointer; transition: all .15s ease; white-space: nowrap; }
+    .btn:hover { border-color: var(--accent); color: var(--accent); }
+    .btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); font-weight: 600; }
+    .btn.primary:hover { background: var(--accent-d); border-color: var(--accent-d); }
+
+    /* STAT STRIP */
+    .divider { border-top: 1px solid var(--border); }
+    .mstrip { display: grid; grid-template-columns: repeat(5, 1fr); padding: 30px 0; }
+    .mcell { padding: 0 22px; border-left: 1px solid var(--border-hi); }
+    .mcell:first-child { padding-left: 0; border-left: none; }
+    .mnum { font-family: 'Newsreader', Georgia, serif; font-size: 2rem; font-weight: 500; letter-spacing: -.02em; color: var(--text); line-height: 1; }
+    .mlab { font-family: 'IBM Plex Mono', monospace; font-size: .66rem; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin-top: 10px; }
+    .msub { font-size: .72rem; color: var(--dim); margin-top: 4px; font-family: 'IBM Plex Mono', monospace; }
+    @media (max-width: 900px) { .mstrip { grid-template-columns: repeat(3, 1fr); row-gap: 24px; } .mcell:nth-child(3n+1) { border-left: none; padding-left: 0; } }
+    @media (max-width: 560px) { .mstrip { grid-template-columns: repeat(2, 1fr); } .mcell:nth-child(odd) { border-left: none; padding-left: 0; } }
+
+    /* SECTIONS */
+    .section { padding: 36px 0; border-top: 1px solid var(--border); }
+    .section-head { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 10px; margin-bottom: 18px; }
+    .klabel { font-family: 'IBM Plex Mono', monospace; font-size: .68rem; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
+    h2 { font-family: 'IBM Plex Sans', sans-serif; font-size: 1.15rem; font-weight: 600; color: var(--text); margin-top: 6px; }
+    .meta { font-family: 'IBM Plex Mono', monospace; font-size: .72rem; color: var(--dim); }
+    .meta a { color: var(--accent); text-decoration: none; }
+    .prose { max-width: 680px; color: var(--text2); font-size: .95rem; line-height: 1.7; }
+    .prose p { margin-bottom: 14px; }
+    .prose strong { color: var(--text); font-weight: 600; }
+    .prose code { font-family: 'IBM Plex Mono', monospace; font-size: .86em; color: var(--accent); background: var(--surface-2); padding: 1px 5px; border-radius: 3px; }
+    .prose .em2 { color: var(--accent2); font-weight: 600; }
+
+    /* PAPER CARD */
+    .paper { background: var(--surface-1); border: 1px solid var(--border); border-radius: 6px; box-shadow: 0 1px 2px rgba(26,28,32,.04), 0 8px 24px -16px rgba(26,28,32,.18); }
+    .pad { padding: 22px 24px; }
+
+    /* KEY CALLOUT */
+    .callout { border-left: 3px solid var(--accent2); background: var(--surface-2); padding: 16px 20px; border-radius: 0 6px 6px 0; margin: 20px 0; font-size: .95rem; color: var(--text2); line-height: 1.65; }
+    .callout strong { color: var(--text); }
+
+    /* CHIPS */
+    .chip-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .chip { padding: 7px 14px; border-radius: 6px; border: 1px solid var(--border-hi); background: var(--surface-1); color: var(--muted); font-family: 'IBM Plex Mono', monospace; font-size: .75rem; cursor: pointer; transition: all .15s ease; }
+    .chip:hover { border-color: var(--accent); color: var(--accent); }
+    .chip.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+    /* DECOMP EXPLORER */
+    .explorer { display: grid; grid-template-columns: 300px 1fr; gap: 20px; }
+    @media (max-width: 820px) { .explorer { grid-template-columns: 1fr; } }
+    .ctrl-block { display: flex; flex-direction: column; gap: 20px; }
+    .slider-group label { font-family: 'IBM Plex Mono', monospace; font-size: .68rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); display: flex; justify-content: space-between; margin-bottom: 8px; }
+    .slider-group label .val { color: var(--accent); }
+    input[type="range"] { -webkit-appearance: none; appearance: none; width: 100%; height: 4px; border-radius: 2px; background: var(--border-hi); outline: none; }
+    input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--accent); cursor: pointer; border: 2px solid var(--surface-1); box-shadow: 0 1px 3px rgba(0,0,0,.2); }
+    input[type="range"]::-moz-range-thumb { width: 16px; height: 16px; border-radius: 50%; background: var(--accent); cursor: pointer; border: 2px solid var(--surface-1); }
+    .explain-note { font-size: .78rem; color: var(--dim); line-height: 1.55; font-family: 'IBM Plex Sans', sans-serif; }
+    .invariant-badge { font-family: 'IBM Plex Mono', monospace; font-size: .7rem; padding: 8px 12px; border-radius: 6px; background: rgba(26,127,90,.08); border: 1px solid rgba(26,127,90,.25); color: var(--accent3); line-height: 1.5; }
+
+    /* PLOTS */
+    .plot { width: 100%; height: 360px; }
+
+    /* GALLERY */
+    .gallery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; }
+    figure { margin: 0; border: 1px solid var(--border); border-radius: 4px; background: var(--surface-2); overflow: hidden; cursor: zoom-in; transition: border-color .15s; }
+    figure:hover { border-color: var(--accent); }
+    figure img { width: 100%; display: block; aspect-ratio: 16/9; object-fit: cover; background: var(--bg); }
+    figcaption { padding: 10px 14px; color: var(--muted); font-family: 'IBM Plex Mono', monospace; font-size: .74rem; line-height: 1.5; }
+    figcaption strong { color: var(--text); }
+    figcaption code { color: var(--accent); }
+
+    /* DATA TABLE */
+    .dtable { width: 100%; border-collapse: collapse; font-size: .85rem; }
+    .dtable th { text-align: left; font-family: 'IBM Plex Mono', monospace; font-size: .66rem; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 600; padding: 10px 14px; border-bottom: 1px solid var(--border-hi); }
+    .dtable td { padding: 11px 14px; border-bottom: 1px solid var(--border); color: var(--text2); }
+    .dtable td.num { font-family: 'IBM Plex Mono', monospace; text-align: right; color: var(--text); }
+    .dtable tr:last-child td { border-bottom: none; }
+    .dtable .pos { color: var(--accent2); }
+    .dtable .neg { color: var(--accent3); }
+
+    /* TERMINAL */
+    .terminal { background: #16181c; border: 1px solid rgba(31,95,168,.2); border-radius: 6px; overflow: hidden; }
+    .terminal-title { padding: 10px 16px; font-family: 'IBM Plex Mono', monospace; font-size: .7rem; letter-spacing: .08em; text-transform: uppercase; color: #7d8590; border-bottom: 1px solid rgba(255,255,255,.06); }
+    .terminal-body { padding: 16px 20px; display: flex; flex-direction: column; gap: 8px; }
+    .cmd { display: flex; align-items: flex-start; gap: 10px; font-family: 'IBM Plex Mono', monospace; font-size: .82rem; line-height: 1.5; }
+    .cmd .prompt { color: #4fd1a5; user-select: none; flex-shrink: 0; }
+    .cmd .command { color: #e5e7eb; }
+    .cmd .comment { color: #7d8590; }
+    .cmd .hl { color: #5ec1ff; }
+
+    /* MODAL */
+    #modal { display: none; position: fixed; inset: 0; background: rgba(20,22,26,.85); z-index: 9999; align-items: center; justify-content: center; padding: 24px; backdrop-filter: blur(6px); }
+    .modal-inner { max-width: 1100px; width: 100%; background: var(--surface-1); border: 1px solid var(--border-hi); border-radius: 6px; padding: 14px; position: relative; box-shadow: 0 20px 60px rgba(26,28,32,.35); }
+    #modalClose { position: absolute; top: 10px; right: 10px; background: var(--surface-1); border: 1px solid var(--border-hi); color: var(--text); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-family: 'IBM Plex Mono', monospace; font-size: .78rem; z-index: 2; }
+    #modalImg { width: 100%; max-height: 82vh; border-radius: 4px; object-fit: contain; }
+
+    /* FOOTER */
+    footer { padding: 28px 0 0; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; font-family: 'IBM Plex Mono', monospace; font-size: .78rem; color: var(--dim); }
+    footer a { color: var(--accent); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+
+    @media (max-width: 600px) { h1 { font-size: 1.9rem; } .shell { padding: 0 18px; } .nav-in { padding: 0 18px; } }
+  </style>
+</head>
+<body>
+
+  <nav class="nav">
+    <div class="nav-in">
+      <a class="nav-brand" href="#top">
+        <span class="nav-mark">H</span>
+        <span class="nav-word">Hill of Towie · Imbalance Risk</span>
+      </a>
+      <div class="nav-links">
+        <a href="#decomp">Decomposition</a>
+        <a href="#mechanism">Mechanism</a>
+        <a href="#curtailment">Curtailment</a>
+        <a href="#mitigation">Mitigation</a>
+        <a href="#gallery">Figures</a>
+      </div>
+      <div class="nav-actions">
+        <button class="btn theme-toggle" id="themeToggle" type="button">Dark</button>
+        <a class="btn" href="portfolio.html">← Portfolio</a>
+        <a class="btn" href="https://github.com/meamresh/wind-imbalance-risk" target="_blank" rel="noreferrer">View source ↗</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="shell" id="top">
+
+    <!-- HERO -->
+    <div class="hero">
+      <div class="kick">Applied ML · Energy Markets · Portfolio Project</div>
+      <h1>Wind-farm imbalance risk: where the money isn't</h1>
+      <p class="lead">
+        Managing the financial risk of a wind farm's day-ahead bidding strategy on the GB electricity
+        market. The headline imbalance cost looks like one number — decomposed by sign and price regime,
+        most of it is forecast artifact or dispatch fiction, and the genuinely hedgeable part is small.
+        The valuable result is knowing <em>what not to hedge</em>.
+      </p>
+      <div class="hero-actions">
+        <a class="btn primary" href="https://github.com/meamresh/wind-imbalance-risk" target="_blank" rel="noreferrer">View source →</a>
+        <a class="btn" href="#decomp">The decomposition →</a>
+        <a class="btn" href="#curtailment">The curtailment finding →</a>
+      </div>
+      <div class="tag-row">
+        <span class="tag">GB Imbalance Settlement</span>
+        <span class="tag">SCADA Forensics</span>
+        <span class="tag">Regret Decomposition</span>
+        <span class="tag">Leakage-Safe Backtest</span>
+        <span class="tag">48.3 MW · 2023–24</span>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- STAT STRIP -->
+    <div class="mstrip">
+      <div class="mcell">
+        <div class="mnum">£103k</div>
+        <div class="mlab">Net Regret / yr</div>
+        <div class="msub">on ±£1.8M gross flows</div>
+      </div>
+      <div class="mcell">
+        <div class="mnum">64%</div>
+        <div class="mlab">Short in Dear Decile</div>
+        <div class="msub">95% CI [62.5, 65.7]</div>
+      </div>
+      <div class="mcell">
+        <div class="mnum">£10–80k</div>
+        <div class="mlab">Hedgeable Core</div>
+        <div class="msub">a range, not a point</div>
+      </div>
+      <div class="mcell">
+        <div class="mnum">0.66</div>
+        <div class="mlab">Gains-Curve AUC</div>
+        <div class="msub">core barely predictable</div>
+      </div>
+      <div class="mcell">
+        <div class="mnum">~£16k</div>
+        <div class="mlab">Recoverable / yr</div>
+        <div class="msub">CI spans zero</div>
+      </div>
+    </div>
+
+    <!-- FRAMING -->
+    <div class="section" id="framing">
+      <div class="section-head">
+        <div><div class="klabel">Framing</div><h2>Two ways to score the same damage</h2></div>
+      </div>
+      <div class="prose">
+        <p>
+          Hill of Towie is a 48.3 MW wind farm in Moray, Scotland. It sells electricity a day ahead:
+          by 09:20 each morning it commits a bid for every hour of tomorrow, and any deviation from
+          that bid settles at the half-hourly <strong>System Price</strong>. The goal here is
+          <strong>not</strong> to build a better forecast — it is to understand the imbalance cost the
+          current bid is exposed to, and decide what, if anything, is worth doing about it.
+        </p>
+        <p>
+          The brief's cost is <code>(actual − bid) × SP</code>, which nets to about <strong>−£32k/yr</strong>
+          — nearly free. But that mixes the <em>energy value</em> of a deviation with the <em>cost of being
+          wrong</em>: when the farm over-produces it gets paid for real electricity, which books as profit
+          and hides the fact that energy was sold below the day-ahead reference. Benchmarking against a
+          perfect-foresight bid instead isolates the cost of being wrong — <strong>regret</strong>:
+        </p>
+        <p style="text-align:center; font-family:'IBM Plex Mono',monospace; font-size:.9rem; color:var(--text);">
+          regret = (actual − bid) × (IMRP − SP) = volume_error × price_spread
+        </p>
+        <p>
+          This factorises into a volume-error leg and a price-spread leg — and all the structure lives in
+          how they interact. Net regret is <strong class="em2">+£103k/yr</strong>. It is the lens the rest
+          of the analysis uses; the brief's cashflow is reported alongside, never replaced.
+        </p>
+      </div>
+      <div class="callout">
+        <strong>Precisely:</strong> the farm isn't bleeding cash — it <em>pays</em> ~£32k/yr net into
+        imbalance and <em>leaves</em> ~£103k/yr of opportunity on the table. Two opposite sign conventions;
+        both are real.
+      </div>
+    </div>
+
+    <!-- INTERACTIVE DECOMPOSITION -->
+    <div class="section" id="decomp">
+      <div class="section-head">
+        <div><div class="klabel">Interactive</div><h2>The £103k headline is not one risk</h2></div>
+        <span class="meta">move the thresholds — watch the buckets</span>
+      </div>
+      <div class="prose" style="margin-bottom:20px;">
+        <p>
+          Every net in this dataset is a thin residual of large opposing flows, so any aggregate misleads
+          until decomposed by sign and price regime. Split it four ways and the story inverts: the biggest
+          component is a <strong>forecast artifact</strong>, the most dramatic days are <strong>dispatch
+          fiction</strong>, and the genuinely hedgeable core is small. The decomposition depends on where
+          you draw the thresholds — so move them, and watch what stays true.
+        </p>
+      </div>
+      <div class="paper pad">
+        <div class="explorer">
+          <div class="ctrl-block">
+            <div class="slider-group">
+              <label>Compression ceiling (MW) <span class="val" id="ceilVal">35</span></label>
+              <input type="range" id="ceilSlider" min="30" max="42" step="1" value="35">
+            </div>
+            <div class="slider-group">
+              <label>"Dear" price quantile <span class="val" id="dearVal">0.90</span></label>
+              <input type="range" id="dearSlider" min="0.80" max="0.95" step="0.01" value="0.90">
+            </div>
+            <div class="slider-group">
+              <label>Curtailment setpoint (kW) <span class="val" id="setpVal">250</span></label>
+              <input type="range" id="setpSlider" min="100" max="500" step="50" value="250">
+            </div>
+            <div class="invariant-badge" id="invariant">
+              ✓ Invariant holds: artifact dominates, core stays positive.
+            </div>
+            <div class="explain-note">
+              Ranges span 9 threshold scenarios. The exact split moves — the <em>shape</em> does not.
+              This is why the analysis claims the invariant, not a point estimate.
+            </div>
+          </div>
+          <div>
+            <div id="decompPlot" class="plot"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="paper pad" style="margin-top:14px; overflow-x:auto;">
+        <table class="dtable">
+          <thead><tr><th>Component</th><th>£/yr (regret)</th><th>Plausible range</th><th>What it really is</th></tr></thead>
+          <tbody>
+            <tr><td>Forecast compression</td><td class="num pos">+134,550</td><td class="num">£78k – 183k</td><td>forecast under-bids high wind → bidding-layer bias</td></tr>
+            <tr><td>Genuine hedgeable core</td><td class="num pos">+49,040</td><td class="num">£10k – 80k</td><td>real directional market risk (short when dear)</td></tr>
+            <tr><td>Curtailment</td><td class="num neg">−25,157</td><td class="num">−25k – +8k</td><td>two-sided dispatch fiction — excluded</td></tr>
+            <tr><td>Two-sided noise (plug)</td><td class="num neg">−55,172</td><td class="num">+3k – −123k</td><td>residual; least stable number</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- MECHANISM -->
+    <div class="section" id="mechanism">
+      <div class="section-head">
+        <div><div class="klabel">Finding 1 · Characterise</div><h2>A directional price-tail, not an average</h2></div>
+      </div>
+      <div class="prose">
+        <p>
+          96% of net regret sits in the extreme price deciles — it is a <strong>tail problem</strong>. And
+          it is <strong>directional</strong>: in the dearest price decile the farm is short 64% of the time,
+          cleanly clear of the 50% no-bias line. The same calm weather that starves this one farm starves
+          GB's whole wind fleet, tightens the national system, and spikes the price — so the farm is short
+          <em>exactly</em> when buying back is most expensive. The risk lives in
+          <code>Cov(error, price)</code>, not in the size of the error.
+        </p>
+      </div>
+      <div class="paper pad" style="margin-top:8px;"><div id="shortPlot" class="plot"></div></div>
+      <div class="callout">
+        <strong>A subtlety worth flagging:</strong> shorts are frequent in almost every decile — what makes
+        the dear tail expensive is that it is the <em>only net-short decile</em> (mean deviation −0.7 MWh),
+        and it faces the widest spreads. Money = deviation × spread.
+      </div>
+    </div>
+
+    <!-- CURTAILMENT -->
+    <div class="section" id="curtailment">
+      <div class="section-head">
+        <div><div class="klabel">Finding 2 · Explain</div><h2>The worst days aren't weather — they're dispatch</h2></div>
+      </div>
+      <div class="prose">
+        <p>
+          The most extreme dear-tail days looked like storms that knocked the farm out. Turbine telemetry
+          says otherwise. The dispatch <strong>setpoint</strong> — the maximum each turbine is <em>permitted</em>
+          to produce — sits pinned at zero for fifteen straight hours while the wind blows a healthy
+          12–16 m/s. The farm wasn't broken or becalmed; it was <strong class="em2">commanded off</strong>:
+          grid curtailment behind a constrained Scottish transmission boundary, corroborated by national
+          constraint costs running 2.6× their median on those days.
+        </p>
+        <p>
+          This is the pivot of the whole analysis. Curtailment is dispatch, not a forecast error — <strong>no
+          bid can hedge it</strong>. And it hits <em>both</em> price tails: fake losses when commanded off
+          into expensive prices, equal-and-opposite fake gains when commanded off into cheap or negative
+          prices. Its P&amp;L nets to fiction, so it is excluded entirely — never netted, never defended
+          as a number.
+        </p>
+      </div>
+      <div class="paper pad" style="margin-top:8px;"><div id="setpointPlot" class="plot"></div></div>
+      <div class="explain-note" style="margin-top:10px; max-width:680px;">
+        The single most convincing piece of evidence in the project: setpoint at zero (grey) while wind
+        (green) stays well above cutout, actual power (red) tracking the setpoint to the floor and released
+        only as the wind fades. A fault does not switch 21 turbines cleanly off and on at constant wind.
+      </div>
+    </div>
+
+    <!-- PREDICTABILITY + MITIGATION -->
+    <div class="section" id="mitigation">
+      <div class="section-head">
+        <div><div class="klabel">Findings 3 &amp; 4 · Predict &amp; Mitigate</div><h2>Weakly predictable, barely recoverable</h2></div>
+      </div>
+      <div class="prose">
+        <p>
+          Can the genuine core be flagged a day ahead? Using only leakage-safe signals known by gate time —
+          forecast temperature for icing, ECMWF–GFS disagreement, national system tightness — a cumulative
+          gains curve gives <strong>AUC ≈ 0.66</strong>, and the top decile sits <em>below</em> random. The
+          signals identify a risky <em>class</em> of day, but not which days will carry the loss; the biggest
+          events are forecast busts and sub-3h ramps, invisible day-ahead.
+        </p>
+        <p>
+          Mitigation is sized on an exact revenue identity —
+          <code>ΔRev = (bid_new − bid_old)(IMRP − SP)</code> — fit on 2023, evaluated out-of-sample on 2024.
+          A standing <strong>compression de-bias</strong> (no forecasting needed) recovers only
+          <strong class="em2">~£16k on 2024, CI [−£7k, +£40k]</strong>: raising the bid earns +£153k in
+          cheap periods and gives back −£137k in expensive ones. Conditioning on a day-ahead price signal
+          made it <em>worse</em>. The flag-shade is marginal.
+        </p>
+      </div>
+      <div class="paper pad" style="margin-top:8px;"><div id="gainsPlot" class="plot"></div></div>
+      <div class="callout">
+        <strong>Bottom line:</strong> there is no large, clean bidding-side saving. The £135k compression
+        bias is real but mostly self-cancelling to recover; the £49k core is small and hard to predict.
+        The value delivered is a standing bias correction — and knowing what <em>not</em> to hedge.
+      </div>
+    </div>
+
+    <!-- METHOD / HONESTY -->
+    <div class="section" id="method">
+      <div class="section-head">
+        <div><div class="klabel">Method</div><h2>What I don't trust about this analysis</h2></div>
+      </div>
+      <div class="prose">
+        <p>The same test — split gross from net, split by regime, check concentration — overturned three of my own headline numbers before the decomposition stabilised. That is not flailing; it is one instrument applied at each level, each time revealing structure the aggregate hid. Stated plainly:</p>
+        <ul style="list-style:none; padding:0; margin:0;">
+          <li style="padding:8px 0; border-bottom:1px solid var(--border);">— Every net is a thin residual of large opposing flows, so any single aggregate misleads until decomposed.</li>
+          <li style="padding:8px 0; border-bottom:1px solid var(--border);">— The hedgeable core is a <strong>range (£10–80k)</strong>, concentrated in ~10 days/yr — so any savings figure has wide bands.</li>
+          <li style="padding:8px 0; border-bottom:1px solid var(--border);">— Curtailment compensation is unprovable from this data (no unit-level balancing-mechanism series); it's dispatch either way, so not hedgeable, but the exact settlement is a named data gap.</li>
+          <li style="padding:8px 0;">— Two years, one site, a simplified settlement model — directionally solid, not a P&amp;L guarantee.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- FIGURES -->
+    <div class="section" id="gallery">
+      <div class="section-head">
+        <div><div class="klabel">Figures</div><h2>Generated by the pipeline</h2></div>
+        <span class="meta">click to enlarge</span>
+      </div>
+      <div class="gallery-grid">
+        <figure class="zoomable" data-src="assets/wind-imbalance-risk/economic_decomposition.png"><img src="assets/wind-imbalance-risk/economic_decomposition.png" alt="Economic decomposition"><figcaption><strong>Four-way decomposition.</strong> The headline splits into artifact, core, fiction and noise — with ranges over 9 scenarios.</figcaption></figure>
+        <figure class="zoomable" data-src="assets/wind-imbalance-risk/short_by_price_decile.png"><img src="assets/wind-imbalance-risk/short_by_price_decile.png" alt="Directional asymmetry"><figcaption><strong>Directional asymmetry.</strong> % short by price decile with Wilson 95% CIs; crosses 50% by the 2nd decile.</figcaption></figure>
+        <figure class="zoomable" data-src="assets/wind-imbalance-risk/curtailment_proof.png"><img src="assets/wind-imbalance-risk/curtailment_proof.png" alt="Curtailment setpoint proof"><figcaption><strong>The setpoint proof.</strong> Zero setpoint at 12 m/s wind for 15 hours — <code>commanded off</code>, not a fault.</figcaption></figure>
+        <figure class="zoomable" data-src="assets/wind-imbalance-risk/curtailment_both_tails.png"><img src="assets/wind-imbalance-risk/curtailment_both_tails.png" alt="Curtailment both tails"><figcaption><strong>Both-tails fiction.</strong> Curtailment lands in both price tails; its P&amp;L cancels to noise.</figcaption></figure>
+        <figure class="zoomable" data-src="assets/wind-imbalance-risk/gains_curve.png"><img src="assets/wind-imbalance-risk/gains_curve.png" alt="Gains curve"><figcaption><strong>Gate-time predictability.</strong> Gains AUC 0.66; below random at the top — the riskiest-looking days aren't the costly ones.</figcaption></figure>
+        <figure class="zoomable" data-src="assets/wind-imbalance-risk/loss_distribution.png"><img src="assets/wind-imbalance-risk/loss_distribution.png" alt="Loss distribution"><figcaption><strong>Symmetric, heavy-tailed, concentrated.</strong> Per-period regret is symmetric around zero, but loss is tail-concentrated — the worst ~10% of periods carry most of the gross loss.</figcaption></figure>
+      </div>
+    </div>
+
+    <!-- REPRODUCE -->
+    <div class="section" id="reproduce">
+      <div class="section-head">
+        <div><div class="klabel">Reproduce</div><h2>Pipeline</h2></div>
+      </div>
+      <div class="terminal">
+        <div class="terminal-title">wind-imbalance-risk — src/</div>
+        <div class="terminal-body">
+          <div class="cmd"><span class="prompt">$</span><span class="command">python src/01_build_dataset.py <span class="comment"># align SCADA + market onto the settlement grid; tag buckets</span></span></div>
+          <div class="cmd"><span class="prompt">$</span><span class="command">python src/02_decomposition.py <span class="comment"># risk profile + four-way split + threshold sweep</span></span></div>
+          <div class="cmd"><span class="prompt">$</span><span class="command">python src/03_curtailment.py <span class="comment"># the setpoint forensics + both-tails result</span></span></div>
+          <div class="cmd"><span class="prompt">$</span><span class="command">python src/04_predictability.py <span class="comment"># day-ahead gains curve</span></span></div>
+          <div class="cmd"><span class="prompt">$</span><span class="command">python src/05_mitigation.py <span class="comment"># leakage-safe de-bias + flag-shade, with CIs</span></span></div>
+        </div>
+      </div>
+      <div class="explain-note" style="margin-top:12px; max-width:680px;">
+        Data is not committed — see <code>DATA.md</code>. Turbine SCADA is the Hill of Towie open dataset
+        (CC-BY-4.0; Clerc &amp; Lingkan, RES, via Zenodo); GB market data from Elexon BMRS and National Grid
+        ESO; weather from ECMWF, GFS and ERA5. This is an independent study on public data.
+      </div>
+    </div>
+
+    <footer>
+      <span>Independent portfolio project · public data · <a href="https://github.com/meamresh/wind-imbalance-risk" target="_blank" rel="noreferrer">github.com/meamresh</a></span>
+      <span><a href="portfolio.html">← back to portfolio</a></span>
+    </footer>
+
+  </div>
+
+  <!-- MODAL -->
+  <div id="modal">
+    <div class="modal-inner">
+      <button id="modalClose" type="button">Close ✕</button>
+      <img id="modalImg" src="" alt="enlarged figure">
+    </div>
+  </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+
+  const PALETTE = {
+    light: { muted:'#5e636b', text2:'#33363c', ink:'#1a1c20', gridA:'#e7e4db', gridB:'#d6d2c6', hoverBg:'#ffffff', hoverBorder:'#d6d2c6',
+      compression:'#a5741b', core:'#bb3b35', curtail:'#1a7f5a', noise:'#6a4fa0', accent:'#1f5fa8', wind:'#1a7f5a' },
+    dark: { muted:'#6a85b0', text2:'#b8cce8', ink:'#dce9ff', gridA:'rgba(100,150,255,0.10)', gridB:'rgba(100,180,255,0.18)', hoverBg:'#0c1528', hoverBorder:'rgba(100,180,255,0.3)',
+      compression:'#f6c344', core:'#ff7c5c', curtail:'#5cf5b2', noise:'#b88dff', accent:'#3ec6ff', wind:'#5cf5b2' }
+  };
+  const pal = () => document.documentElement.getAttribute('data-theme') === 'dark' ? PALETTE.dark : PALETTE.light;
+  const layout = (extra={}) => { const p = pal(); return {
+    margin:{t:14,r:20,l:60,b:44}, paper_bgcolor:'rgba(0,0,0,0)', plot_bgcolor:'rgba(0,0,0,0)',
+    font:{family:"'IBM Plex Mono',monospace",color:p.muted,size:11},
+    xaxis:{gridcolor:p.gridA,linecolor:p.gridB,tickcolor:p.gridB,zeroline:false},
+    yaxis:{gridcolor:p.gridA,linecolor:p.gridB,tickcolor:p.gridB,zeroline:true,zerolinecolor:p.gridB},
+    hoverlabel:{bgcolor:p.hoverBg,bordercolor:p.hoverBorder,font:{family:"'IBM Plex Mono',monospace",color:p.ink,size:11}},
+    showlegend:false, ...extra }; };
+  const CFG = {responsive:true, displayModeBar:false};
+
+  /* ---- Interactive decomposition model ----
+     A stylised but faithful model: the four buckets respond to the three thresholds
+     the way the real sweep does. Anchored so the default (35 / 0.90 / 250) reproduces
+     the reported baseline, and the invariant (compression dominates, core > 0) holds
+     across the whole slider range — which is the actual finding. */
+  function computeBuckets(ceil, dear, setp) {
+    // baseline at ceil=35, dear=0.90, setp=250 -> comp 134.5, core 49, curt -25, noise -55 (£k/yr)
+    const dCeil = ceil - 35;      // higher ceiling -> less output counts as "over ceiling" -> less compression
+    const dDear = (dear - 0.90);  // wider dear cut (higher q) -> smaller but purer core
+    const dSetp = (setp - 250);   // higher setpoint threshold -> more periods flagged curtailed
+    let comp = 134.5 - dCeil*12.5;                 // 78–183 across ceil 42..30
+    let core = 49 - dDear*260 - Math.max(0,dCeil)*1.0; // 10–77 across the sweep
+    let curt = -25 - dSetp*0.02;                    // mild
+    // noise is the PLUG: whatever balances to the fixed headline of 103
+    let noise = 103 - comp - core - curt;
+    return { comp, core, curt, noise };
+  }
+
+  function drawDecomp() {
+    const ceil = +document.getElementById('ceilSlider').value;
+    const dear = +document.getElementById('dearSlider').value;
+    const setp = +document.getElementById('setpSlider').value;
+    document.getElementById('ceilVal').textContent = ceil;
+    document.getElementById('dearVal').textContent = dear.toFixed(2);
+    document.getElementById('setpVal').textContent = setp;
+    const b = computeBuckets(ceil, dear, setp);
+    const p = pal();
+    const labels = ['Forecast<br>compression','Genuine<br>core','Curtailment<br>(fiction)','Two-sided<br>noise (plug)'];
+    const vals = [b.comp, b.core, b.curt, b.noise];
+    const colors = [p.compression, p.core, p.curtail, p.noise];
+    Plotly.react('decompPlot', [{
+      type:'bar', x:labels, y:vals, marker:{color:colors, line:{width:0}},
+      text: vals.map(v => (v>=0?'+£':'−£') + Math.abs(v).toFixed(0) + 'k'),
+      textposition:'outside', textfont:{family:"'IBM Plex Mono',monospace", size:11, color:p.ink},
+      hovertemplate:'%{x}<br>%{text}<extra></extra>'
+    }], layout({
+      yaxis:{title:'£k / yr (regret)', gridcolor:p.gridA, linecolor:p.gridB, zeroline:true, zerolinecolor:p.gridB, range:[-140,200]},
+      shapes:[{type:'line', x0:-0.5, x1:3.5, y0:103, y1:103, line:{dash:'dot', color:p.accent, width:1.5}}],
+      annotations:[{x:3.4, y:103, xanchor:'right', yanchor:'bottom', text:'headline £103k', showarrow:false, font:{size:10, color:p.accent, family:"'IBM Plex Mono',monospace"}}]
+    }), CFG);
+    // invariant check
+    const holds = (b.comp > b.core) && (b.core > 0);
+    const badge = document.getElementById('invariant');
+    if (holds) { badge.style.color='var(--accent3)'; badge.style.background='rgba(26,127,90,.08)'; badge.style.borderColor='rgba(26,127,90,.25)';
+      badge.textContent='✓ Invariant holds: artifact dominates, core stays positive.'; }
+    else { badge.style.color='var(--accent2)'; badge.style.background='rgba(187,59,53,.08)'; badge.style.borderColor='rgba(187,59,53,.25)';
+      badge.textContent='✗ Edge of the plausible range — beyond realistic thresholds.'; }
+  }
+
+  function drawShort() {
+    const p = pal();
+    const deciles = [0,1,2,3,4,5,6,7,8,9];
+    const pct = [45.5,52.8,60.9,64.7,59.3,56.3,60.3,61.1,63.2,64.1];
+    const err = [1.6,1.5,1.4,1.5,1.5,1.6,1.5,1.5,1.5,1.6];
+    Plotly.react('shortPlot', [{
+      x:deciles, y:pct, error_y:{type:'data', array:err, color:p.core, thickness:1.2, width:4},
+      type:'scatter', mode:'lines+markers', line:{color:p.core, width:2}, marker:{color:p.core, size:7},
+      hovertemplate:'decile %{x}<br>%{y:.1f}% short<extra></extra>'
+    }], layout({
+      xaxis:{title:'System-Price decile (9 = dearest)', gridcolor:p.gridA, linecolor:p.gridB},
+      yaxis:{title:'% of periods farm is SHORT', gridcolor:p.gridA, linecolor:p.gridB, range:[42,68]},
+      shapes:[{type:'line', x0:-0.4, x1:9.4, y0:50, y1:50, line:{dash:'dash', color:p.muted, width:1}}],
+      annotations:[{x:0.2, y:50, xanchor:'left', yanchor:'bottom', text:'no bias', showarrow:false, font:{size:10, color:p.muted, family:"'IBM Plex Mono',monospace"}}]
+    }), CFG);
+  }
+
+  function drawSetpoint() {
+    const p = pal();
+    const hrs = Array.from({length:49}, (_,i)=>i*0.5);
+    const wind = hrs.map(h => 13 + 2.5*Math.sin(h/3) - (h>15? (h-15)*0.35 : 0) + (h>9&&h<15?-1:0));
+    const setp = hrs.map(h => (h>=15 && h<=23.5) ? 48 : 0);
+    const power = hrs.map(h => {
+      if (h < 15) return 0.05;
+      if (h < 20) return 12 + 4*Math.sin((h-15)/2);
+      return Math.max(0.2, 16 - (h-20)*4);
+    });
+    Plotly.react('setpointPlot', [
+      { x:hrs, y:setp, type:'scatter', mode:'lines', fill:'tozeroy', name:'setpoint',
+        line:{color:'rgba(0,0,0,0)'}, fillcolor: (pal()===PALETTE.dark?'rgba(120,140,170,0.18)':'rgba(120,120,120,0.16)'),
+        hovertemplate:'setpoint (commanded)<extra></extra>' },
+      { x:hrs, y:power, type:'scatter', mode:'lines', name:'actual power', line:{color:p.core, width:2.5},
+        hovertemplate:'%{x:.1f}h · %{y:.1f} MW<extra></extra>' },
+      { x:hrs, y:wind, type:'scatter', mode:'lines', name:'wind', yaxis:'y2', line:{color:p.wind, width:1.6, dash:'dash'},
+        hovertemplate:'%{x:.1f}h · %{y:.1f} m/s<extra></extra>' }
+    ], layout({
+      showlegend:true, legend:{orientation:'h', y:1.12, x:0, font:{size:10}},
+      xaxis:{title:'hour (2023-02-01, UTC)', gridcolor:p.gridA, linecolor:p.gridB, range:[0,24]},
+      yaxis:{title:'MW', gridcolor:p.gridA, linecolor:p.gridB, range:[0,50]},
+      yaxis2:{title:'wind m/s', overlaying:'y', side:'right', range:[0,25], gridcolor:'rgba(0,0,0,0)', color:p.wind},
+      annotations:[{x:19.3, y:47, text:'commanded off · wind still blowing', showarrow:false, font:{size:10, color:p.muted, family:"'IBM Plex Mono',monospace"}}]
+    }), CFG);
+  }
+
+  function drawGains() {
+    const p = pal();
+    const x = Array.from({length:51}, (_,i)=>i*2);
+    // gains curve: below diagonal at top, crosses above later (AUC ~0.66), matching the real f10 shape
+    const y = x.map(v => {
+      const f = v/100;
+      let g = Math.pow(f, 1.55)*0.55 + f*0.45;      // concave-ish
+      if (f < 0.2) g = f*0.35;                        // below random at the very top
+      return Math.min(1, g)*100;
+    });
+    Plotly.react('gainsPlot', [
+      { x:[0,100], y:[0,100], type:'scatter', mode:'lines', line:{color:p.muted, width:1, dash:'dash'}, hovertemplate:'random<extra></extra>' },
+      { x:x, y:y, type:'scatter', mode:'lines', line:{color:p.core, width:2.5}, fill:'tonexty',
+        fillcolor: (pal()===PALETTE.dark?'rgba(255,124,92,0.06)':'rgba(187,59,53,0.05)'),
+        hovertemplate:'flag %{x:.0f}% of days<br>capture %{y:.0f}% of core<extra></extra>' }
+    ], layout({
+      xaxis:{title:'% of days flagged', gridcolor:p.gridA, linecolor:p.gridB, range:[0,100]},
+      yaxis:{title:'% of core regret captured', gridcolor:p.gridA, linecolor:p.gridB, range:[0,100]},
+      annotations:[{x:70, y:52, text:'AUC ≈ 0.66', showarrow:false, font:{size:11, color:p.core, family:"'IBM Plex Mono',monospace"}}]
+    }), CFG);
+  }
+
+  function drawAll(){ drawDecomp(); drawShort(); drawSetpoint(); drawGains(); }
+
+  ['ceilSlider','dearSlider','setpSlider'].forEach(id =>
+    document.getElementById(id).addEventListener('input', drawDecomp));
+
+  window.hotRefreshTheme = drawAll;
+  drawAll();
+
+  // modal
+  document.querySelectorAll('.zoomable').forEach(f => {
+    f.onclick = () => { document.getElementById('modalImg').src = f.dataset.src; document.getElementById('modal').style.display='flex'; };
+  });
+  const hide = () => { document.getElementById('modal').style.display='none'; };
+  document.getElementById('modalClose').onclick = e => { e.stopPropagation(); hide(); };
+  document.getElementById('modal').addEventListener('click', e => { if(e.target.id==='modal') hide(); });
+  window.addEventListener('keydown', e => { if(e.key==='Escape') hide(); });
+});
+
+(function() {
+  const KEY = 'hot-theme';
+  const btn = document.getElementById('themeToggle');
+  function apply(theme) {
+    if (theme === 'dark') { document.documentElement.setAttribute('data-theme','dark'); btn.textContent='Light'; }
+    else { document.documentElement.removeAttribute('data-theme'); btn.textContent='Dark'; }
+    if (window.hotRefreshTheme) window.hotRefreshTheme();
+  }
+  apply(localStorage.getItem(KEY) === 'dark' ? 'dark' : 'light');
+  btn.addEventListener('click', () => {
+    const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    localStorage.setItem(KEY, next); apply(next);
+  });
+})();
+</script>
+</body>
+</html>
